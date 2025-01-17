@@ -6,31 +6,28 @@
     </div>
     <div class="content-main">
       <Person
-          @open-modal="openModal(person)"
-          v-for="person in celebrities"
-          :key="person.name"
-          :avatar="person.avatar"
-          :name="person.name"
-          :twitter="person.twitter"
+        v-for="person in celebrities"
+        :key="person.name"
+        :avatar="person.avatar"
+        :name="person.name"
+        :twitter="person.twitter"
+        @open-modal="openModal(person)"
       />
-      <Modal :isOpen="isModalOpen" @close="closeModal">
+      <Modal v-if="selectedPerson" :isOpen="isModalOpen" @close="closeModal">
         <ModalContent :person="selectedPerson" />
       </Modal>
     </div>
   </section>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-
-import Modal from './Modal.vue';
-import ModalContent from "~/components/ModalContent.vue";
+<script setup lang="ts">
 import { celebrities } from '~/consts';
+import type { CelebrityItem } from '~/types';
 
-const isModalOpen = ref(false);
-const selectedPerson = ref(null);
+const isModalOpen = ref<boolean>(false);
+const selectedPerson = ref<CelebrityItem | null>(null);
 
-const openModal = (person) => {
+const openModal = (person: CelebrityItem) => {
   selectedPerson.value = person;
   isModalOpen.value = true;
 };
@@ -41,16 +38,16 @@ const closeModal = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 section.main {
   margin: 37px 88px 0 88px;
-  height: calc(100svh - 41px - 37px - 20px);
 
   .content-header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 1rem;
   }
 
   .content-main {
@@ -77,10 +74,9 @@ section.main {
 
 @media (max-width: 1024px) {
   section.main {
-    margin: 12px 20px 0 20px;
+    margin: 12px 20px 20px 20px;
 
     .content-header {
-      margin-bottom: 1rem;
       flex-direction: column;
       align-items: center;
       gap: 1rem;

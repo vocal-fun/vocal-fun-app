@@ -1,12 +1,12 @@
 <template>
   <section class="header">
     <div class="socials">
-      <a class="social shake-little" href="#" target="_blank" rel="noopener noreferrer">
-        <img src="/img/telegram.png" alt="Telegram" width="24" height="22">
+      <a class="social shake-little" href="https://t.me/vocal_fun_official" target="_blank" rel="noopener noreferrer">
+        <img src="/img/telegram.png" alt="Telegram Logo" width="24" height="22">
         TELEGRAM
       </a>
-      <a class="social shake" href="#" target="_blank" rel="noopener noreferrer">
-        <img src="/img/twitter.png" alt="Twitter" width="23" height="18">
+      <a class="social shake-little" href="https://x.com/vocalfun" target="_blank" rel="noopener noreferrer">
+        <img src="/img/twitter.png" alt="Twitter Logo" width="23" height="18">
         TWITTER
       </a>
     </div>
@@ -24,7 +24,7 @@
   </section>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .header {
   display: flex;
   flex-direction: row;
@@ -70,6 +70,7 @@
   }
 
   .wallet-connect {
+    text-align: center;
     a {
       cursor: pointer;
     }
@@ -80,7 +81,7 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 840px) {
   .header {
     height: auto;
     margin-bottom: 35px;
@@ -97,6 +98,7 @@
       order: 1;
       flex-grow: 1;
       text-align: right;
+      margin-left: 20px;
     }
 
     .logo {
@@ -111,19 +113,26 @@
   }
 }
 
-@media (max-width: 475px) {
-.header {
-  margin-bottom: 25px;
-  .socials {
-    justify-content: center;
-  }
-
-  .logo {
-    margin: 10px 0;
-  }
-  .wallet-connect {
-    text-align: center;
+@media (max-width: 500px) {
+  .header {
+    .wallet-connect {
+      margin-left: 0;
+    }
   }
 }
+
+@media (max-width: 475px) {
+  .header {
+    margin-bottom: 25px;
+    .socials {
+      justify-content: center;
+    }
+    .logo {
+      margin: 10px 0;
+    }
+    .wallet-connect {
+      text-align: center;
+    }
+  }
 }
 </style>

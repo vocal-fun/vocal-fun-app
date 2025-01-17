@@ -1,11 +1,11 @@
 export const meta = {
-  url: 'https://desource-labs.org',
-  domain: 'desource-labs.org',
-  title: 'DeSource Labs — Engineering beyond limits',
-  description: 'DeSource Labs is a software engineering company that specializes in building custom software solutions for businesses and startups.',
-  keywords: 'software engineering, blockchain, web3, telegram mini apps, front-end development, back-end development, ux, user experience, software development, software solutions, software company, software development company, software engineering company, software development services, software development agency, software engineering services, software engineering agency',
+  url: 'https://vocal.fun',
+  domain: 'vocal.fun',
+  title: 'Vocal Fun - Talk to realtime AI agents',
+  description: 'Vocal Fun is a platform that allows you to talk to realtime AI agents. You can ask them anything and they will respond to you in real-time.',
+  keywords: 'vocal, fun, ai, agents, ai agents, talk, realtime, platform, ask, respond, real-time',
   ogImage: `${process.env.NUXT_PUBLIC_BASE_URL || ''}/og.jpg`,
   ogImageWidth: '1200',
   ogImageHeight: '630',
-  x: '@desource-labs',
+  x: '@vocalfun',
 };

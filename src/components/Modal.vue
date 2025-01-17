@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-if="isOpen" class="modal-overlay" @click.self="close" @keydown.esc="close">
+    <div v-if="isOpen" class="modal-overlay" @click.self="close">
       <div class="modal-dialog">
         <div class="modal-content">
           <slot></slot>
@@ -10,17 +10,15 @@
   </transition>
 </template>
 
-<script setup>
-import { defineProps, defineEmits } from 'vue';
-
-const props = defineProps({
-  isOpen: Boolean,
-});
+<script setup lang="ts">
+const props = defineProps<{ isOpen: boolean }>();
 
 const emit = defineEmits(['close']);
 
-const handleKeyDown = (event) => {
-  event.key === 'Escape' && close();
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && props.isOpen) {
+    close();
+  }
 };
 
 onMounted(() => {
@@ -30,17 +28,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeyDown);
 });
-
-watch(
-    () => props.isOpen,
-    (newVal) => {
-      if (newVal) {
-        document.addEventListener('keydown', handleKeyDown);
-      } else {
-        document.removeEventListener('keydown', handleKeyDown);
-      }
-    }
-);
 
 const close = () => {
   emit('close');

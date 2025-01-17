@@ -1,12 +1,12 @@
 <template>
   <div class="person shake-little">
-    <div @click="openModal" class="avatar-block">
+    <div class="avatar-block" @click="openModal">
       <img class="avatar-img" :src="'/img/celebrity-logo/' + avatar" :alt="name">
-      <button class="play-btn shake" />
+      <button class="play-btn shake" :aria-label="`Go to ${name} AI agent`" />
     </div>
     <div class="info">
       <span>{{ name }}</span>
-      <a class="twitter" href="#">
+      <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink">
         <img src="/img/twitter-green.png" alt="Twitter logo">
         <span>{{ twitter }}</span>
       </a>
@@ -14,23 +14,12 @@
   </div>
 </template>
 
-<script setup>
-import { defineProps } from 'vue'
+<script setup lang="ts">
+import type { CelebrityItem } from '~/types';
 
-defineProps({
-  avatar: {
-    type: String,
-    required: true
-  },
-  name: {
-    type: String,
-    required: true
-  },
-  twitter: {
-    type: String,
-    required: true
-  },
-});
+const props = defineProps<CelebrityItem>();
+
+const twitterLink = computed(() => `https://x.com/${props.twitter.startsWith('@') ? props.twitter.slice(1) : props.twitter}`);
 
 const emit = defineEmits(['open-modal']);
 
@@ -39,7 +28,7 @@ const openModal = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .person {
   color: #37D339;
   display: flex;
@@ -51,7 +40,6 @@ const openModal = () => {
       -3px 3px 0 0 #1B1B2A,
       3px 0 0 0 #59596D,
       0 -1.5px 0 0 #000000;
-
 
   .avatar-block {
     cursor: pointer;
@@ -77,6 +65,11 @@ const openModal = () => {
       align-items: center;
       gap: 15px;
       cursor: pointer;
+      span {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
     }
 
     .twitter:hover {

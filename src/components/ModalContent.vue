@@ -24,15 +24,15 @@
   </div>
 </template>
 
-<script setup>
-import {defineProps} from "vue";
+<script setup lang="ts">
+import type { CelebrityItem } from '~/types';
 
-defineProps({
-  person: Object,
-});
+defineProps<{
+  person: CelebrityItem,
+}>();
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .header {
   display: inline-flex;
   gap: 1rem;
@@ -71,5 +71,4 @@ defineProps({
     gap: .5rem;
   }
 }
-
 </style>

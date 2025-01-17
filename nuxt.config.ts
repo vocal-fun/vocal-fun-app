@@ -33,7 +33,6 @@ export default defineNuxtConfig({
       //   },
       // ],
       meta: [
-        // TODO: Uncomment fields below when ready
         {
           name: 'description',
           content: meta.description,
@@ -62,10 +61,10 @@ export default defineNuxtConfig({
           name: 'twitter:card',
           content: 'summary_large_image',
         },
-        // {
-        //   name: 'twitter:site',
-        //   content: meta.x,
-        // },
+        {
+          name: 'twitter:site',
+          content: meta.x,
+        },
         {
           property: 'og:title',
           content: meta.title,

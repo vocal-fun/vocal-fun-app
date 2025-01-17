@@ -5,11 +5,10 @@
       <h1>Error {{ error.statusCode }}<br />
         <span>{{ error.statusMessage }}</span>
       </h1>
-      <Button class="error-button" href="/" @click.prevent="handleError">
+      <button class="error-button" href="/" @click.prevent="handleError">
         Home
-      </Button>
+      </button>
     </section>
-    <Footer />
   </main>
 </template>
 

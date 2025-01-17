@@ -2,42 +2,47 @@
   <div class="equalizer">
     <div v-for="(item, index) in eqData" :key="index" :class="['row', 'row-' + ((index % 7) +1)]">
       <div class="end-bar"></div>
-      <div v-for="blockItemNumber in reversedNumbers(item.quantity)" :class="['block', 'tone-' + blockItemNumber]"></div>
+      <div
+        v-for="blockItemNumber in reversedNumbers(item.quantity)"
+        :key="'tone-' + blockItemNumber"
+        :class="['block', 'tone-' + blockItemNumber]"
+      >
+      </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 
-const reversedNumbers = (number) => {
-  return Array.from({ length: number }, (_, i) => number - i);
+const reversedNumbers = (num: number) => {
+  return Array.from({ length: num }, (_, i) => num - i);
 }
 
 const eqData = [
-  {quantity: 4, delay: 1},
-  {quantity: 6, delay: 1},
-  {quantity: 7, delay: 1},
-  {quantity: 6, delay: 1},
-  {quantity: 1, delay: 1},
-  {quantity: 6, delay: 1},
-  {quantity: 7, delay: 1},
-  {quantity: 1, delay: 1},
-  {quantity: 7, delay: 1},
-  {quantity: 6, delay: 1},
-  {quantity: 7, delay: 1},
-  {quantity: 6, delay: 1},
-  {quantity: 1, delay: 1},
-  {quantity: 6, delay: 1},
-  {quantity: 7, delay: 1},
-  {quantity: 1, delay: 1},
-  {quantity: 4, delay: 1},
-  {quantity: 6, delay: 1},
-  {quantity: 7, delay: 1},
-  {quantity: 6, delay: 1}
+  { quantity: 4, delay: 1 },
+  { quantity: 6, delay: 1 },
+  { quantity: 7, delay: 1 },
+  { quantity: 6, delay: 1 },
+  { quantity: 1, delay: 1 },
+  { quantity: 6, delay: 1 },
+  { quantity: 7, delay: 1 },
+  { quantity: 1, delay: 1 },
+  { quantity: 7, delay: 1 },
+  { quantity: 6, delay: 1 },
+  { quantity: 7, delay: 1 },
+  { quantity: 6, delay: 1 },
+  { quantity: 1, delay: 1 },
+  { quantity: 6, delay: 1 },
+  { quantity: 7, delay: 1 },
+  { quantity: 1, delay: 1 },
+  { quantity: 4, delay: 1 },
+  { quantity: 6, delay: 1 },
+  { quantity: 7, delay: 1 },
+  { quantity: 6, delay: 1 }
 ]
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 @use 'sass:math';
 
 @keyframes changeMargin {
@@ -64,7 +69,6 @@ const eqData = [
     height: 10px;
   }
 }
-
 
 .equalizer {
   display: flex;
