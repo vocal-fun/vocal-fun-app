@@ -1,4 +1,4 @@
-export type SocialMediaKey = 'email' | 'telegram' | 'x' | 'linkedin' | 'github';
+export type SocialMediaKey = 'email' | 'telegram' | 'x' | 'linkedin' | 'github' | 'twitter';
 
 export type SocialMediaItem = {
   type: SocialMediaKey;
@@ -12,6 +12,12 @@ export type TeamMember = {
   title: string;
   desc: string;
   socials: { type: SocialMediaKey; href: string }[];
+};
+
+export type CelebrityItem = {
+  name: string;
+  twitter: string;
+  avatar: string;
 };
 
 export interface VideoEvent extends Event {

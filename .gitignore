@@ -28,6 +28,7 @@ pnpm-debug.log*
 .DS_Store
 .fleet
 .idea
+.yarn/
 
 # Local env files
 .env.local
