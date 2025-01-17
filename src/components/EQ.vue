@@ -1,74 +1,177 @@
 <template>
-  <div class="winamp-equalizer">
-    <div class="winamp-band" v-for="(freq, index) in frequencies" :key="index">
-      <input type="range" class="winamp-slider" min="-12" max="12" v-model="values[index]" />
-      <label>{{ freq }} Hz</label>
+  <div class="equalizer">
+    <div v-for="(item, index) in eqData" :key="index" :class="['row', 'row-' + ((index % 7) +1)]">
+      <div class="end-bar"></div>
+      <div v-for="blockItemNumber in reversedNumbers(item.quantity)" :class="['block', 'tone-' + blockItemNumber]"></div>
     </div>
   </div>
 </template>
 
 <script setup>
-const frequencies = [60, 170, 310, 600, 1000, 3000, 6000, 12000]; // Frequency bands
-const values = ref(Array(frequencies.length).fill(0)); // Equalizer values for each band
+
+const reversedNumbers = (number) => {
+  return Array.from({ length: number }, (_, i) => number - i);
+}
+
+const eqData = [
+  {quantity: 4, delay: 1},
+  {quantity: 6, delay: 1},
+  {quantity: 7, delay: 1},
+  {quantity: 6, delay: 1},
+  {quantity: 1, delay: 1},
+  {quantity: 6, delay: 1},
+  {quantity: 7, delay: 1},
+  {quantity: 1, delay: 1},
+  {quantity: 7, delay: 1},
+  {quantity: 6, delay: 1},
+  {quantity: 7, delay: 1},
+  {quantity: 6, delay: 1},
+  {quantity: 1, delay: 1},
+  {quantity: 6, delay: 1},
+  {quantity: 7, delay: 1},
+  {quantity: 1, delay: 1},
+  {quantity: 4, delay: 1},
+  {quantity: 6, delay: 1},
+  {quantity: 7, delay: 1},
+  {quantity: 6, delay: 1}
+]
 </script>
 
 <style scoped>
-.winamp-equalizer {
-  display: flex;
-  gap: 8px;
-  padding: 20px;
-  background: linear-gradient(45deg, #1a1a1a, #444, #1a1a1a);
-  border: 4px solid #00ff00;
-  box-shadow: 0 0 15px #00ff00;
-  border-radius: 10px;
-  width: fit-content;
-  font-family: 'Press Start 2P', monospace; /* Pixel-style font */
+@use 'sass:math';
+
+@keyframes changeMargin {
+  0% {
+    margin-bottom: math.random(20)+px;
+  }
+  50% {
+    margin-bottom: math.random(20)+px;
+  }
+  100% {
+    margin-bottom: math.random(20)+px;
+  }
 }
 
-.winamp-band {
+@keyframes changeHeight {
+  0% {
+    height: 10px;
+  }
+  50% {
+    height: 25px;
+  }
+
+  100% {
+    height: 10px;
+  }
+}
+
+
+.equalizer {
+  display: flex;
+  gap: 10px;
+}
+
+.row {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 50px;
-  gap: 8px;
+  justify-content: flex-end;
 }
 
-.winamp-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 180px;
-  background: transparent;
-  transform: rotate(-90deg);
-  margin: 0;
-  border: 2px solid #00ff00;
-  border-radius: 4px;
-  box-shadow: inset 0 0 10px #00ff00, 0 0 5px #ff00ff;
+.block {
+  height: 10px;
+  width: 12px;
 }
 
-.winamp-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00);
-  border: 2px solid #000;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #ff00ff, 0 0 5px #00ffff;
-  cursor: pointer;
+.row-1 {
+  .block {
+    animation: changeHeight .8s infinite ease-in-out;
+    animation-delay: .4s;
+  }
 }
 
-.winamp-slider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 6px;
-  background: linear-gradient(to bottom, #ff00ff, #00ff00, #00ffff);
-  border-radius: 3px;
-  box-shadow: 0 0 10px #ff00ff, inset 0 0 5px #00ff00;
+.row-2 {
+  .block {
+    animation: changeHeight .6s infinite ease-in-out;
+    animation-delay: .6s;
+  }
 }
 
-label {
-  color: #00ff00;
-  text-shadow: 0 0 5px #00ff00, 0 0 10px #ff00ff;
-  font-size: 12px;
+.row-3 {
+  .block {
+    animation: changeHeight .6s infinite ease-in-out;
+    animation-delay: .5s;
+  }
 }
+
+.row-4 {
+  .block {
+    animation: changeHeight .7s infinite ease-in-out;
+    animation-delay: .5s;
+  }
+}
+
+.row-5 {
+  .block {
+    animation: changeHeight .6s infinite ease-in-out;
+    animation-delay: .2s;
+  }
+}
+
+.row-6 {
+  .block {
+    animation: changeHeight .9s infinite ease-in-out;
+    animation-delay: .2s;
+  }
+}
+
+.tone-1 {
+  background: #197e0c;
+}
+
+.tone-2 {
+  background: #278f0a;
+}
+
+.tone-3 {
+  background: #37d339;
+}
+
+.tone-4 {
+  background: #8bdd29;
+}
+
+.tone-5 {
+  background: #bade39;
+}
+
+.tone-6 {
+  background: #cab836;
+}
+
+.tone-7 {
+  background: #ca9836;
+}
+
+.end-bar {
+  background: #99989d;
+  margin-bottom: 10px;
+  height: 7px;
+  width: 12px;
+
+  animation: changeMargin .5s infinite ease-in-out;
+  animation-delay: 1s;
+}
+
+@media (max-width: 500px) {
+  .row:nth-child(-n+5) {
+    display: none;
+  }
+}
+
+@media (max-width: 390px) {
+  .row:nth-child(-n+7) {
+    display: none;
+  }
+}
+
 </style>

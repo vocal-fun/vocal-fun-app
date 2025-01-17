@@ -117,6 +117,14 @@ const openModal = () => {
 @media (max-width: 540px) {
   .person {
     width: 90%;
+
+    .avatar-block {
+      width: 100%;
+
+      img {
+        width: 100%;
+      }
+    }
   }
 }
 </style>

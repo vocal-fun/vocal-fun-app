@@ -14,7 +14,7 @@
     <div class="logo">
       <img class="logo-bar-element" src="/img/top-bar-element.png" alt="">
       <img class="shake-little shake-constant" src="/logo/logo.png" alt="Logo" width="24" height="24" >
-      vocal.fm
+      vocal.fun
       <img class="logo-bar-element" src="/img/top-bar-element.png" alt="">
     </div>
 

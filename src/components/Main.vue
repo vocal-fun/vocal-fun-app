@@ -2,7 +2,7 @@
   <section class="main">
     <div class="content-header">
       <h2>Talk to realtime AI agents</h2>
-      <div class="equalizer">Equalizer</div>
+      <EQ />
     </div>
     <div class="content-main">
       <Person
@@ -70,9 +70,8 @@ section.main {
   }
 
   .equalizer {
-    height: 100px;
-    width: 400px;
-    border: 1px red dashed;
+    height: 120px;
+    width: 500px;
   }
 }
 
@@ -92,6 +91,8 @@ section.main {
 
       .equalizer {
         width: 100%;
+        display: flex;
+        justify-content: center;
       }
     }
   }
@@ -99,6 +100,9 @@ section.main {
 
 @media (max-width: 500px) {
   section.main {
+    .equalizer {
+      height: 80px;
+    }
     .content-main {
       padding: 12px;
     }
