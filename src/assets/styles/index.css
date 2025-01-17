@@ -3,4 +3,7 @@
 @import './common.css';
 @import './typography.css';
 @import './animations.css';
+@import './shake/csshake-default.css';
+@import './shake/csshake-slow.css';
+@import './shake/csshake-little.css';
 @import './../fonts/index.css';

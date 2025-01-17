@@ -75,4 +75,33 @@ section.main {
     border: 1px red dashed;
   }
 }
+
+@media (max-width: 1024px) {
+  section.main {
+    margin: 12px 20px 0 20px;
+
+    .content-header {
+      margin-bottom: 1rem;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      h2 {
+        text-align: center;
+      }
+
+      .equalizer {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  section.main {
+    .content-main {
+      padding: 12px;
+    }
+  }
+}
 </style>

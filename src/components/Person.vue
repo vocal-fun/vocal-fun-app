@@ -1,8 +1,8 @@
 <template>
-  <div class="person">
+  <div class="person shake-little">
     <div @click="openModal" class="avatar-block">
       <img class="avatar-img" :src="'/img/celebrity-logo/' + avatar" :alt="name">
-      <img class="play-btn" src="/img/play-btn.png" alt="Play button">
+      <button class="play-btn shake" />
     </div>
     <div class="info">
       <span>{{ name }}</span>
@@ -60,6 +60,9 @@ const openModal = () => {
       bottom: 0;
       right: 0;
       position: absolute;
+      background: url("/img/play-btn.png") no-repeat;
+      height: 66px;
+      width: 85px;
     }
   }
 
@@ -87,5 +90,33 @@ const openModal = () => {
 .person:hover {
   transform: scale(1.035);
   z-index: 99;
+}
+
+@media (max-width: 680px) {
+  .person {
+    flex-direction: column;
+    width: 70%;
+    align-items: center;
+
+    .info {
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .avatar-block {
+      button.play-btn {
+        height: 40px;
+        width: 51px;
+        background-size: 100% 100%;
+        background-position: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 540px) {
+  .person {
+    width: 90%;
+  }
 }
 </style>
