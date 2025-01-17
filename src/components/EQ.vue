@@ -84,6 +84,7 @@ const eqData = [
 .block {
   height: 10px;
   width: 12px;
+  will-change: height;
 }
 
 .row-1 {
@@ -161,7 +162,7 @@ const eqData = [
   margin-bottom: 10px;
   height: 7px;
   width: 12px;
-
+  will-change: margin-bottom;
   animation: changeMargin .5s infinite ease-in-out;
   animation-delay: 1s;
 }
