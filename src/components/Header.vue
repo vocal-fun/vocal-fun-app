@@ -30,7 +30,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin: 20px;
+  margin: 1.25em;
   height: 41px;
 
   .logo {
@@ -59,12 +59,12 @@
                   3px 3px 0 0 #EFFFFF inset,
                   1.5px 1.5px 0 0 #ADB5C6 inset,
                   -1.5px -1.5px 0 0 #4A5A6B inset;
-      padding: 6px;
+      padding: .375rem;
       color: #2E3F4B;
       background: #BDCED6;
 
       img {
-        margin-right: 5px;
+        margin-right: .1875rem;
       }
     }
   }
@@ -85,7 +85,7 @@
 @media (max-width: 840px) {
   .header {
     height: auto;
-    margin-bottom: 35px;
+    margin-bottom: 2.1875rem;
     gap: 10px;
     flex-wrap: wrap;
     justify-content: center;
@@ -99,7 +99,7 @@
       order: 1;
       flex-grow: 1;
       text-align: right;
-      margin-left: 20px;
+      margin-left: 1.25rem;
     }
 
     .logo {
@@ -124,12 +124,12 @@
 
 @media (max-width: 475px) {
   .header {
-    margin-bottom: 25px;
+    margin-bottom: 1.56rem;
     .socials {
       justify-content: center;
     }
     .logo {
-      margin: 10px 0;
+      margin: .625rem 0;
     }
     .wallet-connect {
       text-align: center;

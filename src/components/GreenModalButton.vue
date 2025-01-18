@@ -23,7 +23,6 @@ defineProps<{
   display: inline-flex;
   align-items: center;
   gap: .5rem;
-  min-width: 128px;
   transition: color 0.3s ease-in-out;
   > span {
     display: inline-flex;
@@ -38,7 +37,7 @@ defineProps<{
       &.call {
         height: 14px;
         width: 12px;
-        margin-top: 3px;
+        margin-top: .1875rem;
       }
     }
   }

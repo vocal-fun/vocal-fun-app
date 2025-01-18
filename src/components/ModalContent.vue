@@ -9,27 +9,82 @@
     </button>
   </div>
   <div class="content">
-    <div class="avatar">
-      <img :src="imagePath" alt="Selected AI Celebrity Avatar">
-    </div>
-    <div class="name">{{ person.displayName }}</div>
-    <div class="price">10 $vocal/min</div>
+
+    <template v-if="idleOrError">
+      <div class="avatar">
+        <img :src="imagePath" alt="Selected AI Celebrity Avatar">
+      </div>
+      <div class="name">{{ person.displayName }}</div>
+      <div class="price">10 $vocal/min</div>
+      <div v-if="callStatus === 'error'" class="error alert-color">some error happened</div>
+    </template>
+
+    <template v-if="callingOrOnCall">
+      <div class="calling-dialog">
+        <div class="person">
+          <img class="dialog-avatar" :src="imagePath" alt="Selected AI Celebrity Avatar">
+          <div class="name">{{ person.displayName }}</div>
+        </div>
+
+        <img class="call-icon" src="/img/call-icon.png" alt="Call Icon" height="30" width="30">
+
+        <div class="user-info">
+          <img class="dialog-avatar" src="/img/user-avatar.png" alt="Your avatar">
+          <div class="name">You</div>
+        </div>
+      </div>
+    </template>
   </div>
-  <div class="footer">
-    <GreenModalButton text="Call" icon="call" @click="call" />
-    <GreenModalButton v-if="audio" text="Stop" icon="stop" @click="stopAudio" />
-    <GreenModalButton v-else text="Preview" icon="play" @click="playAudio" />
+  <div :class="['footer', callingOrOnCall ? 'footer-on-call' : '']">
+    <template v-if="idleOrError">
+      <GreenModalButton text="Call" icon="call" @click="call" />
+      <GreenModalButton v-if="audio" text="Stop" icon="stop" @click="stopAudio" />
+      <GreenModalButton v-else text="Preview" icon="play" @click="playAudio" />
+    </template>
+
+    <template v-if="callingOrOnCall">
+      <GreenModalButton />
+      <span class="time-on-call">{{ timerText }}</span>
+      <span>&#183;</span>
+      <span v-if="calling">calling <LoadingDots /></span>
+      <button
+          v-if="onCall"
+          @click="hangUp"
+          class="hang-up-button alert-color"
+      >
+        hang up
+      </button>
+<!--      <div style="width: 45px"></div>-->
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import type { CelebrityItem } from '~/types';
+
+defineEmits(['close']);
 
 const props = defineProps<{
   person: CelebrityItem,
 }>();
 
+type callStatusType = 'calling' | 'error' | 'idle' | 'on-call';
+
+let seconds = 0;
+let timer: ReturnType<typeof setInterval> | null = null;
+
 const audio = ref<HTMLAudioElement | null>(null);
+const callStatus = ref<callStatusType>('idle');
+const timerText = ref<string>('0:00');
+
+const idle = computed(() => callStatus.value === 'idle');
+const calling = computed(() => callStatus.value === 'calling');
+const error = computed(() => callStatus.value === 'error');
+const onCall = computed(() => callStatus.value === 'on-call');
+
+const idleOrError = computed(() => idle.value || error.value);
+const callingOrOnCall = computed(() => calling.value || onCall.value);
 
 const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${props.person.imgFormat || 'png'}`);
 const audioPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
@@ -56,9 +111,35 @@ const stopAudio = () => {
 };
 
 const call = () => {
-  console.log('Calling', props.person.displayName);
-  // TODO: Implement calling logic & add missing views here
+  callStatus.value = 'calling';
 };
+
+const hangUp = () => {
+  callStatus.value = 'idle';
+  console.log('timer.value', timer)
+  timer && clearInterval(timer);
+  timerText.value = '0:00';
+}
+
+const updateTimerDisplay = () => {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  timerText.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// for demo purposes
+watch(callStatus, (newStatus) => {
+  if (newStatus === 'calling') {
+    setTimeout(() => {
+      callStatus.value = 'on-call';
+      timer = setInterval(() => {
+        seconds++;
+        updateTimerDisplay();
+      }, 1000);
+    }, 3500);
+  }
+});
+
 </script>
 
 <style scoped lang="scss">
@@ -93,10 +174,10 @@ const call = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .6rem;
+  gap: 2rem;
 
   .avatar {
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem;
     img {
       height: 175px;
     }
@@ -105,10 +186,46 @@ const call = () => {
   .name {
     text-transform: uppercase;
   }
+
+  .error {
+    margin-top: 1.25rem;
+  }
+}
+
+.calling-dialog {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+
+  .dialog-avatar {
+    height: 175px;
+  }
+
+  .person, .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
 }
 
 .footer {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
+
+  .hang-up-button:hover {
+    border-bottom: 1px solid #FA6400;
+    transform: scale(1.1);
+  }
+}
+
+.footer-on-call {
+  width: 240px;
+}
+
+.alert-color {
+  color: #FA6400;
+  text-shadow: 0 0 6.09px 0 #FA6400,
+  0 0.55px 6.65px 0 #FA6400;
 }
 </style>

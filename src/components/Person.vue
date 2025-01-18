@@ -1,7 +1,7 @@
 <template>
   <div class="person shake-little" @click="openModal">
     <div class="avatar-block">
-      <img class="avatar-img" :src="avatarPath" :alt="displayName">
+      <NuxtImg class="avatar-img" :src='avatarPath' :alt="displayName" width="100%"/>
       <button class="play-btn shake" :aria-label="`Go to ${displayName} AI agent`" />
     </div>
     <div class="info">
@@ -34,7 +34,7 @@ const openModal = () => {
   cursor: pointer;
   color: #37D339;
   display: flex;
-  width: 520px;
+  width: 430px;
   transition: transform 0.3s ease-in-out;
   box-shadow:
       3px 3px 0 0 #59596D,
@@ -45,6 +45,7 @@ const openModal = () => {
 
   .avatar-block {
     position: relative;
+    width: 200px;
     .play-btn {
       bottom: 0;
       right: 0;
@@ -53,13 +54,18 @@ const openModal = () => {
       height: 66px;
       width: 85px;
     }
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .info {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 16px;
+    padding: 1rem;
 
     .twitter {
       display: inline-flex;
