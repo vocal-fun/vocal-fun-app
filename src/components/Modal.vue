@@ -84,6 +84,16 @@ const close = () => {
   cursor: pointer;
 }
 
+@media (max-width: 550px) {
+  .modal-dialog {
+    height: 100svh;
+
+    .modal-content {
+      padding-bottom: 25svh;
+    }
+  }
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity .3s ease;
