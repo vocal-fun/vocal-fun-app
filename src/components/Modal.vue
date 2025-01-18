@@ -30,6 +30,7 @@ onBeforeUnmount(() => {
 });
 
 const close = () => {
+  //TODO: call onModalClose function from ModalContent component here
   emit('close');
 };
 </script>

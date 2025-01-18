@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <button class="close" @click="$emit('close')">X</button>
+    <button class="close" @click="onModalClose">X</button>
   </div>
   <div class="info">
     <div class="balance">YOUR VOCAL: 0.18</div>
@@ -26,7 +26,13 @@
           <div class="name">{{ person.displayName }}</div>
         </div>
 
-        <img class="call-icon" src="/img/call-icon.png" alt="Call Icon" height="30" width="30">
+        <img
+            :class="['call-icon', calling ? 'shake shake-constant' : '']"
+            src="/img/call-icon.png"
+            alt="Call Icon"
+            height="30"
+            width="30"
+        >
 
         <div class="user-info">
           <img class="dialog-avatar" src="/img/user-avatar.png" alt="Your avatar">
@@ -54,7 +60,6 @@
       >
         hang up
       </button>
-<!--      <div style="width: 45px"></div>-->
     </template>
   </div>
 </template>
@@ -63,7 +68,7 @@
 import { computed } from "vue";
 import type { CelebrityItem } from '~/types';
 
-defineEmits(['close']);
+const emit = defineEmits(['close']);
 
 const props = defineProps<{
   person: CelebrityItem,
@@ -90,6 +95,7 @@ const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${pro
 const audioPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
 
 const playAudio = async () => {
+
   try {
     stopAudio();
     audio.value = new Audio(audioPath.value);
@@ -110,13 +116,20 @@ const stopAudio = () => {
   }
 };
 
+// TODO: function to be called in parent component
+const onModalClose = () => {
+  emit('close');
+  stopAudio();
+  hangUp()
+}
+
+
 const call = () => {
   callStatus.value = 'calling';
 };
 
 const hangUp = () => {
   callStatus.value = 'idle';
-  console.log('timer.value', timer)
   timer && clearInterval(timer);
   timerText.value = '0:00';
 }
