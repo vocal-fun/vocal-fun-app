@@ -1,0 +1,10 @@
+:root {
+  --color-primary: #37D339;
+  --background: linear-gradient(180.47deg, #151521 22.14%, #302E4B 53.56%, #31304D 89.47%, #1B1B2B 113.03%);;
+  --xs: 320px;
+  --sm: 640px;
+  --md: 768px;
+  --lg: 1024px;
+  --xl: 1280px;
+  --xxl: 1536px;
+}
