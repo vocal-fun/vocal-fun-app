@@ -2,60 +2,60 @@ import type { CelebrityItem } from './types';
 
 export const celebrities: CelebrityItem[] = [
   {
-    name: 'Trump joker',
+    displayName: 'Trump joker',
     twitter: '@trumpjoker_bot',
-    avatar: 'trump-joker.png'
+    name: 'trump-joker'
   },
   {
-    name: 'Vitaly',
+    displayName: 'Vitaly',
     twitter: '@vitaly_bot',
-    avatar: 'buterin.png'
+    name: 'buterin'
   },
   {
-    name: 'Jailed CZ',
+    displayName: 'Jailed CZ',
     twitter: '@jailedcz_bot',
-    avatar: 'cz-jailed.png'
+    name: 'cz-jailed'
   },
   {
-    name: 'Jeethotline',
+    displayName: 'Jeethotline',
     twitter: '@jeethotline_bot',
-    avatar: 'jeethotline.png'
+    name: 'jeethotline'
   },{
-    name: 'Mao',
+    displayName: 'Mao',
     twitter: '@mao_bot',
-    avatar: 'mao.png'
+    name: 'mao'
   },
   {
-    name: 'Putin',
+    displayName: 'Putin',
     twitter: '@putin_bot',
-    avatar: 'putin.png'
+    name: 'putin'
   },
   {
-    name: 'Dokwon',
+    displayName: 'Dokwon',
     twitter: '@dokwon_bot',
-    avatar: 'do-kwon.png'
+    name: 'do-kwon'
   },{
-    name: 'luffy D monkey',
+    displayName: 'luffy D monkey',
     twitter: '@luffydmonkey_bot',
-    avatar: 'luffy-d.png'
+    name: 'luffy-d'
   },
   {
-    name: 'tronman3000',
+    displayName: 'tronman3000',
     twitter: '@tronman_bot',
-    avatar: 'justin-sun.png'
+    name: 'justin-sun'
   },{
-    name: 'elonmusk',
+    displayName: 'elonmusk',
     twitter: '@dokwon_bot',
-    avatar: 'elon.png'
+    name: 'elon'
   },
   {
-    name: 'sbf',
+    displayName: 'sbf',
     twitter: '@luffydmonkey_bot',
-    avatar: 'banks.png'
+    name: 'banks'
   },
   {
-    name: 'coinbald',
+    displayName: 'coinbald',
     twitter: '@tronman_bot',
-    avatar: 'coinbald.png'
+    name: 'coinbald'
   }
 ];

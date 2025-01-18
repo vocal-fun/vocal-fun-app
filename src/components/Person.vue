@@ -1,12 +1,12 @@
 <template>
-  <div class="person shake-little">
-    <div class="avatar-block" @click="openModal">
-      <img class="avatar-img" :src="'/img/celebrity-logo/' + avatar" :alt="name">
-      <button class="play-btn shake" :aria-label="`Go to ${name} AI agent`" />
+  <div class="person shake-little" @click="openModal">
+    <div class="avatar-block">
+      <img class="avatar-img" :src="avatarPath" :alt="displayName">
+      <button class="play-btn shake" :aria-label="`Go to ${displayName} AI agent`" />
     </div>
     <div class="info">
-      <span>{{ name }}</span>
-      <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink">
+      <span>{{ displayName }}</span>
+      <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink" @click.stop>
         <img src="/img/twitter-green.png" alt="Twitter logo">
         <span>{{ twitter }}</span>
       </a>
@@ -17,8 +17,9 @@
 <script setup lang="ts">
 import type { CelebrityItem } from '~/types';
 
-const props = defineProps<CelebrityItem>();
+const props = defineProps<Omit<CelebrityItem, 'audioFormat'>>();
 
+const avatarPath = computed(() => `/img/celebrity-logo/${props.name}.${props.imgFormat || 'png'}`);
 const twitterLink = computed(() => `https://x.com/${props.twitter.startsWith('@') ? props.twitter.slice(1) : props.twitter}`);
 
 const emit = defineEmits(['open-modal']);
@@ -30,6 +31,7 @@ const openModal = () => {
 
 <style scoped lang="scss">
 .person {
+  cursor: pointer;
   color: #37D339;
   display: flex;
   width: 520px;
@@ -42,7 +44,6 @@ const openModal = () => {
       0 -1.5px 0 0 #000000;
 
   .avatar-block {
-    cursor: pointer;
     position: relative;
     .play-btn {
       bottom: 0;

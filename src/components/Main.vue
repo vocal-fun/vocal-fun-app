@@ -8,13 +8,14 @@
       <Person
         v-for="person in celebrities"
         :key="person.name"
-        :avatar="person.avatar"
         :name="person.name"
+        :display-name="person.displayName"
         :twitter="person.twitter"
+        :img-format="person.imgFormat"
         @open-modal="openModal(person)"
       />
       <Modal v-if="selectedPerson" :isOpen="isModalOpen" @close="closeModal">
-        <ModalContent :person="selectedPerson" />
+        <ModalContent :person="selectedPerson" @close="closeModal" />
       </Modal>
     </div>
   </section>

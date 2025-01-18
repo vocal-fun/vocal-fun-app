@@ -73,6 +73,7 @@
     text-align: center;
     a {
       cursor: pointer;
+      transition: color 0.3s ease-in-out;
     }
     a:hover {
       text-decoration: underline;

@@ -1,6 +1,6 @@
 <template>
-  <transition name="fade">
-    <div v-if="isOpen" class="modal-overlay" @click.self="close">
+  <transition v-show="isOpen" name="fade-enter">
+    <div class="modal-overlay" @click.self="close">
       <div class="modal-dialog">
         <div class="modal-content">
           <slot></slot>
@@ -11,6 +11,7 @@
 </template>
 
 <script setup lang="ts">
+// TODO: fix transition, it doesn't work
 const props = defineProps<{ isOpen: boolean }>();
 
 const emit = defineEmits(['close']);
@@ -55,6 +56,7 @@ const close = () => {
 }
 
 .modal-dialog {
+  /* TODO: Full size dialog for mobile view */
   background: black;
   padding: 20px;
   border-radius: 8px;
