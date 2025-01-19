@@ -56,7 +56,8 @@ const openModal = () => {
     }
 
     img {
-      width: 100%;
+      width: 200px;
+      max-width: none;
       height: 100%;
     }
   }
@@ -66,6 +67,7 @@ const openModal = () => {
     flex-direction: column;
     justify-content: space-between;
     padding: 1rem;
+    width: 230px;
 
     .twitter {
       display: inline-flex;

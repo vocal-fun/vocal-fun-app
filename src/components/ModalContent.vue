@@ -65,7 +65,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import type { CelebrityItem } from '~/types';
 
 const emit = defineEmits(['close']);
@@ -233,7 +232,11 @@ watch(callStatus, (newStatus) => {
 }
 
 .footer-on-call {
-  width: 240px;
+  width: 250px;
+}
+
+.time-on-call {
+  width: 52px;
 }
 
 .alert-color {
