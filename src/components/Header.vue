@@ -1,11 +1,11 @@
 <template>
   <section class="header">
     <div class="socials">
-      <a class="social shake-little" href="https://t.me/vocal_fun_official" target="_blank" rel="noopener noreferrer">
+      <a v-play-click-sound class="social shake-little" href="https://t.me/vocal_fun_official" target="_blank" rel="noopener noreferrer">
         <img src="/img/telegram.png" alt="Telegram Logo" width="24" height="22">
         TELEGRAM
       </a>
-      <a class="social shake-little" href="https://x.com/vocalfun" target="_blank" rel="noopener noreferrer">
+      <a v-play-click-sound class="social shake-little" href="https://x.com/vocalfun" target="_blank" rel="noopener noreferrer">
         <img src="/img/twitter.png" alt="Twitter Logo" width="23" height="18">
         TWITTER
       </a>
@@ -19,7 +19,7 @@
     </div>
 
     <div class="wallet-connect">
-      <a href="#">connect wallet</a>
+      <a v-play-click-sound href="#">connect wallet</a>
     </div>
   </section>
 </template>

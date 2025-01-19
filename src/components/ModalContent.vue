@@ -1,10 +1,10 @@
 <template>
   <div class="header">
-    <button class="close" @click="onModalClose">X</button>
+    <button v-play-click-sound class="close" @click="onModalClose">X</button>
   </div>
   <div class="info">
     <div class="balance">YOUR VOCAL: 0.18</div>
-    <button class="buy-more">
+    <button v-play-click-sound class="buy-more">
       BUY MORE
     </button>
   </div>
@@ -40,9 +40,9 @@
   </div>
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : '']">
     <template v-if="idleOrError">
-      <GreenModalButton icon="call" @click="call">Call</GreenModalButton>
-      <GreenModalButton v-if="audio" icon="stop" @click="stopAudio">Stop</GreenModalButton>
-      <GreenModalButton v-else icon="play" @click="playAudio(previewPath)">Preview</GreenModalButton>
+      <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
+      <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
+      <GreenModalButton v-else icon="play" @click="playPreview">Preview</GreenModalButton>
     </template>
 
     <template v-if="callingOrOnCall">
@@ -52,9 +52,9 @@
       <span>&#183;</span>
       <span v-if="calling">calling <LoadingDots /></span>
       <button
-          v-if="onCall"
-          @click="hangUp"
-          class="hang-up-button alert-color"
+        v-if="onCall"
+        class="hang-up-button alert-color"
+        @click="hangUpWithClickSound"
       >
         hang up
       </button>
@@ -63,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+import { playClickSound } from '~/services/audio';
 import type { CelebrityItem } from '~/types';
 
 const emit = defineEmits(['close']);
@@ -75,6 +76,7 @@ type callStatusType = 'calling' | 'error' | 'idle' | 'on-call';
 
 let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
+let cancelCall: (() => void) | null = null;
 
 const audio = ref<HTMLAudioElement | null>(null);
 const callStatus = ref<callStatusType>('idle');
@@ -90,6 +92,7 @@ const callingOrOnCall = computed(() => calling.value || onCall.value);
 
 const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${props.person.imgFormat || 'png'}`);
 const previewPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
+const callingPath = '/audio/calling.mp3';
 
 const playAudio = async (path: string) => {
   try {
@@ -112,10 +115,8 @@ const stopAudio = () => {
   }
 };
 
-// TODO: function to be called in parent component
 const onModalClose = () => {
   emit('close');
-  stopAudio();
   hangUp();
 }
 
@@ -129,20 +130,72 @@ const resetTimer = () => {
 }
 
 const call = async () => {
+  const controller = new AbortController(); // Create an AbortController
+  const signal = controller.signal; // Get the signal
+
+  // Handle cleanup in case of cancellation
+  const cancelCall = () => {
+    controller.abort(); // Abort the call when needed
+  };
+
+  await playClickSound();
   callStatus.value = 'calling';
-  // for demo purposes
-  await new Promise((resolve) => setTimeout(resolve, 3_500));
-  callStatus.value = 'on-call';
-  resetTimer();
-  timer = setInterval(() => {
-    seconds++;
-    updateTimerDisplay();
-  }, 1000);
+
+  // For demo purposes: Play the calling audio
+  playAudio(callingPath);
+
+  // Add the abort signal to your Promise
+  new Promise<void>((resolve, reject) => {
+    const timeoutId = setTimeout(() => resolve(), 9_000); // Simulate a delay of 9 seconds
+    // Check if the operation should be aborted
+    signal.addEventListener('abort', () => {
+      clearTimeout(timeoutId); // Clear the timeout if aborted
+      reject(new Error('Call was cancelled')); // Reject with an error
+    });
+  }).then(() => {
+    callStatus.value = 'on-call';
+    resetTimer();
+    console.info(`[VOCAL.FUN] Call with ${props.person.name} started`);
+    timer = setInterval(() => {
+      seconds++;
+      updateTimerDisplay();
+    }, 1_000);
+  }).catch((error) => {
+    if ((error as Error).message === 'Call was cancelled') {
+      console.log('Call was cancelled before completion');
+    } else {
+      callStatus.value = 'error';
+      console.warn('[VOCAL.FUN] Error during call:', error);
+    }
+  });
+
+  return cancelCall; // Return the cancel function for later use
 };
 
+const startCall = async () => {
+  cancelCall = await call();
+}
+
 const hangUp = () => {
+  stopAudio();
+  cancelCall?.();
   callStatus.value = 'idle';
   resetTimer();
+}
+
+const hangUpWithClickSound = () => {
+  playClickSound();
+  hangUp();
+}
+
+const playPreview = async () => {
+  await playClickSound();
+  playAudio(previewPath.value);
+}
+
+const stopPreview = async () => {
+  await playClickSound();
+  stopAudio();
 }
 
 const updateTimerDisplay = () => {
@@ -150,6 +203,10 @@ const updateTimerDisplay = () => {
   const secs = seconds % 60;
   timerText.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
+
+defineExpose({
+  hangUp,
+});
 </script>
 
 <style scoped lang="scss">

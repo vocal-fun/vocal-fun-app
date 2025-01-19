@@ -15,7 +15,7 @@
         @open-modal="openModal(person)"
       />
       <Modal :isOpen="isModalOpen" @close="closeModal">
-        <ModalContent :person="selectedPerson" @close="closeModal" />
+        <ModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
       </Modal>
     </div>
   </section>
@@ -24,6 +24,8 @@
 <script setup lang="ts">
 import { celebrities } from '~/consts';
 import type { CelebrityItem } from '~/types';
+
+const modalContent = useTemplateRef('modalContent');
 
 const emptyPerson: CelebrityItem = {
   name: '',
@@ -40,6 +42,7 @@ const openModal = (person: CelebrityItem) => {
 
 const closeModal = () => {
   isModalOpen.value = false;
+  modalContent.value?.hangUp();
 };
 </script>
 

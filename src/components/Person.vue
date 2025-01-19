@@ -6,7 +6,7 @@
     </div>
     <div class="info">
       <span>{{ displayName }}</span>
-      <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink" @click.stop>
+      <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink" @click.stop="playClickSound">
         <img src="/img/twitter-green.png" alt="Twitter logo">
         <span>{{ twitter }}</span>
       </a>
@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { playClickSound } from '~/services/audio';
 import type { CelebrityItem } from '~/types';
 
 const props = defineProps<Omit<CelebrityItem, 'audioFormat'>>();
@@ -25,6 +26,7 @@ const twitterLink = computed(() => `https://x.com/${props.twitter.startsWith('@'
 const emit = defineEmits(['open-modal']);
 
 const openModal = () => {
+  playClickSound();
   emit('open-modal');
 };
 </script>
