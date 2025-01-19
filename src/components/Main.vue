@@ -14,9 +14,9 @@
         :img-format="person.imgFormat"
         @open-modal="openModal(person)"
       />
-        <Modal :isOpen="isModalOpen" @close="closeModal">
-          <ModalContent :person="selectedPerson" @close="closeModal" />
-        </Modal>
+      <Modal :isOpen="isModalOpen" @close="closeModal">
+        <ModalContent :person="selectedPerson" @close="closeModal" />
+      </Modal>
     </div>
   </section>
 </template>
@@ -31,7 +31,7 @@ const emptyPerson: CelebrityItem = {
   twitter: '',
 };
 const isModalOpen = ref<boolean>(false);
-const selectedPerson = ref<CelebrityItem | null>(emptyPerson);
+const selectedPerson = ref<CelebrityItem>(emptyPerson);
 
 const openModal = (person: CelebrityItem) => {
   selectedPerson.value = person;
