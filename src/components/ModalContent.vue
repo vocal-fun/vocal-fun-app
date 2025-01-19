@@ -43,14 +43,15 @@
   </div>
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : '']">
     <template v-if="idleOrError">
-      <GreenModalButton text="Call" icon="call" @click="call" />
-      <GreenModalButton v-if="audio" text="Stop" icon="stop" @click="stopAudio" />
-      <GreenModalButton v-else text="Preview" icon="play" @click="playAudio" />
+      <GreenModalButton icon="call" @click="call">Call</GreenModalButton>
+      <GreenModalButton v-if="audio" icon="stop" @click="stopAudio">Stop</GreenModalButton>
+      <GreenModalButton v-else icon="play" @click="playAudio(previewPath)">Preview</GreenModalButton>
     </template>
 
     <template v-if="callingOrOnCall">
-      <GreenModalButton />
-      <span class="time-on-call">{{ timerText }}</span>
+      <GreenModalButton class="time-on-call" icon="call">
+        <span>{{ timerText }}</span>
+      </GreenModalButton>
       <span>&#183;</span>
       <span v-if="calling">calling <LoadingDots /></span>
       <button
@@ -80,7 +81,7 @@ let timer: ReturnType<typeof setInterval> | null = null;
 
 const audio = ref<HTMLAudioElement | null>(null);
 const callStatus = ref<callStatusType>('idle');
-const timerText = ref<string>('0:00');
+const timerText = ref<string>('00:00');
 
 const idle = computed(() => callStatus.value === 'idle');
 const calling = computed(() => callStatus.value === 'calling');
@@ -91,13 +92,12 @@ const idleOrError = computed(() => idle.value || error.value);
 const callingOrOnCall = computed(() => calling.value || onCall.value);
 
 const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${props.person.imgFormat || 'png'}`);
-const audioPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
+const previewPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
 
-const playAudio = async () => {
-
+const playAudio = async (path: string) => {
   try {
     stopAudio();
-    audio.value = new Audio(audioPath.value);
+    audio.value = new Audio(path);
     await audio.value.play();
     audio.value.onended = () => {
       audio.value = null;
@@ -119,18 +119,33 @@ const stopAudio = () => {
 const onModalClose = () => {
   emit('close');
   stopAudio();
-  hangUp()
+  hangUp();
 }
 
+const resetTimer = () => {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+  seconds = 0;
+  timerText.value = '00:00';
+}
 
-const call = () => {
+const call = async () => {
   callStatus.value = 'calling';
+  // for demo purposes
+  await new Promise((resolve) => setTimeout(resolve, 3_500));
+  callStatus.value = 'on-call';
+  resetTimer();
+  timer = setInterval(() => {
+    seconds++;
+    updateTimerDisplay();
+  }, 1000);
 };
 
 const hangUp = () => {
   callStatus.value = 'idle';
-  timer && clearInterval(timer);
-  timerText.value = '0:00';
+  resetTimer();
 }
 
 const updateTimerDisplay = () => {
@@ -138,20 +153,6 @@ const updateTimerDisplay = () => {
   const secs = seconds % 60;
   timerText.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
-
-// for demo purposes
-watch(callStatus, (newStatus) => {
-  if (newStatus === 'calling') {
-    setTimeout(() => {
-      callStatus.value = 'on-call';
-      timer = setInterval(() => {
-        seconds++;
-        updateTimerDisplay();
-      }, 1000);
-    }, 3500);
-  }
-});
-
 </script>
 
 <style scoped lang="scss">
@@ -174,10 +175,11 @@ watch(callStatus, (newStatus) => {
 
   .buy-more {
     text-shadow: 0px 0.55px 6.65px #0ADC0F;
+    border-bottom: 1px solid transparent;
     transition: color 0.3s ease-in-out, border-bottom 0.3s ease-in-out;
     &:hover {
       color: white;
-      border-bottom: 1px solid white;
+      border-bottom-color: white;
     }
   }
 }
@@ -225,18 +227,22 @@ watch(callStatus, (newStatus) => {
   display: flex;
   gap: 1rem;
 
-  .hang-up-button:hover {
-    border-bottom: 1px solid #FA6400;
-    transform: scale(1.1);
+  .hang-up-button {
+    border-bottom: 1px solid transparent;
+    transition: border-bottom 0.3s ease-in-out;
+    &:hover {
+      border-bottom-color: #FA6400;
+    }
   }
 }
 
-.footer-on-call {
-  width: 250px;
-}
-
 .time-on-call {
-  width: 52px;
+  > span {
+    width: 50px;
+  }
+  &:hover {
+    cursor: default;
+  }
 }
 
 .alert-color {
