@@ -1,6 +1,6 @@
 <template>
-  <transition v-show="isOpen" name="fade-enter">
-    <div class="modal-overlay" @click.self="close">
+  <transition name="fade">
+    <div v-show="isOpen" class="modal-overlay" @click.self="close">
       <div class="modal-dialog">
         <div class="modal-content">
           <slot></slot>
@@ -11,7 +11,6 @@
 </template>
 
 <script setup lang="ts">
-// TODO: fix transition, it doesn't work
 const props = defineProps<{ isOpen: boolean }>();
 
 const emit = defineEmits(['close']);
@@ -35,13 +34,13 @@ const close = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   background: linear-gradient(
       180.47deg,
       rgba(21, 21, 33, 0.9) 22.14%,  /* First color with 90% opacity */
@@ -56,9 +55,9 @@ const close = () => {
 }
 
 .modal-dialog {
-  /* TODO: Full size dialog for mobile view */
+  overflow-y: auto;
   background: black;
-  padding: 20px;
+  padding: 1.25rem;
   border-radius: 8px;
   max-width: 650px;
   height: 550px;
@@ -85,9 +84,16 @@ const close = () => {
   cursor: pointer;
 }
 
+@media (max-width: 550px) {
+  .modal-dialog {
+    height: 100dvh;
+    border-radius: 0;
+  }
+}
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity .3s ease;
 }
 
 .fade-enter-from,

@@ -7,13 +7,12 @@
         <path v-else d="m2.973 1.325.479.57c.663.786.594 1.97-.158 2.723l-.408.408a.396.396 0 0 0-.092.416c.149.406.528.914 1.137 1.522.609.61 1.116.988 1.522 1.138a.396.396 0 0 0 .416-.092l.408-.408c.752-.753 1.937-.822 2.724-.16l.57.48c.649.546.715 1.531.146 2.2-.31.358-.748.584-1.22.63-1.818.244-3.726-.632-5.724-2.63C.776 6.124-.1 4.216.143 2.398a1.844 1.844 0 0 1 .63-1.22c.67-.568 1.654-.503 2.2.147Z" fill="black"/>
       </svg>
     </span>
-    {{ text }}
+    <slot></slot>
   </button>
 </template>
 
 <script setup lang="ts">
 defineProps<{
-  text: string,
   icon: 'play' | 'stop' | 'call',
 }>();
 </script>
@@ -23,7 +22,6 @@ defineProps<{
   display: inline-flex;
   align-items: center;
   gap: .5rem;
-  min-width: 128px;
   transition: color 0.3s ease-in-out;
   > span {
     display: inline-flex;
@@ -38,7 +36,7 @@ defineProps<{
       &.call {
         height: 14px;
         width: 12px;
-        margin-top: 3px;
+        margin-top: .1875rem;
       }
     }
   }

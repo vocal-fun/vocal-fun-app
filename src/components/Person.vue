@@ -1,12 +1,12 @@
 <template>
   <div class="person shake-little" @click="openModal">
     <div class="avatar-block">
-      <img class="avatar-img" :src="avatarPath" :alt="displayName">
+      <NuxtImg class="avatar-img" :src='avatarPath' :alt="displayName" width="100%"/>
       <button class="play-btn shake" :aria-label="`Go to ${displayName} AI agent`" />
     </div>
     <div class="info">
       <span>{{ displayName }}</span>
-      <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink" @click.stop>
+      <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink" @click.stop="playClickSound">
         <img src="/img/twitter-green.png" alt="Twitter logo">
         <span>{{ twitter }}</span>
       </a>
@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { playClickSound } from '~/services/audio';
 import type { CelebrityItem } from '~/types';
 
 const props = defineProps<Omit<CelebrityItem, 'audioFormat'>>();
@@ -25,6 +26,7 @@ const twitterLink = computed(() => `https://x.com/${props.twitter.startsWith('@'
 const emit = defineEmits(['open-modal']);
 
 const openModal = () => {
+  playClickSound();
   emit('open-modal');
 };
 </script>
@@ -34,7 +36,7 @@ const openModal = () => {
   cursor: pointer;
   color: #37D339;
   display: flex;
-  width: 520px;
+  width: 430px;
   transition: transform 0.3s ease-in-out;
   box-shadow:
       3px 3px 0 0 #59596D,
@@ -45,6 +47,7 @@ const openModal = () => {
 
   .avatar-block {
     position: relative;
+    width: 200px;
     .play-btn {
       bottom: 0;
       right: 0;
@@ -53,13 +56,20 @@ const openModal = () => {
       height: 66px;
       width: 85px;
     }
+
+    img {
+      width: 200px;
+      max-width: none;
+      height: 100%;
+    }
   }
 
   .info {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 16px;
+    padding: 1rem;
+    width: 230px;
 
     .twitter {
       display: inline-flex;

@@ -159,7 +159,7 @@ const eqData = [
 
 .end-bar {
   background: #99989d;
-  margin-bottom: 10px;
+  margin-bottom: .625rem;
   height: 7px;
   width: 12px;
   will-change: margin-bottom;

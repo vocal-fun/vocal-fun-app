@@ -14,8 +14,8 @@
         :img-format="person.imgFormat"
         @open-modal="openModal(person)"
       />
-      <Modal v-if="selectedPerson" :isOpen="isModalOpen" @close="closeModal">
-        <ModalContent :person="selectedPerson" @close="closeModal" />
+      <Modal :isOpen="isModalOpen" @close="closeModal">
+        <ModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
       </Modal>
     </div>
   </section>
@@ -25,8 +25,15 @@
 import { celebrities } from '~/consts';
 import type { CelebrityItem } from '~/types';
 
+const modalContent = useTemplateRef('modalContent');
+
+const emptyPerson: CelebrityItem = {
+  name: '',
+  displayName: '',
+  twitter: '',
+};
 const isModalOpen = ref<boolean>(false);
-const selectedPerson = ref<CelebrityItem | null>(null);
+const selectedPerson = ref<CelebrityItem>(emptyPerson);
 
 const openModal = (person: CelebrityItem) => {
   selectedPerson.value = person;
@@ -35,13 +42,13 @@ const openModal = (person: CelebrityItem) => {
 
 const closeModal = () => {
   isModalOpen.value = false;
-  selectedPerson.value = null;
+  modalContent.value?.hangUp();
 };
 </script>
 
 <style scoped lang="scss">
 section.main {
-  margin: 37px 88px 0 88px;
+  margin: 2.3rem 5.5rem 0 5.5rem;
 
   .content-header {
     display: flex;
@@ -52,6 +59,8 @@ section.main {
   }
 
   .content-main {
+    max-width: 2048px;
+    margin: auto;
     background: #161622;
     box-shadow:
         1.39px 1.39px 0 0 #59596D,
@@ -63,8 +72,9 @@ section.main {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;
-    padding: 30px;
+    gap: 1.25rem;
+    padding: 1.875rem;
+    margin-bottom: 1rem;
   }
 
   .equalizer {
@@ -75,7 +85,7 @@ section.main {
 
 @media (max-width: 1024px) {
   section.main {
-    margin: 12px 20px 20px 20px;
+    margin: .75rem 1.25px 1.25px 1.25px;
 
     .content-header {
       flex-direction: column;
@@ -101,7 +111,7 @@ section.main {
       height: 80px;
     }
     .content-main {
-      padding: 12px;
+      padding: .75rem;
     }
   }
 }
