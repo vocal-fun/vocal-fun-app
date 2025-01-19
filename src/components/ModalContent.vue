@@ -9,7 +9,6 @@
     </button>
   </div>
   <div class="content">
-
     <template v-if="idleOrError">
       <div class="avatar">
         <img :src="imagePath" alt="Selected AI Celebrity Avatar">
@@ -19,27 +18,25 @@
       <div v-if="callStatus === 'error'" class="error alert-color">some error happened</div>
     </template>
 
-    <template v-if="callingOrOnCall">
-      <div class="calling-dialog">
+    <transition name="fade">
+      <div v-if="callingOrOnCall" class="calling-dialog">
         <div class="person">
           <img class="dialog-avatar" :src="imagePath" alt="Selected AI Celebrity Avatar">
           <div class="name">{{ person.displayName }}</div>
         </div>
-
         <img
-            :class="['call-icon', calling ? 'shake shake-constant' : '']"
-            src="/img/call-icon.png"
-            alt="Call Icon"
-            height="30"
-            width="30"
+          :class="['call-icon', calling ? 'shake shake-constant' : '']"
+          src="/img/call-icon.png"
+          alt="Call Icon"
+          height="30"
+          width="30"
         >
-
         <div class="user-info">
           <img class="dialog-avatar" src="/img/user-avatar.png" alt="Your avatar">
           <div class="name">You</div>
         </div>
       </div>
-    </template>
+    </transition>
   </div>
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : '']">
     <template v-if="idleOrError">
@@ -256,5 +253,26 @@ const updateTimerDisplay = () => {
   color: #FA6400;
   text-shadow: 0 0 6.09px 0 #FA6400,
   0 0.55px 6.65px 0 #FA6400;
+}
+
+.fade-enter-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.fade-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-leave-active {
+  transition: none; /* No transition for leave */
+}
+.fade-leave-from,
+.fade-leave-to {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
