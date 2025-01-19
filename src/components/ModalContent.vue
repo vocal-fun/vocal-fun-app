@@ -170,6 +170,7 @@ const updateTimerDisplay = () => {
   }
 }
 .info {
+  margin: 1rem 0;
   display: inline-flex;
   gap: 1rem;
 
@@ -211,6 +212,11 @@ const updateTimerDisplay = () => {
   align-items: center;
   gap: 3rem;
 
+  @media (max-width: 550px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
   .dialog-avatar {
     height: 175px;
   }
@@ -224,6 +230,7 @@ const updateTimerDisplay = () => {
 }
 
 .footer {
+  margin: 1rem 0;
   display: flex;
   gap: 1rem;
 

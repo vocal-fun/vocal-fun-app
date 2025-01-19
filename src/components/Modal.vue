@@ -35,13 +35,13 @@ const close = () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   background: linear-gradient(
       180.47deg,
       rgba(21, 21, 33, 0.9) 22.14%,  /* First color with 90% opacity */
@@ -56,7 +56,7 @@ const close = () => {
 }
 
 .modal-dialog {
-  /* TODO: Full size dialog for mobile view */
+  overflow-y: auto;
   background: black;
   padding: 1.25rem;
   border-radius: 8px;
@@ -87,11 +87,8 @@ const close = () => {
 
 @media (max-width: 550px) {
   .modal-dialog {
-    height: 100svh;
-
-    .modal-content {
-      padding-bottom: 25svh;
-    }
+    height: 100dvh;
+    border-radius: 0;
   }
 }
 
