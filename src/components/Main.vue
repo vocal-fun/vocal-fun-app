@@ -56,6 +56,8 @@ section.main {
   }
 
   .content-main {
+    max-width: 2048px;
+    margin: auto;
     background: #161622;
     box-shadow:
         1.39px 1.39px 0 0 #59596D,
