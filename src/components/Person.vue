@@ -1,13 +1,35 @@
 <template>
   <div class="person shake-little" @click="openModal">
     <div class="avatar-block">
-      <NuxtImg class="avatar-img" :src='avatarPath' :alt="displayName" width="100%"/>
-      <button class="play-btn shake" :aria-label="`Go to ${displayName} AI agent`" />
+      <NuxtImg
+        class="avatar-img"
+        sizes="90vw md:400px"
+        format="webp"
+        loading="lazy"
+        width="100%"
+        :src="avatarPath"
+        :alt="displayName"
+      />
+      <button class="play-btn shake" :aria-label="`Go to ${displayName} AI agent`">
+        <NuxtImg
+          src="/img/play-btn.png"
+          sizes="102px"
+          format="webp"
+          loading="lazy"
+          :alt="`Go to ${displayName} AI agent`"
+        />
+      </button>
     </div>
     <div class="info">
       <span>{{ displayName }}</span>
       <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink" @click.stop="playClickSound">
-        <img src="/img/twitter-green.png" alt="Twitter logo">
+        <NuxtImg
+          src="/img/twitter-green.png"
+          sizes="88px"
+          format="webp"
+          loading="lazy"
+          :alt="`Go to ${displayName} Twitter`"
+        />
         <span>{{ twitter }}</span>
       </a>
     </div>
@@ -54,14 +76,12 @@ const openModal = () => {
       bottom: 0;
       right: 0;
       position: absolute;
-      background: url("/img/play-btn.png") no-repeat;
-      height: 66px;
-      width: 85px;
+      height: 40px;
+      width: 51px;
     }
 
     img {
       width: 200px;
-      max-width: none;
       height: 100%;
     }
   }
@@ -107,15 +127,7 @@ const openModal = () => {
     .info {
       gap: 1rem;
       align-items: center;
-    }
-
-    .avatar-block {
-      button.play-btn {
-        height: 40px;
-        width: 51px;
-        background-size: 100% 100%;
-        background-position: center;
-      }
+      width: 100%;
     }
   }
 }
