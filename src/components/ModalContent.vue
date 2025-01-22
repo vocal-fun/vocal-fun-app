@@ -24,13 +24,16 @@
           <img class="dialog-avatar" :src="imagePath" alt="Selected AI Celebrity Avatar">
           <div class="name">{{ person.displayName }}</div>
         </div>
-        <img
-          :class="['call-icon', calling ? 'shake shake-constant' : '']"
-          src="/img/call-icon.png"
-          alt="Call Icon"
-          height="30"
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
           width="30"
+          height="36"
+          viewBox="0 0 10 10"
+          alt="Call Icon"
+          :class="['call-icon', calling ? 'shake shake-constant' : '']"
         >
+          <path :d="callD" fill="#37D339"/>
+        </svg>
         <div class="user-info">
           <img class="dialog-avatar" src="/img/user-avatar.png" alt="Your avatar">
           <div class="name">You</div>
@@ -64,6 +67,7 @@
 
 <script setup lang="ts">
 import { audioService } from '~/services/audio';
+import { icons } from '~/consts';
 import type { CelebrityItem } from '~/types';
 import type { Howl } from 'howler';
 
@@ -78,6 +82,7 @@ const emit = defineEmits(['close']);
 let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
 let cancelCall: (() => void) | null = null;
+const callD = icons.call;
 const audio = shallowRef<Howl | null>(null);
 
 const callStatus = ref<callStatusType>('idle');
