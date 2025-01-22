@@ -63,22 +63,23 @@
 </template>
 
 <script setup lang="ts">
-import { playClickSound } from '~/services/audio';
+import { audioService } from '~/services/audio';
 import type { CelebrityItem } from '~/types';
+import type { Howl } from 'howler';
 
-const emit = defineEmits(['close']);
+type callStatusType = 'calling' | 'error' | 'idle' | 'on-call';
 
 const props = defineProps<{
   person: CelebrityItem,
 }>();
 
-type callStatusType = 'calling' | 'error' | 'idle' | 'on-call';
+const emit = defineEmits(['close']);
 
 let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
 let cancelCall: (() => void) | null = null;
+const audio = shallowRef<Howl | null>(null);
 
-const audio = ref<HTMLAudioElement | null>(null);
 const callStatus = ref<callStatusType>('idle');
 const timerText = ref<string>('00:00');
 
@@ -92,25 +93,28 @@ const callingOrOnCall = computed(() => calling.value || onCall.value);
 
 const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${props.person.imgFormat || 'png'}`);
 const previewPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
-const callingPath = '/audio/calling.mp3';
 
-const playAudio = async (path: string) => {
+const play = async (path: string) => {
   try {
-    stopAudio();
-    audio.value = new Audio(path);
-    await audio.value.play();
-    audio.value.onended = () => {
-      audio.value = null;
-    };
+    audioService.interruptBgMusic();
+    stop();
+    audioService.load(path);
+    audio.value = audioService.play(path);
+    if (audio) {
+      audio.value?.on('end', () => {
+        audio.value = null;
+        audioService.resumeBgMusic();
+      });
+    }
   } catch (error) {
     audio.value = null;
     console.warn('[VOCAL.FUN] Error playing audio:', error);
   }
 };
 
-const stopAudio = () => {
-  if (audio.value) {
-    audio.value.pause();
+const stop = () => {
+  if (audio) {
+    audio.value?.pause?.();
     audio.value = null;
   }
 };
@@ -138,11 +142,11 @@ const call = async () => {
     controller.abort(); // Abort the call when needed
   };
 
-  await playClickSound();
+  await audioService.click();
   callStatus.value = 'calling';
 
   // For demo purposes: Play the calling audio
-  playAudio(callingPath);
+  play(audioService.callingUrl);
 
   // Add the abort signal to your Promise
   new Promise<void>((resolve, reject) => {
@@ -177,25 +181,27 @@ const startCall = async () => {
 }
 
 const hangUp = () => {
-  stopAudio();
+  stop();
   cancelCall?.();
   callStatus.value = 'idle';
   resetTimer();
+  audioService.resumeBgMusic();
 }
 
 const hangUpWithClickSound = () => {
-  playClickSound();
+  audioService.click();
   hangUp();
 }
 
 const playPreview = async () => {
-  await playClickSound();
-  playAudio(previewPath.value);
+  await audioService.click();
+  play(previewPath.value);
 }
 
 const stopPreview = async () => {
-  await playClickSound();
-  stopAudio();
+  await audioService.click();
+  audioService.resumeBgMusic();
+  stop();
 }
 
 const updateTimerDisplay = () => {
