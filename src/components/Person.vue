@@ -24,6 +24,7 @@
       <span>{{ displayName }}</span>
       <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink" @click.stop="playClickSound">
         <NuxtImg
+          class="twitter__icon"
           src="/img/twitter-green.png"
           sizes="88px"
           format="webp"
@@ -102,6 +103,10 @@ const openModal = () => {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+      }
+      &__icon {
+        width: 22px;
+        aspect-ratio: 44 / 35;
       }
     }
 
