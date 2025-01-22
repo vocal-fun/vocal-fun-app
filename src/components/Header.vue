@@ -12,10 +12,9 @@
     </div>
 
     <div class="logo" @click="toggleBackgroundSound">
-      <img class="logo-bar-element" src="/img/top-bar-element.png" alt="">
-      <img class="shake-little shake-constant" src="/logo/logo.png" alt="Logo" width="24" height="24" >
+      <span class="logo-bar-element"></span>
       vocal.fun
-      <img class="logo-bar-element" src="/img/top-bar-element.png" alt="">
+      <span class="logo-bar-element"></span>
     </div>
 
     <div class="wallet-connect">
@@ -58,7 +57,14 @@ const toggleBackgroundSound = () => {
     text-transform: uppercase;
 
     .logo-bar-element {
-      height: 12px;
+      width: 6rem;
+      border-radius: 2px;
+      height: 0.5rem;
+      background: linear-gradient(180deg, #ECCF7A 0%, #ECCF7A 20%, #FFFFFF 21%, #FFFFFF 40%, #3F422B 41%, #3F422B 60%, #A3956A 61%, #A3956A 80%, #ECCF7A 81%, #ECCF7A 100%);
+
+      &:first-child {
+        margin-right: 2px;
+      }
     }
   }
 
@@ -125,7 +131,7 @@ const toggleBackgroundSound = () => {
       justify-content: center;
 
       .logo-bar-element {
-        height: 10px;
+        height: 0.6rem;
       }
     }
   }
