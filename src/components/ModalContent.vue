@@ -11,7 +11,13 @@
   <div class="content">
     <template v-if="idleOrError">
       <div class="avatar">
-        <img :src="imagePath" alt="Selected AI Celebrity Avatar">
+        <NuxtImg
+          alt="Selected AI Celebrity Avatar"
+          sizes="90vw md:400px"
+          format="webp"
+          loading="lazy"
+          :src="imagePath"
+        />
       </div>
       <div class="name">{{ person.displayName }}</div>
       <div class="price">10 $vocal/min</div>
@@ -21,7 +27,14 @@
     <transition name="fade">
       <div v-if="callingOrOnCall" class="calling-dialog">
         <div class="person">
-          <img class="dialog-avatar" :src="imagePath" alt="Selected AI Celebrity Avatar">
+          <NuxtImg
+            class="dialog-avatar"
+            alt="Selected AI Celebrity Avatar"
+            sizes="90vw md:400px"
+            format="webp"
+            loading="lazy"
+            :src="imagePath"
+          />
           <div class="name">{{ person.displayName }}</div>
         </div>
         <svg
@@ -32,10 +45,18 @@
           alt="Call Icon"
           :class="['call-icon', calling ? 'shake shake-constant' : '']"
         >
-          <path :d="callD" fill="#37D339"/>
+          <path :d="callD" fill="#00FA00"/>
         </svg>
         <div class="user-info">
-          <img class="dialog-avatar" src="/img/user-avatar.png" alt="Your avatar">
+          <NuxtImg
+            class="dialog-avatar"
+            src="/img/user-avatar.png"
+            alt="Your avatar"
+            sizes="90vw md:400px"
+            format="webp"
+            loading="lazy"
+            quality="100"
+          />
           <div class="name">You</div>
         </div>
       </div>
