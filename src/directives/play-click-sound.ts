@@ -1,3 +1,4 @@
+import { audioService } from '~/services/audio';
 import type { DirectiveBinding } from 'vue';
 
 interface PlayClickSoundElement extends HTMLElement {
@@ -6,25 +7,12 @@ interface PlayClickSoundElement extends HTMLElement {
 
 const playClickSound = {
   mounted(el: PlayClickSoundElement, binding: DirectiveBinding) {
-    const audio = new Audio('/audio/click.mp3');
+    const play = () => audioService.click();
 
-    const playAudio = () => {
-      try {
-        audio.currentTime = 0; // Reset the audio to start
-        audio.play();
-      } catch (err) {
-        console.warn('[VOCAL.FUN] [CLICK] Audio playback failed:', err);
-      }
-    };
-
-    // Add event listeners for click and touchstart
-    el.addEventListener('click', playAudio);
-    el.addEventListener('touchstart', playAudio);
-
+    el.addEventListener('click', play, { passive: true });
     // Store the cleanup function for later unbinding
     el.__playSoundCleanup = () => {
-      el.removeEventListener('click', playAudio);
-      el.removeEventListener('touchstart', playAudio);
+      el.removeEventListener('click', play);
     };
   },
 
