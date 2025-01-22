@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { playClickSound } from '~/services/audio';
+import { audioService } from '~/services/audio';
 import type { CelebrityItem } from '~/types';
 
 const props = defineProps<Omit<CelebrityItem, 'audioFormat'>>();
@@ -24,6 +24,8 @@ const avatarPath = computed(() => `/img/celebrity-logo/${props.name}.${props.img
 const twitterLink = computed(() => `https://x.com/${props.twitter.startsWith('@') ? props.twitter.slice(1) : props.twitter}`);
 
 const emit = defineEmits(['open-modal']);
+
+const playClickSound = () => audioService.click();
 
 const openModal = () => {
   playClickSound();
