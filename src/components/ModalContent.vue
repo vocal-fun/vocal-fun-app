@@ -62,15 +62,15 @@
       </div>
     </transition>
   </div>
-  <div :class="['footer', callingOrOnCall ? 'footer-on-call' : '']">
+  <div :class="['footer', callingOrOnCall ? 'footer-on-call' : 'footer-idle']">
     <template v-if="idleOrError">
       <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
       <GreenModalButton v-else icon="play" @click="playPreview">Preview</GreenModalButton>
     </template>
 
-    <template v-if="callingOrOnCall">
-      <GreenModalButton class="time-on-call" icon="call">
+    <template v-else-if="callingOrOnCall">
+      <GreenModalButton class="time-on-call" icon="call" :class="{ 'calling': calling }">
         <span>{{ timerText }}</span>
       </GreenModalButton>
       <span>&#183;</span>
@@ -319,6 +319,17 @@ defineExpose({
   margin: 1rem 0;
   display: flex;
   gap: 1rem;
+  width: 240px;
+
+  &.footer-idle {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &.footer-on-call {
+    width: 100%;
+    justify-content: center;
+  }
 
   .hang-up-button {
     border-bottom: 1px solid transparent;
@@ -330,6 +341,10 @@ defineExpose({
 }
 
 .time-on-call {
+  &.calling {
+    width: 121px;
+    justify-content: end;
+  }
   > span {
     width: 50px;
   }
