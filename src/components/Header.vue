@@ -11,7 +11,7 @@
       </a>
     </div>
 
-    <div class="logo">
+    <div class="logo" @click="toggleBackgroundSound">
       <img class="logo-bar-element" src="/img/top-bar-element.png" alt="">
       <img class="shake-little shake-constant" src="/logo/logo.png" alt="Logo" width="24" height="24" >
       vocal.fun
@@ -24,6 +24,22 @@
   </section>
 </template>
 
+<script setup lang="ts">
+import { audioService } from '~/services/audio';
+
+const isPlaying = ref<boolean>(false);
+
+const toggleBackgroundSound = () => {
+  audioService.click();
+  if (isPlaying.value) {
+    audioService.pauseBgMusic();
+  } else {
+    audioService.playBgMusic();
+  }
+  isPlaying.value = !isPlaying.value;
+};
+</script>
+
 <style scoped lang="scss">
 .header {
   display: flex;
@@ -34,6 +50,7 @@
   height: 41px;
 
   .logo {
+    cursor: pointer;
     font-size: 1.2rem;
     display: inline-flex;
     align-items: center;
