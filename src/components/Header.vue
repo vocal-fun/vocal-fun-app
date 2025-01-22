@@ -11,11 +11,11 @@
       </a>
     </div>
 
-    <div class="logo" @click="toggleBackgroundSound">
+    <button class="logo" @click="toggleBackgroundSound">
       <span class="logo-bar-element"></span>
       vocal.fun
       <span class="logo-bar-element"></span>
-    </div>
+    </button>
 
     <div class="wallet-connect">
       <a v-play-click-sound href="#">connect wallet</a>
