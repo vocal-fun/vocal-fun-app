@@ -29,6 +29,14 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeyDown);
 });
 
+watch(() => props.isOpen, (isOpen) => {
+  if (isOpen) {
+    document.documentElement.style.overflowY = 'hidden';
+  } else {
+    document.documentElement.style.overflowY = '';
+  }
+});
+
 const close = () => {
   emit('close');
 };
