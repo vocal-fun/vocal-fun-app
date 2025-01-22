@@ -27,13 +27,8 @@ import type { CelebrityItem } from '~/types';
 
 const modalContent = useTemplateRef('modalContent');
 
-const emptyPerson: CelebrityItem = {
-  name: '',
-  displayName: '',
-  twitter: '',
-};
 const isModalOpen = ref<boolean>(false);
-const selectedPerson = ref<CelebrityItem>(emptyPerson);
+const selectedPerson = ref<CelebrityItem>(celebrities[0]);
 
 const openModal = (person: CelebrityItem) => {
   selectedPerson.value = person;
