@@ -21,7 +21,7 @@
       </div>
       <div class="name">{{ person.displayName }}</div>
       <div class="price">10 $vocal/min</div>
-      <div v-if="callStatus === 'error'" class="error alert-color">some error happened</div>
+      <div v-show="error" class="error alert-color">some error happened</div>
     </template>
 
     <transition name="fade">
@@ -62,6 +62,7 @@
       </div>
     </transition>
   </div>
+  <div v-show="!error" class="recognition" :class="{ hidden: !speechRecResult }">- {{ speechRecResult }}</div>
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : 'footer-idle']">
     <template v-if="idleOrError">
       <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
@@ -87,12 +88,13 @@
 </template>
 
 <script setup lang="ts">
+import { useSpeechRecognition } from '@vueuse/core';
 import { audioService } from '~/services/audio';
 import { icons } from '~/consts';
 import type { CelebrityItem } from '~/types';
 import type { Howl } from 'howler';
 
-type callStatusType = 'calling' | 'error' | 'idle' | 'on-call';
+type callStatusType = 'calling' | 'idle' | 'on-call';
 
 const props = defineProps<{
   person: CelebrityItem,
@@ -102,34 +104,47 @@ const emit = defineEmits(['close']);
 
 let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
-let cancelCall: (() => void) | null = null;
+let cancelCurrentCall: (() => void) | null = null;
 const callD = icons.call;
 const audio = shallowRef<Howl | null>(null);
 
 const callStatus = ref<callStatusType>('idle');
 const timerText = ref<string>('00:00');
+const hasErrors = ref<boolean>(false); // TODO: Set to true for errors from backend
 
 const idle = computed(() => callStatus.value === 'idle');
 const calling = computed(() => callStatus.value === 'calling');
-const error = computed(() => callStatus.value === 'error');
+const error = computed(() => !isSupported.value || speechRecError.value || hasErrors.value);
 const onCall = computed(() => callStatus.value === 'on-call');
 
 const idleOrError = computed(() => idle.value || error.value);
-const callingOrOnCall = computed(() => calling.value || onCall.value);
+const callingOrOnCall = computed(() => (calling.value || onCall.value) && !error.value);
 
 const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${props.person.imgFormat || 'png'}`);
 const previewPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
 
-const play = async (path: string) => {
+const {
+  isSupported,
+  // isListening,
+  // isFinal,
+  result: speechRecResult,
+  error: speechRecError,
+  start: startSpeechRec,
+  stop: stopSpeechRec,
+} = useSpeechRecognition();
+
+const playCurrentSound = async (path: string, withoutResume = false) => {
   try {
     audioService.interruptBgMusic();
-    stop();
+    stopCurrentSound();
     audioService.load(path);
     audio.value = audioService.play(path);
     if (audio) {
       audio.value?.on('end', () => {
         audio.value = null;
-        audioService.resumeBgMusic();
+        if (!withoutResume) {
+          audioService.resumeBgMusic();
+        }
       });
     }
   } catch (error) {
@@ -138,7 +153,7 @@ const play = async (path: string) => {
   }
 };
 
-const stop = () => {
+const stopCurrentSound = () => {
   if (audio) {
     audio.value?.pause?.();
     audio.value = null;
@@ -159,20 +174,28 @@ const resetTimer = () => {
   timerText.value = '00:00';
 }
 
+const resetCallData = () => {
+  resetTimer();
+  stopSpeechRec();
+  speechRecError.value = undefined;
+  hasErrors.value = false;
+  speechRecResult.value = '';
+}
+
 const call = async () => {
   const controller = new AbortController(); // Create an AbortController
   const signal = controller.signal; // Get the signal
 
   // Handle cleanup in case of cancellation
-  const cancelCall = () => {
+  const cancelCurrentCall = () => {
     controller.abort(); // Abort the call when needed
   };
-
+  resetCallData();
   await audioService.click();
   callStatus.value = 'calling';
 
   // For demo purposes: Play the calling audio
-  play(audioService.callingUrl);
+  playCurrentSound(audioService.callingUrl, true);
 
   // Add the abort signal to your Promise
   new Promise<void>((resolve, reject) => {
@@ -186,6 +209,8 @@ const call = async () => {
     callStatus.value = 'on-call';
     resetTimer();
     console.info(`[VOCAL.FUN] Call with ${props.person.name} started`);
+    startSpeechRec();
+    // TODO: Add watch for speechRecResult and send it to backend
     timer = setInterval(() => {
       seconds++;
       updateTimerDisplay();
@@ -194,23 +219,23 @@ const call = async () => {
     if ((error as Error).message === 'Call was cancelled') {
       console.log('Call was cancelled before completion');
     } else {
-      callStatus.value = 'error';
+      hasErrors.value = true;
       console.warn('[VOCAL.FUN] Error during call:', error);
     }
   });
 
-  return cancelCall; // Return the cancel function for later use
+  return cancelCurrentCall; // Return the cancel function for later use
 };
 
 const startCall = async () => {
-  cancelCall = await call();
+  cancelCurrentCall = await call();
 }
 
 const hangUp = () => {
-  stop();
-  cancelCall?.();
+  resetCallData();
+  stopCurrentSound();
+  cancelCurrentCall?.();
   callStatus.value = 'idle';
-  resetTimer();
   audioService.resumeBgMusic();
 }
 
@@ -221,13 +246,14 @@ const hangUpWithClickSound = () => {
 
 const playPreview = async () => {
   await audioService.click();
-  play(previewPath.value);
+  // TODO: add preview sound from backend, remove the line below
+  playCurrentSound(previewPath.value);
 }
 
 const stopPreview = async () => {
   await audioService.click();
   audioService.resumeBgMusic();
-  stop();
+  stopCurrentSound();
 }
 
 const updateTimerDisplay = () => {
@@ -312,6 +338,15 @@ defineExpose({
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+  }
+}
+
+.recognition {
+  margin: 0.5rem 1rem;
+  text-align: center;
+  transition: visibility 0.3s ease-in-out;
+  &.hidden {
+    visibility: hidden;
   }
 }
 
