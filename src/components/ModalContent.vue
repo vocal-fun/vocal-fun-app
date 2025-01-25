@@ -395,7 +395,7 @@ defineExpose({
   gap: 1rem;
 
   .buy-more {
-    text-shadow: 0px 0.55px 6.65px #0ADC0F;
+    text-shadow: 0 0.55px 6.65px #0ADC0F;
     border-bottom: 1px solid transparent;
     transition: color 0.3s ease-in-out, border-bottom 0.3s ease-in-out;
     &:hover {
