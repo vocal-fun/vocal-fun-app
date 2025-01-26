@@ -89,15 +89,15 @@
 
 <script setup lang="ts">
 import { watch } from 'vue';
-import type { Howl } from 'howler';
 import { useSpeechRecognition } from '@vueuse/core';
+import type { Howl } from 'howler';
 
 import { icons } from '~/consts';
 import { audioService } from '~/services/audio';
+import { vocalService } from '~/services/vocal';
+import { getCachedVoiceLine, getIntialVoiceLine, getVocalResponse, setVoicePersonality } from '~/services/vocalUtils';
+import { AudioStreamPlayer } from '~/services/AudioStreamManager';
 import type { CelebrityItem } from '~/types';
-import {vocalService} from "~/services/vocal";
-import {getCachedVoiceLine, getIntialVoiceLine, getVocalResponse, setVoicePersonality} from "~/services/vocalUtils";
-import {AudioStreamPlayer} from "~/services/AudioStreamManager";
 
 type callStatusType = 'calling' | 'idle' | 'on-call';
 
