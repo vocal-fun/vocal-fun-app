@@ -88,11 +88,16 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue';
 import { useSpeechRecognition } from '@vueuse/core';
-import { audioService } from '~/services/audio';
-import { icons } from '~/consts';
-import type { CelebrityItem } from '~/types';
 import type { Howl } from 'howler';
+
+import { icons } from '~/consts';
+import { audioService } from '~/services/audio';
+import { vocalService } from '~/services/vocal';
+import { getCachedVoiceLine, getIntialVoiceLine, getVocalResponse, setVoicePersonality } from '~/services/vocalUtils';
+import { AudioStreamPlayer } from '~/services/AudioStreamManager';
+import type { CelebrityItem } from '~/types';
 
 type callStatusType = 'calling' | 'idle' | 'on-call';
 
@@ -106,6 +111,7 @@ let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
 let cancelCurrentCall: (() => void) | null = null;
 const callD = icons.call;
+const audioPlayer = new AudioStreamPlayer();
 const audio = shallowRef<Howl | null>(null);
 
 const callStatus = ref<callStatusType>('idle');
@@ -121,7 +127,6 @@ const idleOrError = computed(() => idle.value || error.value);
 const callingOrOnCall = computed(() => (calling.value || onCall.value) && !error.value);
 
 const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${props.person.imgFormat || 'png'}`);
-const previewPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
 
 const {
   isSupported,
@@ -208,9 +213,12 @@ const call = async () => {
   }).then(() => {
     callStatus.value = 'on-call';
     resetTimer();
+
     console.info(`[VOCAL.FUN] Call with ${props.person.name} started`);
+
     startSpeechRec();
-    // TODO: Add watch for speechRecResult and send it to backend
+    userCall();
+
     timer = setInterval(() => {
       seconds++;
       updateTimerDisplay();
@@ -239,6 +247,52 @@ const hangUp = () => {
   audioService.resumeBgMusic();
 }
 
+vocalService.onMessage("transcript_text", (message) => {
+  console.log("Transcript text:", message.text);
+  // setMessages(prev => [...prev, {
+  //   message: message.text,
+  //   sender: 'Vocal',
+  // }]);
+});
+
+vocalService.onMessage("tts_stream", async (streamData) => {
+  switch (streamData.type) {
+    case "stream_start":
+      console.log("Stream started");
+      await audioPlayer.resume();
+      break;
+    case "audio_chunk":
+      await audioPlayer.addChunk(streamData.chunk);
+      break;
+    case "stream_end":
+      console.log("Stream ended");
+      break;
+    case "error":
+      console.error("Stream error:", streamData.error);
+      await audioPlayer.stop();
+      hasErrors.value = true;
+      break;
+  }
+});
+
+// Handle start vocal responses
+vocalService.onMessage("start_vocal_response", (message) => {
+  console.log("Start vocal response:", message.text);
+  // playInitialVoiceLine(message.text, message.audio_base64);
+  handleInitialVoiceLine(message.text, message.audio_base64);
+});
+
+// Handle personality updates
+vocalService.onMessage("personality_update", (message) => {
+  console.log("Personality update status:", message.status);
+});
+
+// Handle errors
+vocalService.onMessage("error", (message) => {
+  console.error("Error:", message.error);
+  hasErrors.value = true;
+});
+
 const hangUpWithClickSound = () => {
   audioService.click();
   hangUp();
@@ -246,8 +300,12 @@ const hangUpWithClickSound = () => {
 
 const playPreview = async () => {
   await audioService.click();
-  // TODO: add preview sound from backend, remove the line below
-  playCurrentSound(previewPath.value);
+
+  vocalService.onConnected(() => {
+    console.log('socket connected', 'Trump');
+    setVoicePersonality('Trump');
+    getIntialVoiceLine();
+  })
 }
 
 const stopPreview = async () => {
@@ -261,6 +319,51 @@ const updateTimerDisplay = () => {
   const secs = seconds % 60;
   timerText.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
+
+
+const handleInitialVoiceLine = async (text: string, audio: string) => {
+  const firstMessage = text;
+  const formattedMessage = {
+    message: firstMessage,
+    sender: 'Vocal',
+  };
+
+  // reactive ref
+  // const updatedMessages = [...messages, formattedMessage];
+  // setMessages(updatedMessages);
+
+  // Resume audio context and play the audio
+  await audioPlayer.resume();
+  await audioPlayer.addChunk(audio);
+};
+
+const userCall = async () => {
+  let cachedVoiceLine = getCachedVoiceLine('Trump');
+  if (cachedVoiceLine) {
+    console.log('found cachedVoiceLine', cachedVoiceLine.text);
+    await handleInitialVoiceLine(cachedVoiceLine.text, cachedVoiceLine.audio);
+  } else {
+    console.log('getting initial voice line');
+    getIntialVoiceLine();
+  }
+};
+
+watch(speechRecResult, (newResult) => {
+  console.log(`New speech recognition result: ${newResult}`);
+  newResult && getVocalResponse(newResult);
+});
+
+watch(speechRecError, (newResult) => {
+  console.log('speechRecError:', newResult);
+});
+watch(error, (newResult) => {
+  console.log('error:', newResult); //speechRecError.value || hasErrors.value
+  console.log('speechRecError.value, hasErrors.value', {
+    speechRecError: speechRecError.value,
+    hasErrors: hasErrors.value,
+  })
+});
+
 
 defineExpose({
   hangUp,
@@ -287,7 +390,7 @@ defineExpose({
   gap: 1rem;
 
   .buy-more {
-    text-shadow: 0px 0.55px 6.65px #0ADC0F;
+    text-shadow: 0 0.55px 6.65px #0ADC0F;
     border-bottom: 1px solid transparent;
     transition: color 0.3s ease-in-out, border-bottom 0.3s ease-in-out;
     &:hover {
