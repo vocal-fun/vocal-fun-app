@@ -17,6 +17,8 @@
     "@nuxt/image": "^1.8.1",
     "@nuxtjs/sitemap": "^7.0.0",
     "@vueuse/core": "^12.5.0",
+    "@web3modal/ethers": "^5.1.11",
+    "ethers": "^6.13.5",
     "howler": "^2.2.4",
     "nuxt": "^3.14.1592",
     "vue": "^3.5.13",
