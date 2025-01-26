@@ -111,13 +111,12 @@ let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
 let cancelCurrentCall: (() => void) | null = null;
 const callD = icons.call;
+const audioPlayer = new AudioStreamPlayer();
 const audio = shallowRef<Howl | null>(null);
 
 const callStatus = ref<callStatusType>('idle');
 const timerText = ref<string>('00:00');
 const hasErrors = ref<boolean>(false); // TODO: Set to true for errors from backend
-// const isCalling = ref<boolean>(false);
-const audioPlayer = ref<AudioStreamPlayer>(new AudioStreamPlayer());
 
 const idle = computed(() => callStatus.value === 'idle');
 const calling = computed(() => callStatus.value === 'calling');
@@ -128,7 +127,6 @@ const idleOrError = computed(() => idle.value || error.value);
 const callingOrOnCall = computed(() => (calling.value || onCall.value) && !error.value);
 
 const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${props.person.imgFormat || 'png'}`);
-const previewPath = computed(() => `/audio/${props.person.name}.${props.person.audioFormat || 'mp3'}`);
 
 const {
   isSupported,
@@ -226,11 +224,10 @@ const call = async () => {
       updateTimerDisplay();
     }, 1_000);
   }).catch((error) => {
-    hasErrors.value = true;
-
     if ((error as Error).message === 'Call was cancelled') {
       console.log('Call was cancelled before completion');
     } else {
+      hasErrors.value = true;
       console.warn('[VOCAL.FUN] Error during call:', error);
     }
   });
@@ -258,27 +255,25 @@ vocalService.onMessage("transcript_text", (message) => {
   // }]);
 });
 
-
 vocalService.onMessage("tts_stream", async (streamData) => {
   switch (streamData.type) {
     case "stream_start":
       console.log("Stream started");
-      await audioPlayer.value.resume();
+      await audioPlayer.resume();
       break;
     case "audio_chunk":
-      await audioPlayer.value.addChunk(streamData.chunk);
+      await audioPlayer.addChunk(streamData.chunk);
       break;
     case "stream_end":
       console.log("Stream ended");
       break;
     case "error":
       console.error("Stream error:", streamData.error);
-      await audioPlayer.value.stop();
+      await audioPlayer.stop();
       hasErrors.value = true;
       break;
   }
 });
-
 
 // Handle start vocal responses
 vocalService.onMessage("start_vocal_response", (message) => {
@@ -338,8 +333,8 @@ const handleInitialVoiceLine = async (text: string, audio: string) => {
   // setMessages(updatedMessages);
 
   // Resume audio context and play the audio
-  await audioPlayer.value.resume();
-  await audioPlayer.value.addChunk(audio);
+  await audioPlayer.resume();
+  await audioPlayer.addChunk(audio);
 };
 
 const userCall = async () => {
