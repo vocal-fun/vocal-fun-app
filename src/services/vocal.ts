@@ -4,43 +4,46 @@ class VocalService {
   private messageHandlers: { [key: string]: (message: any) => void } = {};
   private onConnectedCallback: any = null;
 
-  initializeWebSocket() {
-    this.socket = new WebSocket("ws://15.206.168.54:8000/ws");
+  initializeWebSocket(): void {
+    try {
+      this.socket = new WebSocket("ws://15.206.168.54:8000/ws");
 
-    this.socket.onopen = () => {
-      console.info("WebSocket connection established.");
-      this.isConnected = true;
+      this.socket.onopen = () => {
+        console.info("WebSocket connection established.");
+        this.isConnected = true;
 
-      if (this.onConnectedCallback) {
-        this.onConnectedCallback();
-      }
-    };
-
-    this.socket.onclose = () => {
-      console.info("WebSocket connection closed. Reconnecting...");
-      this.isConnected = false;
-      setTimeout(() => this.initializeWebSocket(), 1000);
-    };
-
-    this.socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    this.socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      const messageType = message.message_type;
-
-      if (messageType === "tts_stream") {
-        // Handle streaming data
-        if (this.messageHandlers["tts_stream"]) {
-          this.messageHandlers["tts_stream"](message.stream_data);
+        if (this.onConnectedCallback) {
+          this.onConnectedCallback();
         }
-      } else if (messageType && this.messageHandlers[messageType]) {
-        this.messageHandlers[messageType](message);
-      } else {
-        console.warn(`Unhandled message type: ${messageType}`);
-      }
-    };
+      };
+
+      this.socket.onclose = () => {
+        console.info("WebSocket connection closed. Reconnecting...");
+        this.isConnected = false;
+        setTimeout(() => this.initializeWebSocket(), 1000);
+      };
+
+      this.socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+      };
+
+      this.socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        const messageType = message.message_type;
+        if (messageType === "tts_stream") {
+          // Handle streaming data
+          if (this.messageHandlers["tts_stream"]) {
+            this.messageHandlers["tts_stream"](message.stream_data);
+          }
+        } else if (messageType && this.messageHandlers[messageType]) {
+          this.messageHandlers[messageType](message);
+        } else {
+          console.warn(`Unhandled message type: ${messageType}`);
+        }
+      };
+    } catch (error) {
+      console.error("Error initializing WebSocket:", error);
+    }
   }
 
   /**
