@@ -41,9 +41,7 @@
       <span class="logo-bar-element"></span>
     </button>
 
-    <div class="wallet-connect">
-      <a v-play-click-sound href="#">connect wallet</a>
-    </div>
+    <ConnectWallet class="wallet" />
   </section>
 </template>
 
@@ -127,19 +125,6 @@ const toggleBackgroundSound = () => {
       }
     }
   }
-
-  .wallet-connect {
-    text-align: center;
-    white-space: nowrap;
-    a {
-      cursor: pointer;
-      transition: color 0.3s ease-in-out;
-    }
-    a:hover {
-      text-decoration: underline;
-      color: white;
-    }
-  }
 }
 
 @media (max-width: 840px) {
@@ -155,7 +140,7 @@ const toggleBackgroundSound = () => {
       flex-grow: 1;
     }
 
-    .wallet-connect {
+    .wallet {
       order: 1;
       flex-grow: 1;
       text-align: right;
@@ -191,7 +176,7 @@ const toggleBackgroundSound = () => {
     .logo {
       margin: .625rem 0;
     }
-    .wallet-connect {
+    .wallet {
       text-align: center;
     }
   }
