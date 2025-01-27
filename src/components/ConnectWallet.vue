@@ -20,45 +20,50 @@
 </template>
 
 <script setup lang="ts">
-import { useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/vue';
+import { useAppKit, useAppKitAccount } from '@reown/appkit/vue';
 import { useBlockchain } from '~/composables/blockchain';
 
 const { signMessage } = useBlockchain();
-const { address, isConnected } = useWeb3ModalAccount();
-const modal = useWeb3Modal();
+const appKitAccount = useAppKitAccount();
+const modal = useAppKit();
 const hasSigned = ref(false);
 
+const isConnected = computed(() => appKitAccount.value.isConnected);
+
+const address = computed(() => appKitAccount.value.address);
+
 const formattedAddress = computed(() => {
-  if (address.value) {
-    return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`;
+  const addr = address.value;
+  if (addr) {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   }
   return '';
 });
 
 onMounted(() => {
-  const storedHasSigned = localStorage.getItem('hasSigned')
-  const storedAddress = localStorage.getItem('signedAddress')
+  const storedHasSigned = localStorage.getItem('hasSigned');
+  const storedAddress = localStorage.getItem('signedAddress');
   if (storedHasSigned === 'true' && storedAddress === address.value) {
-    hasSigned.value = true
+    hasSigned.value = true;
   }
 });
 
-async function promptSignMessage() {
+async function promptSignMessage(): Promise<void> {
   try {
-    await signMessage()
-    hasSigned.value = true
-    localStorage.setItem('hasSigned', 'true')
-    localStorage.setItem('signedAddress', address.value || '')
+    await signMessage();
+    hasSigned.value = true;
+    localStorage.setItem('hasSigned', 'true');
+    localStorage.setItem('signedAddress', address.value || '');
   } catch (error) {
-    console.error('Message signing failed:', error)
-    hasSigned.value = false
-    localStorage.removeItem('hasSigned')
-    localStorage.removeItem('signedAddress')
+    console.error('Message signing failed:', error);
+    hasSigned.value = false;
+    localStorage.removeItem('hasSigned');
+    localStorage.removeItem('signedAddress');
   }
 }
 watch(isConnected, async (newVal, oldVal) => {
   if (newVal && !oldVal && !hasSigned.value) {
-    await promptSignMessage()
+    await promptSignMessage();
   }
 })
 </script>
