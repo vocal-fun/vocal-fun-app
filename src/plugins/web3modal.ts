@@ -23,8 +23,9 @@ export default defineNuxtPlugin(() => {
     ethersConfig,
     chains: chainsToSupport,
     projectId: wcProjectId,
-    enableAnalytics: true,
+    enableAnalytics: false,
     enableOnramp: true,
+    enableSwaps: true,
   });
 
   return {
