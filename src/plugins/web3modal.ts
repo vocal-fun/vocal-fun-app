@@ -1,11 +1,8 @@
 import { defineNuxtPlugin } from '#app';
-import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
-import { createAppKit } from '@reown/appkit/vue';
-import { base } from '@reown/appkit/networks';
-import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
-import { wcProjectId } from '~/consts';
+import { createWeb3Modal, defaultConfig } from '@web3modal/ethers/vue';
+import { chainsToSupport, wcProjectId, defaultRpcUrl, defaultChainId } from '~/consts';
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(() => {
   const metadata = {
     name: 'VOCAL.FUN',
     description: 'Vocal Fun - Talk to realtime AI agents',
@@ -13,28 +10,22 @@ export default defineNuxtPlugin((nuxtApp) => {
     icons: ['https://vocal-frontend.vercel.app/favicon.ico'],
   };
 
-  const wagmiAdapter = new WagmiAdapter({
-    networks: [base],
-    projectId: wcProjectId,
+  const ethersConfig = defaultConfig({
+    metadata,
+    enableEIP6963: true,
+    enableInjected: false,
+    enableCoinbase: true,
+    rpcUrl: defaultRpcUrl,
+    defaultChainId,
   });
 
-  const modal = createAppKit({
-    adapters: [wagmiAdapter],
-    networks: [base],
-    metadata: metadata,
+  const modal = createWeb3Modal({
+    ethersConfig,
+    chains: chainsToSupport,
     projectId: wcProjectId,
-    features: {
-      analytics: false,
-      onramp: true,
-      swaps: true,
-      send: true,
-      receive: true,
-    },
-   });
-
-  const queryClient = new QueryClient();
-
-  nuxtApp.vueApp.use(VueQueryPlugin, { queryClient });
+    enableAnalytics: true,
+    enableOnramp: true,
+  });
 
   return {
     provide: {
