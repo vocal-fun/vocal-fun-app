@@ -302,8 +302,8 @@ const playPreview = async () => {
   await audioService.click();
 
   vocalService.onConnected(() => {
-    console.log('socket connected', props.person.name);
-    setVoicePersonality(props.person.name);
+    console.log('socket connected', props.person.backend);
+    setVoicePersonality(props.person.backend);
     getIntialVoiceLine();
   })
 }
@@ -338,7 +338,7 @@ const handleInitialVoiceLine = async (text: string, audio: string) => {
 };
 
 const userCall = async () => {
-  let cachedVoiceLine = getCachedVoiceLine(props.person.name);
+  let cachedVoiceLine = getCachedVoiceLine(props.person.backend);
   if (cachedVoiceLine) {
     console.log('found cachedVoiceLine', cachedVoiceLine.text);
     await handleInitialVoiceLine(cachedVoiceLine.text, cachedVoiceLine.audio);

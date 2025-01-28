@@ -4,59 +4,71 @@ export const celebrities: CelebrityItem[] = [
   {
     displayName: 'Trump joker',
     twitter: '@trumpjoker_bot',
-    name: 'trump-joker'
+    name: 'trump-joker',
+    backend: 'Trump'
   },
   {
     displayName: 'Vitaly',
     twitter: '@vitaly_bot',
-    name: 'buterin'
+    name: 'buterin',
+    backend: 'Vitalik'
   },
   {
     displayName: 'Jailed CZ',
     twitter: '@jailedcz_bot',
-    name: 'cz-jailed'
+    name: 'cz-jailed',
+    backend: 'CZ'
   },
   {
     displayName: 'Jeethotline',
     twitter: '@jeethotline_bot',
-    name: 'jeethotline'
+    name: 'jeethotline',
+    backend: ''
   },{
     displayName: 'Mao',
     twitter: '@mao_bot',
-    name: 'mao'
+    name: 'mao',
+    backend: ''
   },
   {
     displayName: 'Putin',
     twitter: '@putin_bot',
-    name: 'putin'
+    name: 'putin',
+    backend: ''
   },
   {
     displayName: 'Dokwon',
     twitter: '@dokwon_bot',
-    name: 'do-kwon'
+    name: 'do-kwon',
+    backend: ''
   },{
     displayName: 'luffy D monkey',
     twitter: '@luffydmonkey_bot',
-    name: 'luffy-d'
+    name: 'luffy-d',
+    backend: ''
   },
   {
     displayName: 'tronman3000',
     twitter: '@tronman_bot',
-    name: 'justin-sun'
+    name: 'justin-sun',
+    backend: ''
   },{
     displayName: 'elonmusk',
     twitter: '@dokwon_bot',
-    name: 'elon'
+    name: 'elon',
+    backend: 'Elon Musk'
   },
   {
     displayName: 'sbf',
     twitter: '@luffydmonkey_bot',
-    name: 'banks'
+    name: 'banks',
+    backend: ''
   },
   {
     displayName: 'coinbald',
     twitter: '@tronman_bot',
-    name: 'coinbald'
+    name: 'coinbald',
+    backend: ''
   }
 ];
 
