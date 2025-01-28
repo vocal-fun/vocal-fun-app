@@ -302,8 +302,8 @@ const playPreview = async () => {
   await audioService.click();
 
   vocalService.onConnected(() => {
-    console.log('socket connected', 'Trump');
-    setVoicePersonality('Trump');
+    console.log('socket connected', props.person.name);
+    setVoicePersonality(props.person.name);
     getIntialVoiceLine();
   })
 }
@@ -338,7 +338,7 @@ const handleInitialVoiceLine = async (text: string, audio: string) => {
 };
 
 const userCall = async () => {
-  let cachedVoiceLine = getCachedVoiceLine('Trump');
+  let cachedVoiceLine = getCachedVoiceLine(props.person.name);
   if (cachedVoiceLine) {
     console.log('found cachedVoiceLine', cachedVoiceLine.text);
     await handleInitialVoiceLine(cachedVoiceLine.text, cachedVoiceLine.audio);
