@@ -1,16 +1,17 @@
-import {vocalService} from "~/services/vocal";
+import { vocalService } from '~/services/vocal';
+
+export let selectedVoice: string;
+
+const cachedVoiceLine: Record<string, { text: string; audio: string }> = {};
 
 export async function getVocalResponse(transcript: string) {
   vocalService.getVocalResponse(transcript);
 }
 
-export let selectedVoice: string
 export async function setVoicePersonality(personality: string) {
   selectedVoice = personality;
   vocalService.setVoicePersonality(selectedVoice);
 }
-
-let cachedVoiceLine: any = {};
 
 export async function getIntialVoiceLine() {
   vocalService.getInitialVoiceLine();
