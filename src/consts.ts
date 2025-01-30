@@ -1,65 +1,3 @@
-import type { CelebrityItem } from './types';
-
-export const celebrities: CelebrityItem[] = [
-  {
-    displayName: 'Trump joker',
-    twitter: '@trumpjoker_bot',
-    name: 'trump-joker'
-  },
-  {
-    displayName: 'Vitaly',
-    twitter: '@vitaly_bot',
-    name: 'buterin'
-  },
-  {
-    displayName: 'Jailed CZ',
-    twitter: '@jailedcz_bot',
-    name: 'cz-jailed'
-  },
-  {
-    displayName: 'Jeethotline',
-    twitter: '@jeethotline_bot',
-    name: 'jeethotline'
-  },{
-    displayName: 'Mao',
-    twitter: '@mao_bot',
-    name: 'mao'
-  },
-  {
-    displayName: 'Putin',
-    twitter: '@putin_bot',
-    name: 'putin'
-  },
-  {
-    displayName: 'Dokwon',
-    twitter: '@dokwon_bot',
-    name: 'do-kwon'
-  },{
-    displayName: 'luffy D monkey',
-    twitter: '@luffydmonkey_bot',
-    name: 'luffy-d'
-  },
-  {
-    displayName: 'tronman3000',
-    twitter: '@tronman_bot',
-    name: 'justin-sun'
-  },{
-    displayName: 'elonmusk',
-    twitter: '@dokwon_bot',
-    name: 'elon'
-  },
-  {
-    displayName: 'sbf',
-    twitter: '@luffydmonkey_bot',
-    name: 'banks'
-  },
-  {
-    displayName: 'coinbald',
-    twitter: '@tronman_bot',
-    name: 'coinbald'
-  }
-];
-
 export const icons = {
   play: 'M9.43993 4.13143C10.1867 4.51529 10.1867 5.48477 9.43992 5.86863L1.66142 9.86696C0.920935 10.2476 -3.72704e-08 9.76612 0 8.99836V1.00164C3.72705e-08 0.233881 0.920939 -0.247589 1.66143 0.133044L9.43993 4.13143Z',
   stop: 'M0.5 0.5H9.5V9.5H0.5V0.5Z',
@@ -75,7 +13,10 @@ export const baseNetwork = {
 };
 
 export const chainsToSupport = [baseNetwork];
-export const messageToSign = 'Please sign this message to proceed.';
 export const wcProjectId = '31b43709-d56d-4c07-b74c-a7421139da88=e81377cdc3f06c06104ae06b0f71d973270c87bae05fa29c82432808697b58f2';
 export const defaultRpcUrl = baseNetwork.rpcUrl;
 export const defaultChainId = baseNetwork.chainId;
+
+export const endpoint = 'https://api.vocal.fun/api/v1';
+export const wsEndpoint = 'https://api.vocal.fun';
+export const wsCallEndpoint = 'https://api.vocal.fun/call';

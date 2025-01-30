@@ -1,5 +1,5 @@
 <template>
-  <button class="modal-button">
+  <button class="modal-button" :disabled="disabled">
     <span>
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" :class="icon">
         <path :d="d" fill="black"/>
@@ -14,6 +14,7 @@ import { icons } from '~/consts';
 
 const props = defineProps<{
   icon: 'play' | 'stop' | 'call',
+  disabled?: boolean,
 }>();
 
 const d = computed(() => icons[props.icon]);
@@ -25,6 +26,9 @@ const d = computed(() => icons[props.icon]);
   align-items: center;
   gap: .5rem;
   transition: color 0.3s ease-in-out;
+  &[disabled] {
+    cursor: not-allowed;
+  }
   > span {
     display: inline-flex;
     width: 22px;

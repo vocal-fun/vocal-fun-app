@@ -1,10 +1,10 @@
 <template>
   <div class="wallet-connect">
     <button
-      v-if="!isConnected || !hasSigned"
+      v-if="!isLoggedIn"
       v-play-click-sound
       class="wallet-connect__button"
-      @click="!isConnected ? modal.open() : promptSignMessage()"
+      @click="handleConnectClick()"
     >
       connect wallet
     </button>
@@ -12,7 +12,7 @@
       v-else
       v-play-click-sound
       class="wallet-connect__button"
-      @click="modal.open()"
+      @click="openModal()"
     >
       {{ formattedAddress }}
     </button>
@@ -20,47 +20,16 @@
 </template>
 
 <script setup lang="ts">
-import { useWeb3Modal, useWeb3ModalAccount } from '@web3modal/ethers/vue';
-import { useBlockchain } from '~/composables/blockchain';
+import { useWalletConnect } from '~/composables/useWalletConnect';
 
-const { signMessage } = useBlockchain();
-const { address, isConnected } = useWeb3ModalAccount();
-const modal = useWeb3Modal();
-const hasSigned = ref(false);
+const { isLoggedIn, accountAddress, openModal, handleConnectClick } = useWalletConnect();
 
 const formattedAddress = computed(() => {
-  if (address.value) {
-    return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`;
+  if (accountAddress.value) {
+    return `${accountAddress.value.slice(0, 6)}...${accountAddress.value.slice(-4)}`;
   }
   return '';
 });
-
-onMounted(() => {
-  const storedHasSigned = localStorage.getItem('hasSigned')
-  const storedAddress = localStorage.getItem('signedAddress')
-  if (storedHasSigned === 'true' && storedAddress === address.value) {
-    hasSigned.value = true
-  }
-});
-
-async function promptSignMessage() {
-  try {
-    await signMessage()
-    hasSigned.value = true
-    localStorage.setItem('hasSigned', 'true')
-    localStorage.setItem('signedAddress', address.value || '')
-  } catch (error) {
-    console.error('Message signing failed:', error)
-    hasSigned.value = false
-    localStorage.removeItem('hasSigned')
-    localStorage.removeItem('signedAddress')
-  }
-}
-watch(isConnected, async (newVal, oldVal) => {
-  if (newVal && !oldVal && !hasSigned.value) {
-    await promptSignMessage()
-  }
-})
 </script>
 
 <style scoped lang="scss">

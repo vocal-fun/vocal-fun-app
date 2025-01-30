@@ -1,4 +1,5 @@
 import { Howl } from 'howler';
+import type { Preview } from '~/types';
 
 interface AudioCache {
   audio: Howl;
@@ -25,19 +26,48 @@ class AudioService {
 
   /**
    * Load audio into cache or update audio settings
-   * @param url Audio URL
+   * @param urlOrPreview Audio URL or Preview object
    * @param loop Loop audio
    * @param volume Audio volume; 0.0 to 1.0; default 1.0
    * @param fadein Fade in duration in ms
    * @param fadeout Fade out duration in ms
    */
-  load(url: string, loop: boolean = false, volume: number = 1, fadein?: number, fadeout?: number): void {
+  load(urlOrPreview: string | Preview, loop: boolean = false, volume: number = 1, fadein?: number, fadeout?: number): void {
+    if (typeof urlOrPreview === 'string') {
+      this.loadFile(urlOrPreview, loop, volume, fadein, fadeout);
+    } else {
+      this.loadPreview(urlOrPreview, loop, volume, fadein, fadeout);
+    }
+  }
+
+  private loadFile(url: string, loop: boolean = false, volume: number = 1, fadein?: number, fadeout?: number): void {
     if (this.audioCache[url]) {
       return; // If already cached, skip loading
     }
     this.audioCache[url] = {
       audio: new Howl({
         src: [url],
+        loop,
+        volume,
+        autoplay: false,
+      }),
+      loop,
+      volume,
+      fadein,
+      fadeout,
+    };
+  }
+
+  private loadPreview(preview: Preview, loop: boolean = false, volume: number = 1, fadein?: number, fadeout?: number): void {
+    const { agentId, audio, format } = preview;
+    const url = `data:audio/${format};base64,${audio}`;
+    if (this.audioCache[agentId]) {
+      return; // If already cached, skip loading
+    }
+    this.audioCache[agentId] = {
+      audio: new Howl({
+        src: [url],
+        format: [format],
         loop,
         volume,
         autoplay: false,

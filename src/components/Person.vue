@@ -1,5 +1,5 @@
 <template>
-  <div class="person shake-little" @click="openModal">
+  <div class="person shake-little" :class="{ disabled }" @click="openModal('default')">
     <div class="avatar-block">
       <NuxtImg
         class="avatar-img"
@@ -7,60 +7,47 @@
         format="webp"
         loading="lazy"
         width="100%"
-        :src="avatarPath"
-        :alt="displayName"
+        placeholder="/img/user-avatar.png"
+        :src="image"
+        :alt="name"
       />
-      <button class="play-btn shake" :aria-label="`Go to ${displayName} AI agent`">
-        <NuxtImg
-          src="/img/play-btn.png"
-          sizes="102px"
-          format="webp"
-          loading="lazy"
-          :alt="`Go to ${displayName} AI agent`"
-        />
-      </button>
     </div>
     <div class="info">
-      <span>{{ displayName }}</span>
-      <a class="twitter" target="_blank" rel="noopener noreferrer" :href="twitterLink" @click.stop="playClickSound">
-        <NuxtImg
-          class="twitter__icon"
-          src="/img/twitter-green.png"
-          sizes="88px"
-          format="webp"
-          loading="lazy"
-          :alt="`Go to ${displayName} Twitter`"
-        />
-        <span>{{ twitter }}</span>
-      </a>
+      <span>{{ name }}</span>
+      <span>${{ rate }} / min</span>
+    </div>
+    <div class="buttons">
+      <button class="preview shake" :disabled="disabled" @click="openModal('preview')">PREVIEW</button>
+      <button class="shake" :disabled="disabled" @click="openModal('call')">CALL</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { audioService } from '~/services/audio';
-import type { CelebrityItem } from '~/types';
+import type { AgentDto, OpenModalState } from '~/types';
 
-const props = defineProps<Omit<CelebrityItem, 'audioFormat'>>();
+const props = defineProps<Omit<AgentDto, '__v' | 'createdAt'> & { disabled: boolean }>();
 
-const avatarPath = computed(() => `/img/celebrity-logo/${props.name}.${props.imgFormat || 'png'}`);
-const twitterLink = computed(() => `https://x.com/${props.twitter.startsWith('@') ? props.twitter.slice(1) : props.twitter}`);
-
-const emit = defineEmits(['open-modal']);
+const emit = defineEmits<{
+  'open-modal': [state: OpenModalState],
+}>();
 
 const playClickSound = () => audioService.click();
 
-const openModal = () => {
+const openModal = (state: OpenModalState = 'default') => {
+  if (props.disabled) return;
   playClickSound();
-  emit('open-modal');
+  emit('open-modal', state);
 };
 </script>
 
 <style scoped lang="scss">
 .person {
   cursor: pointer;
-  color: #37D339;
+  color: var(--color-primary);
   display: flex;
+  flex-wrap: wrap;
   width: 430px;
   transition: transform 0.3s ease-in-out;
   box-shadow:
@@ -70,16 +57,47 @@ const openModal = () => {
       3px 0 0 0 #59596D,
       0 -1.5px 0 0 #000000;
 
+  &.disabled {
+    cursor: not-allowed;
+  }
+
+  > * {
+    flex: 1 1 50%;
+  }
+
+  > .buttons {
+    flex: 1 1 100%;
+    display: flex;
+    z-index: 1;
+
+    > button {
+      flex: 1 1 50%;
+      padding: 1rem;
+      background-color: var(--color-primary);
+      color: #1B1B2A;
+      border: none;
+      cursor: pointer;
+      justify-content: center;
+
+      &[disabled] {
+        cursor: not-allowed;
+      }
+
+      &:hover {
+        transform: scale(1.035);
+        z-index: 100;
+      }
+    }
+
+    .preview {
+      background-color: #37D33933;
+      color: var(--color-primary);
+    }
+  }
+
   .avatar-block {
     position: relative;
     width: 200px;
-    .play-btn {
-      bottom: 0;
-      right: 0;
-      position: absolute;
-      height: 40px;
-      width: 51px;
-    }
 
     img {
       width: 200px;
@@ -93,34 +111,12 @@ const openModal = () => {
     justify-content: space-between;
     padding: 1rem;
     width: 230px;
-
-    .twitter {
-      display: inline-flex;
-      align-items: center;
-      gap: 15px;
-      cursor: pointer;
-      span {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-      }
-      &__icon {
-        width: 22px;
-        aspect-ratio: 44 / 35;
-      }
-    }
-
-    .twitter:hover {
-      span {
-        color: white;
-      }
-    }
   }
-}
 
-.person:hover {
-  transform: scale(1.035);
-  z-index: 99;
+  &:hover {
+    transform: scale(1.035);
+    z-index: 99;
+  }
 }
 
 @media (max-width: 680px) {
@@ -128,6 +124,15 @@ const openModal = () => {
     flex-direction: column;
     width: 70%;
     align-items: center;
+
+    > * {
+      flex: auto;
+    }
+
+    > .buttons {
+      flex: auto;
+      width: 100%;
+    }
 
     .info {
       gap: 1rem;

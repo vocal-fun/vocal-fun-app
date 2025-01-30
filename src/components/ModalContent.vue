@@ -3,10 +3,13 @@
     <button v-play-click-sound class="close" @click="onModalClose">X</button>
   </div>
   <div class="info">
-    <div class="balance">YOUR VOCAL: 0.18</div>
-    <button v-play-click-sound class="buy-more">
-      BUY MORE
-    </button>
+    <template v-if="user">
+      <div class="balance">YOUR MINUTES: {{ user.balance }}</div>
+      <button v-play-click-sound class="buy-more" @click="openBuyModal">
+        BUY MORE
+      </button>
+    </template>
+    <ConnectWallet v-else class="buy-more" @click="onModalClose" />
   </div>
   <div class="content">
     <template v-if="idleOrError">
@@ -16,11 +19,11 @@
           sizes="90vw md:400px"
           format="webp"
           loading="lazy"
-          :src="imagePath"
+          :src="person.image"
         />
       </div>
-      <div class="name">{{ person.displayName }}</div>
-      <div class="price">10 $vocal/min</div>
+      <div class="name">{{ person.name }}</div>
+      <div class="price">${{ person.rate }} / min</div>
       <div v-show="error" class="error alert-color">some error happened</div>
     </template>
 
@@ -33,9 +36,9 @@
             sizes="90vw md:400px"
             format="webp"
             loading="lazy"
-            :src="imagePath"
+            :src="person.image"
           />
-          <div class="name">{{ person.displayName }}</div>
+          <div class="name">{{ person.name }}</div>
         </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -65,9 +68,9 @@
   <div v-show="!error" class="recognition" :class="{ hidden: !speechRecResult }">- {{ speechRecResult }}</div>
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : 'footer-idle']">
     <template v-if="idleOrError">
-      <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
+      <GreenModalButton icon="call" :disabled="!user" @click="startCall">Call</GreenModalButton>
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
-      <GreenModalButton v-else icon="play" @click="playPreview">Preview</GreenModalButton>
+      <GreenModalButton v-else icon="play" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
     </template>
 
     <template v-else-if="callingOrOnCall">
@@ -97,13 +100,26 @@ import { audioService } from '~/services/audio';
 import { vocalService } from '~/services/vocal';
 import { getCachedVoiceLine, getIntialVoiceLine, getVocalResponse, setVoicePersonality } from '~/services/vocalUtils';
 import { AudioStreamPlayer } from '~/services/AudioStreamManager';
-import type { CelebrityItem } from '~/types';
+import type { AgentDto, OpenModalState, Preview } from '~/types';
 
-type callStatusType = 'calling' | 'idle' | 'on-call';
+type CallStatusType = 'calling' | 'idle' | 'on-call';
 
-const props = defineProps<{
-  person: CelebrityItem,
-}>();
+const props = withDefaults(
+  defineProps<{
+    person?: AgentDto,
+  }>(),
+  {
+    person: () => ({
+      name: '',
+      image: '',
+      twitter: '',
+      __v: 0,
+      rate: 1,
+      createdAt: '',
+      _id: '',
+    }),
+  }
+);
 
 const emit = defineEmits(['close']);
 
@@ -114,7 +130,7 @@ const callD = icons.call;
 const audioPlayer = new AudioStreamPlayer();
 const audio = shallowRef<Howl | null>(null);
 
-const callStatus = ref<callStatusType>('idle');
+const callStatus = ref<CallStatusType>('idle');
 const timerText = ref<string>('00:00');
 const hasErrors = ref<boolean>(false); // TODO: Set to true for errors from backend
 
@@ -126,7 +142,17 @@ const onCall = computed(() => callStatus.value === 'on-call');
 const idleOrError = computed(() => idle.value || error.value);
 const callingOrOnCall = computed(() => (calling.value || onCall.value) && !error.value);
 
-const imagePath = computed(() => `/img/celebrity-logo/${props.person.name}.${props.person.imgFormat || 'png'}`);
+const agentsStore = useAgentsStore();
+const preview = computed<Preview | null>(() =>
+  agentsStore.previews[props.person._id]
+  ? { ...agentsStore.previews[props.person._id], agentId: props.person._id }
+  : null
+);
+
+const buyStore = useBuyStore();
+const authStore = useAuthStore();
+
+const user = computed(() => authStore.user);
 
 const {
   isSupported,
@@ -158,6 +184,11 @@ const playCurrentSound = async (path: string, withoutResume = false) => {
   }
 };
 
+const openBuyModal = () => {
+  buyStore.openBuyModal();
+  onModalClose();
+};
+
 const stopCurrentSound = () => {
   if (audio) {
     audio.value?.pause?.();
@@ -187,7 +218,7 @@ const resetCallData = () => {
   speechRecResult.value = '';
 }
 
-const call = async () => {
+const call = async (click = true) => {
   const controller = new AbortController(); // Create an AbortController
   const signal = controller.signal; // Get the signal
 
@@ -196,7 +227,9 @@ const call = async () => {
     controller.abort(); // Abort the call when needed
   };
   resetCallData();
-  await audioService.click();
+  if (click) {
+    await audioService.click();
+  }
   callStatus.value = 'calling';
 
   // For demo purposes: Play the calling audio
@@ -235,8 +268,11 @@ const call = async () => {
   return cancelCurrentCall; // Return the cancel function for later use
 };
 
-const startCall = async () => {
-  cancelCurrentCall = await call();
+const startCall = async (click = true) => {
+  if (!user.value) {
+    return; // Do nothing if user is not logged in
+  }
+  cancelCurrentCall = await call(click);
 }
 
 const hangUp = () => {
@@ -298,14 +334,18 @@ const hangUpWithClickSound = () => {
   hangUp();
 }
 
-const playPreview = async () => {
-  await audioService.click();
-
-  vocalService.onConnected(() => {
-    console.log('socket connected', 'Trump');
-    setVoicePersonality('Trump');
-    getIntialVoiceLine();
-  })
+const playPreview = async (click = true) => {
+  if (click) {
+    await audioService.click();
+  }
+  if (props.person._id) {
+    await playCurrentSound(props.person._id);
+  }
+  // vocalService.onConnected(() => {
+  //   console.log('socket connected', 'Trump');
+  //   setVoicePersonality('Trump');
+  //   getIntialVoiceLine();
+  // })
 }
 
 const stopPreview = async () => {
@@ -348,6 +388,24 @@ const userCall = async () => {
   }
 };
 
+const onOpen = async (state: OpenModalState) => {
+  await nextTick();
+  await agentsStore.getAgentPreview(props.person);
+  if (preview.value) {
+    audioService.load(preview.value);
+  }
+  switch (state) {
+    case 'default':
+      break;
+    case 'preview':
+      await playPreview(false);
+      break;
+    case 'call':
+      await startCall(false);
+      break;
+  }
+}
+
 watch(speechRecResult, (newResult) => {
   console.log(`New speech recognition result: ${newResult}`);
   newResult && getVocalResponse(newResult);
@@ -366,6 +424,7 @@ watch(error, (newResult) => {
 
 
 defineExpose({
+  onOpen,
   hangUp,
 });
 </script>

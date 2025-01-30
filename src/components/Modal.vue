@@ -64,7 +64,12 @@ const close = () => {
 
 .modal-dialog {
   overflow-y: auto;
-  background: black;
+  background: black; /* Base black background */
+  background: linear-gradient(
+      180deg, 
+      rgba(55, 211, 57, 0) 0%, 
+      rgba(55, 211, 57, 0.12) 100%
+  ), black; /* Layering gradient over black */
   padding: 1.25rem;
   border-radius: 8px;
   max-width: 650px;

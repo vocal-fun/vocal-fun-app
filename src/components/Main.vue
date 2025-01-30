@@ -6,13 +6,15 @@
     </div>
     <div class="content-main">
       <Person
-        v-for="person in celebrities"
+        v-for="person in agents"
         :key="person.name"
         :name="person.name"
-        :display-name="person.displayName"
         :twitter="person.twitter"
-        :img-format="person.imgFormat"
-        @open-modal="openModal(person)"
+        :image="person.image"
+        :_id="person._id"
+        :rate="person.rate"
+        :disabled="modalLoading"
+        @open-modal="openModal(person, $event)"
       />
       <Modal :isOpen="isModalOpen" @close="closeModal">
         <ModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
@@ -22,23 +24,35 @@
 </template>
 
 <script setup lang="ts">
-import { celebrities } from '~/consts';
-import type { CelebrityItem } from '~/types';
+import type { AgentDto, OpenModalState } from '~/types';
 
 const modalContent = useTemplateRef('modalContent');
+const agentsStore = useAgentsStore();
 
+const modalLoading = ref<boolean>(false);
 const isModalOpen = ref<boolean>(false);
-const selectedPerson = ref<CelebrityItem>(celebrities[0]);
+const selectedPerson = ref<AgentDto | undefined>(undefined);
 
-const openModal = (person: CelebrityItem) => {
+const agents = computed(() => agentsStore.agents);
+
+const openModal = async (person: AgentDto, state: OpenModalState) => {
+  // modalLoading.value = true;
   selectedPerson.value = person;
+  modalContent.value?.onOpen(state); // TODO: await modalContent.value?.onOpen(state); if need to wait
   isModalOpen.value = true;
+  // modalLoading.value = false;
 };
 
 const closeModal = () => {
   isModalOpen.value = false;
   modalContent.value?.hangUp();
 };
+
+onBeforeMount(async () => {
+  await agentsStore.getAgents();
+  // preload first agent
+  selectedPerson.value = agentsStore.agents[0];
+});
 </script>
 
 <style scoped lang="scss">
@@ -51,9 +65,11 @@ section.main {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    gap: 1rem;
   }
 
   .content-main {
+    min-height: 700px;
     max-width: 2048px;
     margin: auto;
     background: #161622;
@@ -74,7 +90,7 @@ section.main {
 
   .equalizer {
     height: 120px;
-    width: 500px;
+    width: 430px;
   }
 }
 

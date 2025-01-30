@@ -1,5 +1,5 @@
 <template>
-  <section class="header">
+  <section class="header" :class="{ 'header--with-account': user }">
     <div class="socials">
       <a v-play-click-sound class="social shake-little" href="https://t.me/vocal_fun_official" target="_blank" rel="noopener noreferrer">
         <NuxtImg
@@ -41,7 +41,16 @@
       <span class="logo-bar-element"></span>
     </button>
 
-    <ConnectWallet class="wallet" />
+    <div class="user">
+      <button v-if="user" v-play-click-sound class="account" @click="buyStore.openBuyModal">
+        YOUR MINUTES: {{ user.balance }}
+      </button>
+      <ConnectWallet class="wallet" />
+    </div>
+
+    <Modal :isOpen="isBuyModalOpen" @close="buyStore.closeBuyModal">
+      <BuyModalContent @close="buyStore.closeBuyModal" />
+    </Modal>
   </section>
 </template>
 
@@ -49,6 +58,12 @@
 import { audioService } from '~/services/audio';
 
 const isPlaying = ref<boolean>(false);
+
+const buyStore = useBuyStore();
+const authStore = useAuthStore();
+
+const user = computed(() => authStore.user);
+const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 
 const toggleBackgroundSound = () => {
   audioService.click();
@@ -62,6 +77,41 @@ const toggleBackgroundSound = () => {
 </script>
 
 <style scoped lang="scss">
+@mixin responsive-header($without-account: false) {
+  & {
+    height: auto;
+    margin-bottom: 2.1875rem;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .socials {
+      order: 1;
+      flex-grow: 1;
+    }
+
+    .user {
+      order: 1;
+      flex-grow: 1;
+      text-align: right;
+      @if ($without-account == true) {
+        margin-left: 1.25rem;
+        justify-content: end;
+      }
+    }
+
+    .logo {
+      order: 2;
+      flex-grow: 2;
+      justify-content: center;
+
+      .logo-bar-element {
+        height: 0.6rem;
+      }
+    }
+  }
+}
+
 .header {
   display: flex;
   flex-direction: row;
@@ -125,43 +175,45 @@ const toggleBackgroundSound = () => {
       }
     }
   }
-}
 
-@media (max-width: 840px) {
-  .header {
-    height: auto;
-    margin-bottom: 2.1875rem;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
+  .user {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-left: 1.25rem;
+  }
 
-    .socials {
-      order: 1;
-      flex-grow: 1;
-    }
-
-    .wallet {
-      order: 1;
-      flex-grow: 1;
-      text-align: right;
-      margin-left: 1.25rem;
-    }
-
-    .logo {
-      order: 2;
-      flex-grow: 2;
-      justify-content: center;
-
-      .logo-bar-element {
-        height: 0.6rem;
-      }
+  .account {
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out, text-decoration 0.3s ease-in-out;
+    &:hover {
+      text-decoration: underline;
+      color: white;
     }
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 1048px) {
+  .header--with-account {
+    @include responsive-header;
+  }
+}
+
+@media (max-width: 840px) {
+  .header:not(.header--with-account) {
+    @include responsive-header($without-account: true);
+  }
+}
+
+@media (max-width: 655px) {
   .header {
-    .wallet-connect {
+    .socials {
+      justify-content: center;
+    }
+    .user {
       margin-left: 0;
     }
   }
@@ -170,13 +222,11 @@ const toggleBackgroundSound = () => {
 @media (max-width: 475px) {
   .header {
     margin-bottom: 1.56rem;
-    .socials {
-      justify-content: center;
-    }
     .logo {
       margin: .625rem 0;
     }
-    .wallet {
+    .user {
+      flex-direction: column;
       text-align: center;
     }
   }

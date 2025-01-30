@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: false },
   css: ['~/assets/styles/index.css'],
-  modules: ['@nuxt/image', '@nuxtjs/sitemap'],
+  modules: ['@nuxt/image', '@nuxtjs/sitemap', '@pinia/nuxt'],
 
   app: {
     head: {
@@ -106,6 +106,12 @@ export default defineNuxtConfig({
           content: 'website',
         },
       ],
+    },
+  },
+
+  nitro: {
+    routeRules: {
+      "/api/v1/**": { proxy: "https://api.vocal.fun/api/v1/**" },
     },
   },
 });
