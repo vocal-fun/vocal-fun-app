@@ -17,6 +17,10 @@ export default defineNuxtPlugin(() => {
     enableCoinbase: true,
     rpcUrl: defaultRpcUrl,
     defaultChainId,
+    auth: {
+      email: false,
+      socials: undefined,
+    }
   });
 
   const modal = createWeb3Modal({
