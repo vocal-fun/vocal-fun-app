@@ -13,7 +13,7 @@ export const baseNetwork = {
 };
 
 export const chainsToSupport = [baseNetwork];
-export const wcProjectId = '31b43709-d56d-4c07-b74c-a7421139da88=e81377cdc3f06c06104ae06b0f71d973270c87bae05fa29c82432808697b58f2';
+export const wcProjectId = 'fb93d3bd1d8f1197ffa577a77489afe6';
 export const defaultRpcUrl = baseNetwork.rpcUrl;
 export const defaultChainId = baseNetwork.chainId;
 
