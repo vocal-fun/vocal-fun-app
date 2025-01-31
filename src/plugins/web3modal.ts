@@ -24,8 +24,8 @@ export default defineNuxtPlugin(() => {
     chains: chainsToSupport,
     projectId: wcProjectId,
     enableAnalytics: false,
-    enableOnramp: true,
-    enableSwaps: true,
+    enableOnramp: false,
+    enableSwaps: false,
   });
 
   return {

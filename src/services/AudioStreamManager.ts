@@ -9,9 +9,14 @@ export class AudioStreamPlayer {
   constructor() {
     // Initialize AudioContext only when first needed
     this.initializeAudioContext();
+    this.setCallbacks(() => {
+      console.log('[AUDIO STREAM] Started playing audio response');
+    }, () => {
+      console.log('[AUDIO STREAM] Finished playing audio response');
+    });
   }
 
-  private initializeAudioContext() {
+  private initializeAudioContext(): void {
     if (typeof window !== 'undefined') {
       // Get the correct AudioContext definition
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -23,12 +28,12 @@ export class AudioStreamPlayer {
     }
   }
 
-  public setCallbacks(onStart: () => void, onEnd: () => void) {
+  public setCallbacks(onStart: () => void, onEnd: () => void): void {
     this.onStartCallback = onStart;
     this.onEndCallback = onEnd;
   }
 
-  public async addChunk(base64Audio: string) {
+  public async addChunk(base64Audio: string): Promise<void> {
     if (!this.audioContext) {
       this.initializeAudioContext();
       if (!this.audioContext) {
@@ -56,7 +61,7 @@ export class AudioStreamPlayer {
     }
   }
 
-  private async playNextChunk() {
+  private async playNextChunk(): Promise<void> {
     if (!this.audioContext || this.audioQueue.length === 0 || this.isPlaying) {
       return;
     }
@@ -93,7 +98,7 @@ export class AudioStreamPlayer {
     }
   }
 
-  public async stop() {
+  public async stop(): Promise<void> {
     try {
       if (this.sourceNode) {
         this.sourceNode.stop();
@@ -112,7 +117,7 @@ export class AudioStreamPlayer {
     }
   }
 
-  public async resume() {
+  public async resume(): Promise<void> {
     try {
       if (this.audioContext?.state === 'suspended') {
         await this.audioContext.resume();
@@ -122,7 +127,7 @@ export class AudioStreamPlayer {
     }
   }
 
-  public async cleanup() {
+  public async cleanup(): Promise<void> {
     try {
       await this.stop();
       if (this.audioContext) {

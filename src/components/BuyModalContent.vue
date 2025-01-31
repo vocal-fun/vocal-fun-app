@@ -203,6 +203,11 @@ const openWallet = () => {
     transform: scale(1.035);
   }
 }
+@media (max-width: 600px) {
+  .label-options {
+    flex-direction: column;
+  }
+}
 @media (max-width: 550px) {
   .info,
   .account,
@@ -212,9 +217,6 @@ const openWallet = () => {
   }
   .info {
     gap: 2rem;
-    .label-options {
-      flex-direction: column;
-    }
     .amount-controls {
       justify-content: center;
     }

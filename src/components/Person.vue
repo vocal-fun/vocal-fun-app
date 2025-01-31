@@ -18,7 +18,7 @@
     </div>
     <div class="buttons">
       <button class="preview shake" :disabled="disabled" @click="openModal('preview')">PREVIEW</button>
-      <button class="shake" :disabled="disabled" @click="openModal('call')">CALL</button>
+      <button class="shake" :disabled="disabled || !user" @click="openModal('call')">CALL</button>
     </div>
   </div>
 </template>
@@ -33,10 +33,14 @@ const emit = defineEmits<{
   'open-modal': [state: OpenModalState],
 }>();
 
+const authStore = useAuthStore();
+const user = computed(() => authStore.user);
+
 const playClickSound = () => audioService.click();
 
 const openModal = (state: OpenModalState = 'default') => {
   if (props.disabled) return;
+  if (state === 'call' && !user.value) return;
   playClickSound();
   emit('open-modal', state);
 };

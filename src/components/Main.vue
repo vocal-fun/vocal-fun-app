@@ -45,7 +45,7 @@ const openModal = async (person: AgentDto, state: OpenModalState) => {
 
 const closeModal = () => {
   isModalOpen.value = false;
-  modalContent.value?.hangUp();
+  modalContent.value?.close();
 };
 
 onBeforeMount(async () => {

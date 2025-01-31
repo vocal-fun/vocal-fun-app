@@ -24,7 +24,7 @@
       </div>
       <div class="name">{{ person.name }}</div>
       <div class="price">${{ person.rate }} / min</div>
-      <div v-show="error" class="error alert-color">some error happened</div>
+      <div v-show="hasError" class="error alert-color">some error happened</div>
     </template>
 
     <transition name="fade">
@@ -65,7 +65,7 @@
       </div>
     </transition>
   </div>
-  <div v-show="!error" class="recognition" :class="{ hidden: !speechRecResult }">- {{ speechRecResult }}</div>
+  <!-- <div v-show="!error" class="recognition" :class="{ hidden: !speechRecResult }">- {{ speechRecResult }}</div> -->
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : 'footer-idle']">
     <template v-if="idleOrError">
       <GreenModalButton icon="call" :disabled="!user" @click="startCall">Call</GreenModalButton>
@@ -91,15 +91,10 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
-import { useSpeechRecognition } from '@vueuse/core';
 import type { Howl } from 'howler';
 
 import { icons } from '~/consts';
 import { audioService } from '~/services/audio';
-import { vocalService } from '~/services/vocal';
-import { getCachedVoiceLine, getIntialVoiceLine, getVocalResponse, setVoicePersonality } from '~/services/vocalUtils';
-import { AudioStreamPlayer } from '~/services/AudioStreamManager';
 import type { AgentDto, OpenModalState, Preview } from '~/types';
 
 type CallStatusType = 'calling' | 'idle' | 'on-call';
@@ -127,20 +122,17 @@ let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
 let cancelCurrentCall: (() => void) | null = null;
 const callD = icons.call;
-const audioPlayer = new AudioStreamPlayer();
 const audio = shallowRef<Howl | null>(null);
 
 const callStatus = ref<CallStatusType>('idle');
 const timerText = ref<string>('00:00');
-const hasErrors = ref<boolean>(false); // TODO: Set to true for errors from backend
 
 const idle = computed(() => callStatus.value === 'idle');
 const calling = computed(() => callStatus.value === 'calling');
-const error = computed(() => !isSupported.value || speechRecError.value || hasErrors.value);
 const onCall = computed(() => callStatus.value === 'on-call');
 
-const idleOrError = computed(() => idle.value || error.value);
-const callingOrOnCall = computed(() => (calling.value || onCall.value) && !error.value);
+const idleOrError = computed(() => idle.value || hasError.value);
+const callingOrOnCall = computed(() => (calling.value || onCall.value) && !hasError.value);
 
 const agentsStore = useAgentsStore();
 const preview = computed<Preview | null>(() =>
@@ -154,15 +146,7 @@ const authStore = useAuthStore();
 
 const user = computed(() => authStore.user);
 
-const {
-  isSupported,
-  // isListening,
-  // isFinal,
-  result: speechRecResult,
-  error: speechRecError,
-  start: startSpeechRec,
-  stop: stopSpeechRec,
-} = useSpeechRecognition();
+const { initCallSession, closeCallSession, startRecording, stopRecording, hasError } = useCallApi();
 
 const playCurrentSound = async (path: string, withoutResume = false) => {
   try {
@@ -199,6 +183,12 @@ const stopCurrentSound = () => {
 const onModalClose = () => {
   emit('close');
   hangUp();
+  closeCallSession();
+}
+
+const close = () => {
+  hangUp();
+  closeCallSession();
 }
 
 const resetTimer = () => {
@@ -210,12 +200,12 @@ const resetTimer = () => {
   timerText.value = '00:00';
 }
 
-const resetCallData = () => {
+const resetCallData = (keepError = false) => {
   resetTimer();
-  stopSpeechRec();
-  speechRecError.value = undefined;
-  hasErrors.value = false;
-  speechRecResult.value = '';
+  stopRecording();
+  if (!keepError) {
+    hasError.value = false;
+  }
 }
 
 const call = async (click = true) => {
@@ -234,6 +224,8 @@ const call = async (click = true) => {
 
   // For demo purposes: Play the calling audio
   playCurrentSound(audioService.callingUrl, true);
+  // Initiate the call session and web socket connection
+  await initCallSession(props.person._id);
 
   // Add the abort signal to your Promise
   new Promise<void>((resolve, reject) => {
@@ -249,8 +241,7 @@ const call = async (click = true) => {
 
     console.info(`[VOCAL.FUN] Call with ${props.person.name} started`);
 
-    startSpeechRec();
-    userCall();
+    startRecording();
 
     timer = setInterval(() => {
       seconds++;
@@ -260,7 +251,7 @@ const call = async (click = true) => {
     if ((error as Error).message === 'Call was cancelled') {
       console.log('Call was cancelled before completion');
     } else {
-      hasErrors.value = true;
+      error.value = true;
       console.warn('[VOCAL.FUN] Error during call:', error);
     }
   });
@@ -275,59 +266,13 @@ const startCall = async (click = true) => {
   cancelCurrentCall = await call(click);
 }
 
-const hangUp = () => {
-  resetCallData();
+const hangUp = (keepError = false) => {
+  resetCallData(keepError);
   stopCurrentSound();
   cancelCurrentCall?.();
   callStatus.value = 'idle';
   audioService.resumeBgMusic();
 }
-
-vocalService.onMessage("transcript_text", (message) => {
-  console.log("Transcript text:", message.text);
-  // setMessages(prev => [...prev, {
-  //   message: message.text,
-  //   sender: 'Vocal',
-  // }]);
-});
-
-vocalService.onMessage("tts_stream", async (streamData) => {
-  switch (streamData.type) {
-    case "stream_start":
-      console.log("Stream started");
-      await audioPlayer.resume();
-      break;
-    case "audio_chunk":
-      await audioPlayer.addChunk(streamData.chunk);
-      break;
-    case "stream_end":
-      console.log("Stream ended");
-      break;
-    case "error":
-      console.error("Stream error:", streamData.error);
-      await audioPlayer.stop();
-      hasErrors.value = true;
-      break;
-  }
-});
-
-// Handle start vocal responses
-vocalService.onMessage("start_vocal_response", (message) => {
-  console.log("Start vocal response:", message.text);
-  // playInitialVoiceLine(message.text, message.audio_base64);
-  handleInitialVoiceLine(message.text, message.audio_base64);
-});
-
-// Handle personality updates
-vocalService.onMessage("personality_update", (message) => {
-  console.log("Personality update status:", message.status);
-});
-
-// Handle errors
-vocalService.onMessage("error", (message) => {
-  console.error("Error:", message.error);
-  hasErrors.value = true;
-});
 
 const hangUpWithClickSound = () => {
   audioService.click();
@@ -341,11 +286,6 @@ const playPreview = async (click = true) => {
   if (props.person._id) {
     await playCurrentSound(props.person._id);
   }
-  // vocalService.onConnected(() => {
-  //   console.log('socket connected', 'Trump');
-  //   setVoicePersonality('Trump');
-  //   getIntialVoiceLine();
-  // })
 }
 
 const stopPreview = async () => {
@@ -359,34 +299,6 @@ const updateTimerDisplay = () => {
   const secs = seconds % 60;
   timerText.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
-
-
-const handleInitialVoiceLine = async (text: string, audio: string) => {
-  const firstMessage = text;
-  const formattedMessage = {
-    message: firstMessage,
-    sender: 'Vocal',
-  };
-
-  // reactive ref
-  // const updatedMessages = [...messages, formattedMessage];
-  // setMessages(updatedMessages);
-
-  // Resume audio context and play the audio
-  await audioPlayer.resume();
-  await audioPlayer.addChunk(audio);
-};
-
-const userCall = async () => {
-  let cachedVoiceLine = getCachedVoiceLine('Trump');
-  if (cachedVoiceLine) {
-    console.log('found cachedVoiceLine', cachedVoiceLine.text);
-    await handleInitialVoiceLine(cachedVoiceLine.text, cachedVoiceLine.audio);
-  } else {
-    console.log('getting initial voice line');
-    getIntialVoiceLine();
-  }
-};
 
 const onOpen = async (state: OpenModalState) => {
   await nextTick();
@@ -406,26 +318,15 @@ const onOpen = async (state: OpenModalState) => {
   }
 }
 
-watch(speechRecResult, (newResult) => {
-  console.log(`New speech recognition result: ${newResult}`);
-  newResult && getVocalResponse(newResult);
+watch(hasError, (value) => {
+  if (value) {
+    hangUp(true);
+  }
 });
-
-watch(speechRecError, (newResult) => {
-  console.log('speechRecError:', newResult);
-});
-watch(error, (newResult) => {
-  console.log('error:', newResult); //speechRecError.value || hasErrors.value
-  console.log('speechRecError.value, hasErrors.value', {
-    speechRecError: speechRecError.value,
-    hasErrors: hasErrors.value,
-  })
-});
-
 
 defineExpose({
   onOpen,
-  hangUp,
+  close,
 });
 </script>
 
