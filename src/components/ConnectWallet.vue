@@ -20,15 +20,17 @@
 </template>
 
 <script setup lang="ts">
-import { useWalletConnect } from '~/composables/useWalletConnect';
-
-const { isLoggedIn, accountAddress, openModal, handleConnectClick } = useWalletConnect();
+const { isLoggedIn, isConnected, accountAddress, openModal, handleConnectClick, trackConnection } = useWalletConnect();
 
 const formattedAddress = computed(() => {
   if (accountAddress.value) {
     return `${accountAddress.value.slice(0, 6)}...${accountAddress.value.slice(-4)}`;
   }
   return '';
+});
+
+watch(isConnected, async (newVal, oldVal) => {
+  await trackConnection(newVal, oldVal);
 });
 </script>
 

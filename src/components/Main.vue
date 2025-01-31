@@ -28,6 +28,7 @@ import type { AgentDto, OpenModalState } from '~/types';
 
 const modalContent = useTemplateRef('modalContent');
 const agentsStore = useAgentsStore();
+const { isLoggedIn, handleConnectClick } = useWalletConnect();
 
 const modalLoading = ref<boolean>(false);
 const isModalOpen = ref<boolean>(false);
@@ -36,11 +37,16 @@ const selectedPerson = ref<AgentDto | undefined>(undefined);
 const agents = computed(() => agentsStore.agents);
 
 const openModal = async (person: AgentDto, state: OpenModalState) => {
-  // modalLoading.value = true;
+  if (state === 'call' && !isLoggedIn.value) {
+    handleConnectClick();
+    return;
+  }
+
+  modalLoading.value = true;
   selectedPerson.value = person;
-  modalContent.value?.onOpen(state); // TODO: await modalContent.value?.onOpen(state); if need to wait
-  isModalOpen.value = true;
-  // modalLoading.value = false;
+  isModalOpen.value = true; // TODO: move this line after await if need to wait
+  await modalContent.value?.onOpen(state);
+  modalLoading.value = false;
 };
 
 const closeModal = () => {

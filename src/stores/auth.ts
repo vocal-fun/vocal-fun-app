@@ -1,6 +1,5 @@
 import { useWeb3ModalAccount } from '@web3modal/ethers/vue';
 import { defineStore } from 'pinia';
-import { useBlockchain } from '~/composables/blockchain';
 import type { NonceDto, UserDto } from '~/types';
 
 export const useAuthStore = defineStore('auth', () => {

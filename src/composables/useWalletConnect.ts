@@ -19,7 +19,7 @@ export function useWalletConnect() {
     }
   }
 
-  watch(isConnected, async (newVal, oldVal) => {
+  const trackConnection = async (newVal: boolean, oldVal: boolean) => {
     if (loading.value) return;
     try {
       if (oldVal && !newVal) {
@@ -32,7 +32,7 @@ export function useWalletConnect() {
     } catch (error) {
       console.error('Error handling connection change:', error);
     }
-  });
+  }
 
   function handleConnectClick() {
     if (!isConnected.value) {
@@ -43,9 +43,11 @@ export function useWalletConnect() {
   }
 
   return {
+    isConnected,
     isLoggedIn,
     accountAddress,
     openModal: () => modal.open(),
     handleConnectClick,
+    trackConnection,
   };
 }
