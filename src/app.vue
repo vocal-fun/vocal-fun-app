@@ -7,14 +7,13 @@
 import { audioService } from './services/audio';
 
 const authStore = useAuthStore();
-const { info } = useNotification();
 
 onBeforeMount(async () => {
   audioService.initCache();
   try {
     await authStore.authorize();
   } catch (e) {
-    info('Your session has expired. Please log in again.');
+    // info('Your session has expired. Please log in again.');
     console.info(e);
   }
 });

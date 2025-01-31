@@ -7,7 +7,7 @@ export function useBuyModal() {
   const authStore = useAuthStore();
   const { transfer } = useBlockchain();
   const modal = useWeb3Modal();
-  const { success, warning } = useNotification();
+  // const { success, warning } = useNotification();
 
   const amount = ref(1);
 
@@ -68,10 +68,10 @@ export function useBuyModal() {
       const to = option.recipient;
       await transfer(contractAddress, to, amount.value);
       closeBuyModal();
-      success(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
+      // success(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
     } catch (error) {
       console.warn('Error buying:', error);
-      warning('An error occurred while processing your purchase');
+      // warning('An error occurred while processing your purchase');
     } finally {
       sendLoading.value = false;
     }
@@ -83,10 +83,10 @@ export function useBuyModal() {
     }
     try {
       await navigator.clipboard.writeText(selectedOption.value.recipient);
-      success('Recipient address copied to clipboard.');
+      // success('Recipient address copied to clipboard.');
     } catch (error) {
       console.warn('Error copying recipient address:', error);
-      warning('An error occurred while copying recipient address.');
+      // warning('An error occurred while copying recipient address.');
     }
   };
 
