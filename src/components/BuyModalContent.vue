@@ -2,7 +2,7 @@
   <div class="header">
     <div class="account">
       <span>YOUR MINUTES: {{ balance }}</span>
-      <button @click="openWallet">{{ formattedAddress }}</button>
+      <button v-play-click-sound @click="openWallet">{{ formattedAddress }}</button>
     </div>
     <button v-play-click-sound class="close" @click="onModalClose">X</button>
   </div>
@@ -17,13 +17,19 @@
         <Token with-name token="base" />
       </span>
       <div class="label-options">
-        <button v-for="item in buyOptions" :key="item.symbol" :class="{ active: selectedOption?.address === item.address }" @click="selectOption(item)">
+        <button
+          v-for="item in buyOptions"
+          v-play-click-sound
+          :key="item.symbol"
+          :class="{ active: selectedOption?.address === item.address }"
+          @click="selectOption(item)"
+        >
           {{ amount }} <Token with-name :token="item.symbol" /> = {{ amount }} MIN
         </button>
       </div>
       <div class="amount-controls">
-        <button @click="increaseAmount">+</button>
-        <button @click="decreaseAmount">-</button>
+        <button v-play-click-sound @click="increaseAmount">+</button>
+        <button v-play-click-sound @click="decreaseAmount">-</button>
       </div>
     </div>
     <div v-show="selectedOption?.recipient" class="info__qr">
@@ -33,13 +39,13 @@
   </div>
   <div class="recipient">
     <span>Send {{ optionsString }} to this address</span>
-    <button @click="copyRecipient">{{ selectedOption?.recipient ?? 'n/a' }}</button>
+    <button v-play-click-sound @click="copyRecipient">{{ selectedOption?.recipient ?? 'n/a' }}</button>
   </div>
   <div class="warning">
     <span>⚠ {{ optionsString }} Only</span>
     <span>⚠ BASE Chain ONLY</span>
   </div>
-  <button class="action shake-little" :class="selectedSymbol.toLowerCase()" :disabled="sendLoading" @click="buy">
+  <button v-play-click-sound class="action shake-little" :class="selectedSymbol.toLowerCase()" :disabled="sendLoading" @click="buy">
     SEND {{ amount }} <Token with-name icon-position="right" size="20px" :token="selectedSymbol" />
   </button>
 </template>
