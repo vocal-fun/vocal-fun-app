@@ -66,7 +66,7 @@ export function useBuyModal() {
       }
       const contractAddress = option.address;
       const to = option.recipient;
-      await transfer(contractAddress, to, amount.value);
+      await transfer(user.address, contractAddress, to, amount.value);
       closeBuyModal();
       // success(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
     } catch (error) {

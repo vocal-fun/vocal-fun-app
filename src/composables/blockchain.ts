@@ -1,4 +1,12 @@
-import { BrowserProvider, ethers, type Eip1193Provider } from 'ethers';
+import { BrowserProvider, ethers, Contract, type Eip1193Provider, type ContractTransactionResponse } from 'ethers';
+
+interface IERC20 {
+  balanceOf(owner: string): Promise<bigint>;
+  transfer(to: string, amount: bigint): Promise<ContractTransactionResponse>;
+  decimals(): Promise<bigint>;
+  approve(spender: string, amount: bigint): Promise<ContractTransactionResponse>;
+  allowance(owner: string, spender: string): Promise<bigint>;
+}
 
 const ERC20_ABI = [
   'function balanceOf(address owner) view returns (uint256)',
@@ -35,13 +43,19 @@ export function useBlockchain() {
     }
   }
 
-  const transfer = async (contractAddress: string, to: string, amount: number) => {
+  const transfer = async (from: string, contractAddress: string, to: string, amount: number) => {
     try {
       const provider = getProvider();
       const signer = await provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, ERC20_ABI, signer);
+
+      const contract = new Contract(contractAddress, ERC20_ABI, signer) as Contract & IERC20;
       const decimals = await contract.decimals();
+      const allowance = await contract.allowance(from, contractAddress);
       const value = ethers.parseUnits(`${amount}`, decimals);
+      if (allowance < value) {
+        const tx = await contract.approve(contractAddress, ethers.MaxUint256);
+        await tx.wait();
+      }
       const tx = await contract.transfer(to, value);
       await tx.wait();
     } catch (error) {
