@@ -7,5 +7,5 @@ export const meta = {
   ogImage: `${process.env.NUXT_PUBLIC_BASE_URL || ''}/og.jpg`,
   ogImageWidth: '1200',
   ogImageHeight: '630',
-  x: '@vocalfun',
+  x: '@vocal_fun',
 };

@@ -1,7 +1,7 @@
 <template>
   <section class="header" :class="{ 'header--with-account': user }">
     <div class="socials">
-      <a v-play-click-sound class="social shake-little" href="https://t.me/vocal_fun_official" target="_blank" rel="noopener noreferrer">
+      <a v-play-click-sound class="social shake-little" href="https://t.me/vocalfunofficial" target="_blank" rel="noopener noreferrer">
         <NuxtImg
           class="telegram"
           src="/img/telegram.png"
@@ -12,7 +12,7 @@
         />
         TELEGRAM
       </a>
-      <a v-play-click-sound class="social shake-little" href="https://x.com/vocalfun" target="_blank" rel="noopener noreferrer">
+      <a v-play-click-sound class="social shake-little" href="https://x.com/vocal_fun" target="_blank" rel="noopener noreferrer">
         <NuxtImg
           class="twitter"
           src="/img/twitter.png"
