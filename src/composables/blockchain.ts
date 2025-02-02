@@ -43,26 +43,21 @@ export function useBlockchain() {
     }
   }
 
-  const transfer = async (from: string, contractAddress: string, to: string, amount: number) => {
-    try {
-      const provider = getProvider();
-      const signer = await provider.getSigner();
+  const transfer = async (contractAddress: string, to: string, amount: number) => {
+    const provider = getProvider();
+    const signer = await provider.getSigner();
 
-      const contract = new Contract(contractAddress, ERC20_ABI, signer) as Contract & IERC20;
-      const decimals = Number(await contract.decimals());
-      // No need for allowance if recipient is the regular address
-      // const allowance = await contract.allowance(from, contractAddress);
-      const value = ethers.parseUnits(`${amount}`, decimals);
-      // if (allowance < value) {
-      //   const tx = await contract.approve(contractAddress, ethers.MaxUint256);
-      //   await tx.wait();
-      // }
-      const tx = await contract.transfer(to, value);
-      await tx.wait();
-    } catch (error) {
-      console.warn('Error signing transfer ERC20 tx:', error);
-      throw new Error('An error occurred while transferring ERC20 tokens.');
-    }
+    const contract = new Contract(contractAddress, ERC20_ABI, signer) as Contract & IERC20;
+    const decimals = Number(await contract.decimals());
+    // No need for allowance if recipient is the regular address
+    // const allowance = await contract.allowance(from, contractAddress);
+    const value = ethers.parseUnits(`${amount}`, decimals);
+    // if (allowance < value) {
+    //   const tx = await contract.approve(contractAddress, ethers.MaxUint256);
+    //   await tx.wait();
+    // }
+    const tx = await contract.transfer(to, value);
+    await tx.wait();
   }
 
   return {

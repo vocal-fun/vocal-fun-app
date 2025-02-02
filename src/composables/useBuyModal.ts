@@ -7,7 +7,7 @@ export function useBuyModal() {
   const authStore = useAuthStore();
   const { transfer } = useBlockchain();
   const modal = useWeb3Modal();
-  // const { success, warning } = useNotification();
+  // const { success, info, warning } = useNotification();
 
   const amount = ref(1);
 
@@ -58,19 +58,35 @@ export function useBuyModal() {
     try {
       const user = authStore.user;
       if (!user) {
-        throw new Error('User not authenticated.');
+        console.info('User not logged in to purchase');
+        // info('Please connect your wallet to proceed');
+        return;
       }
       const option = selectedOption.value;
       if (!option) {
-        throw new Error('No payment option selected.');
+        console.info('No payment option selected to purchase');
+        // info('Please select a payment option');
+        return;
       }
       const contractAddress = option.address;
       const to = option.recipient;
-      await transfer(user.address, contractAddress, to, amount.value);
+      await transfer(contractAddress, to, amount.value);
       closeBuyModal();
+      console.info(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
       // success(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
     } catch (error) {
-      console.warn('Error buying:', error);
+      const errorMessage = (error as Error).message;
+      if (errorMessage.includes('user rejected action')) {
+        console.info('Purchase cancelled by user');
+        // warning('Purchase cancelled');
+        return;
+      }
+      if (errorMessage.includes('transfer amount exceeds balance')) {
+        console.info('Insufficient balance');
+        // warning('Insufficient balance');
+        return;
+      }
+      console.warn('Error signing transfer ERC20 tx:', error);
       // warning('An error occurred while processing your purchase');
     } finally {
       sendLoading.value = false;

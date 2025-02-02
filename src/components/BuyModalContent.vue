@@ -47,6 +47,7 @@
   </div>
   <button v-play-click-sound class="action shake-little" :class="selectedSymbol.toLowerCase()" :disabled="sendLoading" @click="buy">
     SEND {{ amount }} <Token with-name icon-position="right" size="20px" :token="selectedSymbol" />
+    <LoadingDots v-show="sendLoading" />
   </button>
 </template>
 
