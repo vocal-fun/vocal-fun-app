@@ -1,3 +1,4 @@
+import io, { Socket } from 'socket.io-client';
 import { useWeb3ModalAccount } from '@web3modal/ethers/vue';
 import { defineStore } from 'pinia';
 import type { NonceDto, UserDto } from '~/types';
@@ -8,6 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
   const nonceData = ref<NonceDto | null>(null);
   const token = ref('');
   const user = ref<UserDto | null>(null);
+  const ws = ref<Socket | null>(null);
 
   function isLoggedInAddress(address: string | undefined) {
     return token.value && loggedInAddress.value.toLowerCase() === address?.toLowerCase();
@@ -63,7 +65,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true;
     const { address: walletAddress } = useWeb3ModalAccount();
     // Check current address and address from token
-    if (walletAddress.value?.toLowerCase() !== tokenData.address.toLowerCase()) {
+    if (walletAddress.value && walletAddress.value.toLowerCase() !== tokenData.address.toLowerCase()) {
       logout();
       return;
     }
@@ -111,6 +113,42 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  function subscribeOnUserBalance(): void {
+    if (!token.value) return;
+    unsubscribeFromUserBalance();
+    try {
+      ws.value = io('https://api.vocal.fun', {
+        auth: {
+          token: token.value,
+        },
+      });
+      ws.value.on('connect', () => {
+        console.log('[USER API] Connected to server');
+      });
+      ws.value.on('disconnect', () => {
+        console.log('[USER API] Disconnected from server');
+      });
+      ws.value.on('balance_update', (args: { balance: number }) => {
+        if (!user.value) {
+          console.warn('[USER API] [WARN] User data is not available but balance updated');
+          return;
+        }
+        console.log('[USER API] Balance updated: ', args.balance);
+        user.value = {
+          ...user.value,
+          balance: args.balance,
+        };
+      });
+    } catch (error) {
+      console.warn('[USER API] Error connecting to server:', error);
+    }
+  }
+
+  function unsubscribeFromUserBalance(): void {
+    if (!ws.value) return;
+    ws.value.disconnect();
+  }
+
   async function getUser(): Promise<void> {
     try {
       loading.value = true;
@@ -121,13 +159,20 @@ export const useAuthStore = defineStore('auth', () => {
         },
       });
       user.value = res.user;
+      // Subscribe on user balance
+      subscribeOnUserBalance();
     } catch (error) {
       user.value = null;
+      unsubscribeFromUserBalance();
       throw error; // Rethrow error to handle it in app.vue (for token expiration)
     } finally {
       loading.value = false;
     }
   }
+
+  const destroy = () => {
+    unsubscribeFromUserBalance();
+  };
 
   return {
     loading,
@@ -143,5 +188,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     login,
     isLoggedInAddress,
+    destroy,
   };
 });

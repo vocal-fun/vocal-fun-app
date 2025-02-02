@@ -20,5 +20,6 @@ onBeforeMount(async () => {
 
 onBeforeUnmount(() => {
   audioService.clearCache();
+  authStore.destroy();
 });
 </script>
