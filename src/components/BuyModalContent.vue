@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="account">
-      <span>YOUR MINUTES: {{ balance }}</span>
+      <span>YOUR BALANCE: ${{ balance }}</span>
       <button v-play-click-sound @click="openWallet">{{ formattedAddress }}</button>
     </div>
     <button v-play-click-sound class="close" @click="onModalClose">X</button>
@@ -24,7 +24,7 @@
           :class="{ active: selectedOption?.address === item.address }"
           @click="selectOption(item)"
         >
-          {{ amount }} <Token with-name :token="item.symbol" /> = {{ amount }} MIN
+          {{ amount }} <Token with-name :token="item.symbol" />
         </button>
       </div>
       <div class="amount-controls">
