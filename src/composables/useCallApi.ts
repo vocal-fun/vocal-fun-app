@@ -1,4 +1,5 @@
 import io, { Socket } from 'socket.io-client';
+import { usePermission } from '@vueuse/core';
 import { AudioStreamPlayer } from '~/services/AudioStreamManager';
 
 export function useCallApi() {
@@ -6,12 +7,15 @@ export function useCallApi() {
 
   const authStore = useAuthStore();
   const loading = ref(false);
-  const hasError = ref<boolean>(false);
+  const hasCallError = ref<boolean>(false);
   const token = computed(() => authStore.token);
   const sessionId = ref('');
   const ws = ref<Socket | null>(null);
   const activeAgentId = ref('');
   const isConnected = computed(() => ws.value?.connected);
+  const micPermission = usePermission('microphone');
+  const isMicAllowed = computed(() => micPermission.value === 'granted');
+  const hasError = computed(() => !isMicAllowed || hasCallError.value);
 
   const isRecording = ref(false);
   const mediaStream = ref<MediaStream | null>(null);
@@ -68,6 +72,7 @@ export function useCallApi() {
     });
     ws.value.on('error', (error: Error) => {
       console.warn('[CALL API] Error: ' + error?.message);
+      hasCallError.value = true;
     });
     activeAgentId.value = agentId;
     loading.value = false;
@@ -108,7 +113,7 @@ export function useCallApi() {
       audioProcessor.value = processor;
       audioContextObj.value = audioContext;
     } catch (error) {
-      hasError.value = true;
+      hasCallError.value = true;
       console.warn('[CALL API] Error starting recording:', error);
     }
   };
@@ -149,6 +154,7 @@ export function useCallApi() {
     isRecording,
     loading,
     isConnected,
+    hasCallError,
     hasError,
     getCallSession,
     initCallSession,

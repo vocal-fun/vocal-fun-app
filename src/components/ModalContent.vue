@@ -146,7 +146,7 @@ const authStore = useAuthStore();
 
 const user = computed(() => authStore.user);
 
-const { initCallSession, closeCallSession, startRecording, stopRecording, hasError } = useCallApi();
+const { hasError, hasCallError, initCallSession, closeCallSession, startRecording, stopRecording } = useCallApi();
 
 const playCurrentSound = async (path: string, withoutResume = false) => {
   try {
@@ -204,7 +204,7 @@ const resetCallData = (keepError = false) => {
   resetTimer();
   stopRecording();
   if (!keepError) {
-    hasError.value = false;
+    hasCallError.value = false;
   }
 }
 
