@@ -49,13 +49,14 @@ export function useBlockchain() {
       const signer = await provider.getSigner();
 
       const contract = new Contract(contractAddress, ERC20_ABI, signer) as Contract & IERC20;
-      const decimals = await contract.decimals();
-      const allowance = await contract.allowance(from, contractAddress);
+      const decimals = Number(await contract.decimals());
+      // No need for allowance if recipient is the regular address
+      // const allowance = await contract.allowance(from, contractAddress);
       const value = ethers.parseUnits(`${amount}`, decimals);
-      if (allowance < value) {
-        const tx = await contract.approve(contractAddress, ethers.MaxUint256);
-        await tx.wait();
-      }
+      // if (allowance < value) {
+      //   const tx = await contract.approve(contractAddress, ethers.MaxUint256);
+      //   await tx.wait();
+      // }
       const tx = await contract.transfer(to, value);
       await tx.wait();
     } catch (error) {
