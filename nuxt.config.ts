@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: false },
   css: ['~/assets/styles/index.css'],
-  modules: ['@nuxt/image', '@nuxtjs/sitemap', '@pinia/nuxt'],
+  modules: ['@nuxt/image', '@nuxtjs/sitemap', '@pinia/nuxt', 'vue-sonner/nuxt'],
 
   app: {
     head: {

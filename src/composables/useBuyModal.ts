@@ -7,6 +7,8 @@ export function useBuyModal() {
   const authStore = useAuthStore();
   const { transfer } = useBlockchain();
   const modal = useWeb3Modal();
+  const { $toast } = useNuxtApp();
+
   // const { success, info, warning } = useNotification();
 
   const amount = ref(1);
@@ -53,44 +55,58 @@ export function useBuyModal() {
     selectedOption.value = option;
   }
 
-  const buy = async () => {
+  const _buy = async () => {
     sendLoading.value = true;
+    const option = selectedOption.value;
     try {
       const user = authStore.user;
       if (!user) {
         console.info('User not logged in to purchase');
         // info('Please connect your wallet to proceed');
-        return;
+        // return;
+        throw 'User not logged in to purchase';
       }
-      const option = selectedOption.value;
       if (!option) {
         console.info('No payment option selected to purchase');
         // info('Please select a payment option');
-        return;
+        // return;
+        throw 'No payment option selected to purchase';
       }
       const contractAddress = option.address;
       const to = option.recipient;
       await transfer(contractAddress, to, amount.value);
       closeBuyModal();
       console.info(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
+      return `Purchase successful! ${amount.value} ${option.symbol} has been sent`;
       // success(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
     } catch (error) {
       const errorMessage = (error as Error).message;
       if (errorMessage.includes('user rejected action')) {
         console.info('Purchase cancelled by user');
         // warning('Purchase cancelled');
-        return;
+        // return;
+        throw 'Purchase cancelled by user';
       }
       if (errorMessage.includes('transfer amount exceeds balance')) {
         console.info('Insufficient balance');
         // warning('Insufficient balance');
-        return;
+        // return;
+        throw `Insufficient ${option?.symbol} balance`;
       }
       console.warn('Error signing transfer ERC20 tx:', error);
       // warning('An error occurred while processing your purchase');
+      throw 'An error occurred while processing your purchase';
     } finally {
       sendLoading.value = false;
     }
+  };
+
+  const buy = async () => {
+    $toast.promise(_buy(), {
+      loading: 'Processing purchase...',
+      success: (data: string) => data,
+      error: (data: string) => data,
+    });
   };
 
   const copyRecipient = async () => {
@@ -99,10 +115,10 @@ export function useBuyModal() {
     }
     try {
       await navigator.clipboard.writeText(selectedOption.value.recipient);
-      // success('Recipient address copied to clipboard.');
+      $toast.success('Recipient address copied to clipboard.');
     } catch (error) {
+      $toast.warning('An error occurred while copying recipient address.');
       console.warn('Error copying recipient address:', error);
-      // warning('An error occurred while copying recipient address.');
     }
   };
 
