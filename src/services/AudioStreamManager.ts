@@ -7,7 +7,7 @@ export class AudioStreamPlayer {
   private onEndCallback: (() => void) | null = null;
 
   constructor() {
-    // Initialize AudioContext only when first needed
+    // Initialize AudioContext with correct sample rate
     this.initializeAudioContext();
     this.setCallbacks(() => {
       console.log('[AUDIO STREAM] Started playing audio response');
@@ -18,10 +18,9 @@ export class AudioStreamPlayer {
 
   private initializeAudioContext(): void {
     if (typeof window !== 'undefined') {
-      // Get the correct AudioContext definition
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioContextClass) {
-        this.audioContext = new AudioContextClass();
+        this.audioContext = new AudioContextClass({ sampleRate: 24000 }); // Match server sample rate
       } else {
         console.error('Web Audio API is not supported in this browser');
       }
@@ -43,18 +42,32 @@ export class AudioStreamPlayer {
     }
 
     try {
-      const audioData = atob(base64Audio);
-      const arrayBuffer = new ArrayBuffer(audioData.length);
-      const view = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < audioData.length; i++) {
-        view[i] = audioData.charCodeAt(i);
+      // Decode base64 to binary
+      const binaryString = atob(base64Audio);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
       }
 
-      const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+      // Convert to Float32Array (server sends pcm_f32le)
+      const floatData = new Float32Array(bytes.buffer);
+
+      // Create audio buffer
+      const audioBuffer = this.audioContext.createBuffer(
+        1, // mono
+        floatData.length,
+        this.audioContext.sampleRate
+      );
+
+      // Copy the PCM data to the audio buffer
+      audioBuffer.copyToChannel(floatData, 0);
+
+      // Add to queue
       this.audioQueue.push(audioBuffer);
 
+      // Start playing if not already playing
       if (!this.isPlaying) {
-        this.playNextChunk();
+        await this.playNextChunk();
       }
     } catch (error) {
       console.error('Error processing audio chunk:', error);
@@ -74,8 +87,15 @@ export class AudioStreamPlayer {
     this.sourceNode.buffer = audioBuffer;
     this.sourceNode.connect(this.audioContext.destination);
 
+    // Handle the end of this chunk
     this.sourceNode.onended = () => {
       this.isPlaying = false;
+      if (this.sourceNode) {
+        this.sourceNode.disconnect();
+        this.sourceNode = null;
+      }
+
+      // Play next chunk if available
       if (this.audioQueue.length > 0) {
         this.playNextChunk();
       } else if (this.onEndCallback) {
@@ -83,6 +103,7 @@ export class AudioStreamPlayer {
       }
     };
 
+    // Call start callback if this is the first chunk
     if (this.onStartCallback && this.audioQueue.length === 0) {
       this.onStartCallback();
     }
@@ -107,8 +128,7 @@ export class AudioStreamPlayer {
       }
       this.audioQueue = [];
       this.isPlaying = false;
-      
-      // Suspend the audio context to save resources
+
       if (this.audioContext?.state === 'running') {
         await this.audioContext.suspend();
       }
