@@ -11,7 +11,7 @@ export const useAgentsStore = defineStore('agents', () => {
       const res = await $fetch<AgentDto[]>('/api/v1/agents');
       agents.value = res;
     } catch (error) {
-      console.warn('Error fetching agents:', error);
+      console.warn('[AGENTS] Error fetching agents:', error);
       agents.value = [];
     } finally {
       loading.value = false;
@@ -30,7 +30,7 @@ export const useAgentsStore = defineStore('agents', () => {
       });
       previews.value[agent._id] = res;
     } catch (error) {
-      console.warn(`Error fetching ${agent.name} (id: ${agent._id}) agent preview:`, error);
+      console.warn(`[PREVIEW] Error fetching ${agent.name} (id: ${agent._id}) agent preview:`, error);
     } finally {
       loading.value = false;
     }

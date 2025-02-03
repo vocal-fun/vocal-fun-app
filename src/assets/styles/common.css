@@ -21,6 +21,24 @@ body {
     "YTLC" 500;
 }
 
+/* #region TOAST */
+.vocal-toast {
+  background: linear-gradient(89.99deg, #151521 -64.2%, #302E4B -2.4%, #31304D 68.23%, #1B1B2B 114.57%);
+  font-size: 11px;
+  border-radius: 0;
+  border: none;
+  box-shadow: 1.39px 1.39px 0px 0px #59596D;
+  color: white;
+  &[data-type="success"] {
+    color: var(--color-primary);
+  }
+  &[data-type="error"],
+  &[data-type="warning"] {
+    color: var(--color-warn);
+  }
+}
+/* #endregion */
+
 /* #region NuxtImg */
 .image {
   opacity: 1;

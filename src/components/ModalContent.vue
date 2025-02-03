@@ -433,7 +433,7 @@ defineExpose({
     border-bottom: 1px solid transparent;
     transition: border-bottom 0.3s ease-in-out;
     &:hover {
-      border-bottom-color: #FA6400;
+      border-bottom-color: var(--color-warn);
     }
   }
 }
@@ -452,9 +452,9 @@ defineExpose({
 }
 
 .alert-color {
-  color: #FA6400;
-  text-shadow: 0 0 6.09px 0 #FA6400,
-  0 0.55px 6.65px 0 #FA6400;
+  color: var(--color-warn);
+  text-shadow: 0 0 6.09px 0 var(--color-warn),
+  0 0.55px 6.65px 0 var(--color-warn);
 }
 
 .fade-enter-active {

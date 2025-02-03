@@ -183,7 +183,7 @@ const openWallet = () => {
   width: 100%;
   display: flex;
   gap: 1rem;
-  color: #FA6400;
+  color: var(--color-warn);
 }
 .action {
   display: flex;
