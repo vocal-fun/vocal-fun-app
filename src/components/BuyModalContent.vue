@@ -28,8 +28,8 @@
         </button>
       </div>
       <div class="amount-controls">
-        <button v-play-click-sound @click="increaseAmount">+</button>
         <button v-play-click-sound @click="decreaseAmount">-</button>
+        <button v-play-click-sound @click="increaseAmount">+</button>
       </div>
     </div>
     <div v-show="selectedOption?.recipient" class="info__qr">
@@ -99,6 +99,7 @@ const openWallet = () => {
   align-items: center;
   justify-content: flex-end;
   width: 100%;
+  border-bottom: 1px solid #00fa0047;
   .account {
     margin-left: 2rem; // To make it visually centered
     flex: 1;
@@ -127,6 +128,9 @@ const openWallet = () => {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    > :first-child {
+      opacity: 0.6;
+    }
     .text {
       display: flex;
       align-items: center;
@@ -153,11 +157,14 @@ const openWallet = () => {
       padding: 0.5rem 1rem;
       background: #00FA0014;
       border-radius: 100px;
-      transition: background-color 0.3s ease-in-out;
+      transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
       &:hover,
       &.active {
         background-color: var(--color-primary);
         color: white;
+      }
+      &:hover {
+        transform: scale(1.05);
       }
     }
   }
@@ -222,10 +229,22 @@ const openWallet = () => {
     flex-direction: column;
     align-items: center;
   }
+  .account {
+    padding-bottom: 0.5rem;
+  }
   .info {
     gap: 2rem;
     .amount-controls {
       justify-content: center;
+    }
+  }
+  @media (max-height: 670px) {
+    .info {
+      gap: 1rem;
+    }
+    .recipient,
+    .warning {
+      font-size: 12px;
     }
   }
 }

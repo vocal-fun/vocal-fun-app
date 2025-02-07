@@ -103,6 +103,11 @@ const close = () => {
     height: 100dvh;
     border-radius: 0;
   }
+  @media (max-height: 670px) {
+    .modal-content {
+      padding-bottom: 0;
+    }
+  }
 }
 
 .fade-enter-active,

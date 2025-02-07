@@ -321,6 +321,7 @@ defineExpose({
   align-items: center;
   justify-content: flex-end;
   width: 100%;
+  border-bottom: 1px solid #00fa0047;
   .close {
     padding: 0.5rem 1rem;
     transition: color 0.3s ease-in-out;
