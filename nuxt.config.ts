@@ -109,6 +109,10 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/': { redirect: '/agents' },
+  },
+
   nitro: {
     routeRules: {
       "/api/v1/**": { proxy: "https://api.vocal.fun/api/v1/**" },

@@ -45,8 +45,8 @@ const openModal = async (person: Agent, state: OpenModalState) => {
 
   modalLoading.value = true;
   selectedPerson.value = person;
-  if (route.query.person !== person.route) {
-    router.replace({ query: { person: person.route } });
+  if (route.query.agent !== person.route) {
+    router.replace({ query: { agent: person.route } });
   }
   isModalOpen.value = true; // TODO: move this line after await if need to wait
   await modalContent.value?.onOpen(state);
@@ -55,15 +55,15 @@ const openModal = async (person: Agent, state: OpenModalState) => {
 
 const closeModal = () => {
   isModalOpen.value = false;
-  modalContent.value?.close();
+  modalContent.value?.onClose();
   router.replace({ query: {} });
 };
 
 onBeforeMount(async () => {
   await agentsStore.getAgents();
-  const personRoute = route.query.person as string | undefined;
-  if (personRoute) {
-    const person = agentsStore.agents.find((agent) => agent.route === personRoute);
+  const agentRoute = route.query.agent as string | undefined;
+  if (agentRoute) {
+    const person = agentsStore.agents.find((agent) => agent.route === agentRoute);
     if (person) {
       selectedPerson.value = person;
       await openModal(person, 'default');
