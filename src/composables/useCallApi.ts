@@ -4,9 +4,13 @@ import { AudioStreamPlayer } from '~/services/AudioStreamManager';
 
 export function useCallApi() {
   const audioPlayer = new AudioStreamPlayer();
+  audioPlayer.setCallbacks(() => {
+    pauseRecording();
+  }, () => {
+    resumeRecording();
+  });
 
   const authStore = useAuthStore();
-  const loading = ref(false);
   const hasCallError = ref<boolean>(false);
   const token = computed(() => authStore.token);
   const sessionId = ref('');
@@ -36,46 +40,56 @@ export function useCallApi() {
     }
   };
 
-  const initCallSession = async (agentId: string) => {
+  const initCallSession = async (agentId: string): Promise<void> => {
     if (activeAgentId.value === agentId && isConnected.value) {
       return;
     }
-    loading.value = true;
     await getCallSession(agentId);
     if (!sessionId.value || !token.value) {
-      loading.value = false;
       return;
     }
-    ws.value = io('https://api.vocal.fun/call', {
-      auth: {
-        token: token.value,
-        sessionId: sessionId.value,
-      },
+    return new Promise((resolve, reject) => {
+      try {
+        ws.value = io('https://api.vocal.fun/call', {
+          auth: {
+            token: token.value,
+            sessionId: sessionId.value,
+          },
+        });
+        ws.value.on('connect', () => {
+          console.log('[CALL API] Connected to server');
+        });
+        ws.value.on('call_ready', () => {
+          console.log('[CALL API] Call ready - you can start speaking');
+          resolve();
+        });
+        ws.value.on('disconnect', () => {
+          stopRecording();
+          console.log('[CALL API] Disconnected from server');
+          audioPlayer?.cleanup();
+          reject(new Error('Disconnected from server'));
+        });
+        ws.value.on('audio_stream', handleTTSStream);
+        ws.value.on('audio_stream_end', () => {
+          console.log('[CALL API] Audio stream ended');
+        });
+        ws.value.on('ai_disconnected', () => {
+          console.log('[CALL API] AI server disconnected');
+          hasCallError.value = true;
+          reject(new Error('AI server disconnected'));
+        });
+        ws.value.on('error', (error: Error) => {
+          console.warn('[CALL API] Error: ' + error?.message);
+          hasCallError.value = true;
+          reject(error);
+        });
+        activeAgentId.value = agentId;
+      } catch (error) {
+        hasCallError.value = true;
+        console.warn('[CALL API] Error connecting to server:', error);
+        reject(error);
+      }
     });
-    ws.value.on('connect', () => {
-      console.log('[CALL API] Connected to server');
-    });
-    ws.value.on('call_ready', () => {
-      console.log('[CALL API] Call ready - you can start speaking');
-    });
-    ws.value.on('disconnect', () => {
-      stopRecording();
-      console.log('[CALL API] Disconnected from server');
-      audioPlayer?.cleanup();
-    });
-    ws.value.on('audio_stream', handleTTSStream);
-    ws.value.on('audio_stream_end', () => {
-      console.log('[CALL API] Audio stream ended');
-    });
-    ws.value.on('ai_disconnected', () => {
-      console.log('[CALL API] AI server disconnected');
-    });
-    ws.value.on('error', (error: Error) => {
-      console.warn('[CALL API] Error: ' + error?.message);
-      hasCallError.value = true;
-    });
-    activeAgentId.value = agentId;
-    loading.value = false;
   };
 
   const startRecording = async () => {
@@ -118,6 +132,22 @@ export function useCallApi() {
     }
   };
 
+  const pauseRecording = () => {
+    if (!isRecording.value) {
+      return;
+    }
+    audioProcessor.value?.disconnect();
+    console.log('[CALL API] Recording paused');
+  };
+
+  const resumeRecording = () => {
+    if (!audioContextObj.value) {
+      return;
+    }
+    audioProcessor.value?.connect(audioContextObj.value?.destination);
+    console.log('[CALL API] Recording resumed');
+  }
+
   const stopRecording = () => {
     if (!isRecording.value) {
       return;
@@ -152,7 +182,6 @@ export function useCallApi() {
 
   return {
     isRecording,
-    loading,
     isConnected,
     hasCallError,
     hasError,

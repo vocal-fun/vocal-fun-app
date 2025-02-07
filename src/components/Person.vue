@@ -14,7 +14,7 @@
     </div>
     <div class="info">
       <span>{{ name }}</span>
-      <span>${{ rate }} / min</span>
+      <span>{{ rate }} $VOCAL / min</span>
     </div>
     <div class="buttons">
       <button class="preview shake" :disabled="disabled" @click.stop="openModal('preview')">PREVIEW</button>
@@ -25,9 +25,9 @@
 
 <script setup lang="ts">
 import { audioService } from '~/services/audio';
-import type { AgentDto, OpenModalState } from '~/types';
+import type { Agent, OpenModalState } from '~/types';
 
-const props = defineProps<Omit<AgentDto, '__v' | 'createdAt'> & { disabled: boolean }>();
+const props = defineProps<Omit<Agent, 'route' | 'createdAt' | 'id'> & { disabled: boolean }>();
 
 const emit = defineEmits<{
   'open-modal': [state: OpenModalState],

@@ -4,7 +4,7 @@
   </div>
   <div class="info">
     <template v-if="user">
-      <div class="balance">YOUR MINUTES: {{ user.balance }}</div>
+      <div class="balance">BALANCE: {{ user.balance }} $VOCAL</div>
       <button v-play-click-sound class="buy-more" @click="openBuyModal">
         BUY MORE
       </button>
@@ -23,7 +23,7 @@
         />
       </div>
       <div class="name">{{ person.name }}</div>
-      <div class="price">${{ person.rate }} / min</div>
+      <div class="price">{{ person.rate }} $VOCAL / min</div>
       <div v-show="hasError" class="error alert-color">some error happened</div>
     </template>
 
@@ -65,7 +65,6 @@
       </div>
     </transition>
   </div>
-  <!-- <div v-show="!error" class="recognition" :class="{ hidden: !speechRecResult }">- {{ speechRecResult }}</div> -->
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : 'footer-idle']">
     <template v-if="idleOrError">
       <GreenModalButton icon="call" :disabled="!user" @click="startCall">Call</GreenModalButton>
@@ -95,23 +94,22 @@ import type { Howl } from 'howler';
 
 import { icons } from '~/consts';
 import { audioService } from '~/services/audio';
-import type { AgentDto, OpenModalState, Preview } from '~/types';
+import type { Agent, OpenModalState, Preview } from '~/types';
 
 type CallStatusType = 'calling' | 'idle' | 'on-call';
 
 const props = withDefaults(
   defineProps<{
-    person?: AgentDto,
+    person?: Agent,
   }>(),
   {
     person: () => ({
       name: '',
       image: '',
-      twitter: '',
-      __v: 0,
       rate: 1,
       createdAt: '',
-      _id: '',
+      id: '',
+      route: '',
     }),
   }
 );
@@ -136,8 +134,8 @@ const callingOrOnCall = computed(() => (calling.value || onCall.value) && !hasEr
 
 const agentsStore = useAgentsStore();
 const preview = computed<Preview | null>(() =>
-  agentsStore.previews[props.person._id]
-  ? { ...agentsStore.previews[props.person._id], agentId: props.person._id }
+  agentsStore.previews[props.person.id]
+  ? { ...agentsStore.previews[props.person.id], agentId: props.person.id }
   : null
 );
 
@@ -183,12 +181,6 @@ const stopCurrentSound = () => {
 const onModalClose = () => {
   emit('close');
   hangUp();
-  closeCallSession();
-}
-
-const close = () => {
-  hangUp();
-  closeCallSession();
 }
 
 const resetTimer = () => {
@@ -208,68 +200,58 @@ const resetCallData = (keepError = false) => {
   }
 }
 
-const call = async (click = true) => {
-  const controller = new AbortController(); // Create an AbortController
-  const signal = controller.signal; // Get the signal
-
-  // Handle cleanup in case of cancellation
-  const cancelCurrentCall = () => {
-    controller.abort(); // Abort the call when needed
-  };
-  resetCallData();
-  if (click) {
-    await audioService.click();
-  }
+const call = async (signal: AbortSignal) => {
   callStatus.value = 'calling';
-
-  // For demo purposes: Play the calling audio
-  playCurrentSound(audioService.callingUrl, true);
-  // Initiate the call session and web socket connection
-  await initCallSession(props.person._id);
-
-  // Add the abort signal to your Promise
-  new Promise<void>((resolve, reject) => {
-    const timeoutId = setTimeout(() => resolve(), 9_000); // Simulate a delay of 9 seconds
-    // Check if the operation should be aborted
-    signal.addEventListener('abort', () => {
-      clearTimeout(timeoutId); // Clear the timeout if aborted
-      reject(new Error('Call was cancelled')); // Reject with an error
-    });
-  }).then(() => {
+  playCurrentSound(audioService.callingUrl, true); // Play the calling audio in parallel
+  const startInitTime = Date.now();
+  try {
+    // Initiate the call session and web socket connection
+    await initCallSession(props.person.id);
+    signal.throwIfAborted(); // Check if the call was cancelled
+    const callDurationLeft = 2_000 - (Date.now() - startInitTime);
+    await new Promise<void>((resolve) => setTimeout(resolve, callDurationLeft < 0 ? 0 : callDurationLeft));
     callStatus.value = 'on-call';
-    resetTimer();
-
+    stopCurrentSound();
+    signal.throwIfAborted(); // Check if the call was cancelled
     console.info(`[VOCAL.FUN] Call with ${props.person.name} started`);
-
-    startRecording();
-
+    await startRecording();
     timer = setInterval(() => {
       seconds++;
       updateTimerDisplay();
     }, 1_000);
-  }).catch((error) => {
-    if ((error as Error).message === 'Call was cancelled') {
-      console.log('Call was cancelled before completion');
+  } catch (error) {
+    if (error == 'cancelled') {
+      console.log('[VOCAL.FUN] Call was cancelled before completion');
     } else {
-      error.value = true;
+      hasCallError.value = true;
       console.warn('[VOCAL.FUN] Error during call:', error);
     }
-  });
-
-  return cancelCurrentCall; // Return the cancel function for later use
-};
+  }
+}
 
 const startCall = async (click = true) => {
   if (!user.value) {
     return; // Do nothing if user is not logged in
   }
-  cancelCurrentCall = await call(click);
+  if (click) {
+    await audioService.click();
+  }
+  const controller = new AbortController(); // Create an AbortController
+  const signal = controller.signal; // Get the signal
+  // Handle cleanup in case of cancellation
+  const _cancelCurrentCall = () => {
+    controller.abort('cancelled'); // Abort the call when needed
+  };
+  resetCallData();
+  call(signal);
+  cancelCurrentCall = _cancelCurrentCall;
 }
 
 const hangUp = (keepError = false) => {
   resetCallData(keepError);
   stopCurrentSound();
   cancelCurrentCall?.();
+  closeCallSession();
   callStatus.value = 'idle';
   audioService.resumeBgMusic();
 }
@@ -283,8 +265,8 @@ const playPreview = async (click = true) => {
   if (click) {
     await audioService.click();
   }
-  if (props.person._id) {
-    await playCurrentSound(props.person._id);
+  if (props.person.id) {
+    await playCurrentSound(props.person.id);
   }
 }
 
@@ -311,6 +293,9 @@ const onOpen = async (state: OpenModalState) => {
       break;
     case 'preview':
       await playPreview(false);
+      if (!preview.value) {
+        stopCurrentSound(); // to show play button again if no preview
+      }
       break;
     case 'call':
       await startCall(false);
@@ -326,7 +311,7 @@ watch(hasError, (value) => {
 
 defineExpose({
   onOpen,
-  close,
+  close: hangUp,
 });
 </script>
 

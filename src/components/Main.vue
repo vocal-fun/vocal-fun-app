@@ -9,9 +9,8 @@
         v-for="person in agents"
         :key="person.name"
         :name="person.name"
-        :twitter="person.twitter"
         :image="person.image"
-        :_id="person._id"
+        :id="person.id"
         :rate="person.rate"
         :disabled="modalLoading"
         @open-modal="openModal(person, $event)"
@@ -24,19 +23,21 @@
 </template>
 
 <script setup lang="ts">
-import type { AgentDto, OpenModalState } from '~/types';
+import type { Agent, OpenModalState } from '~/types';
 
 const modalContent = useTemplateRef('modalContent');
 const agentsStore = useAgentsStore();
 const { isLoggedIn, handleConnectClick } = useWalletConnect();
+const route = useRoute();
+const router = useRouter();
 
 const modalLoading = ref<boolean>(false);
 const isModalOpen = ref<boolean>(false);
-const selectedPerson = ref<AgentDto | undefined>(undefined);
+const selectedPerson = ref<Agent | undefined>(undefined);
 
 const agents = computed(() => agentsStore.agents);
 
-const openModal = async (person: AgentDto, state: OpenModalState) => {
+const openModal = async (person: Agent, state: OpenModalState) => {
   if (state === 'call' && !isLoggedIn.value) {
     handleConnectClick();
     return;
@@ -44,6 +45,9 @@ const openModal = async (person: AgentDto, state: OpenModalState) => {
 
   modalLoading.value = true;
   selectedPerson.value = person;
+  if (route.query.person !== person.route) {
+    router.replace({ query: { person: person.route } });
+  }
   isModalOpen.value = true; // TODO: move this line after await if need to wait
   await modalContent.value?.onOpen(state);
   modalLoading.value = false;
@@ -52,10 +56,20 @@ const openModal = async (person: AgentDto, state: OpenModalState) => {
 const closeModal = () => {
   isModalOpen.value = false;
   modalContent.value?.close();
+  router.replace({ query: {} });
 };
 
 onBeforeMount(async () => {
   await agentsStore.getAgents();
+  const personRoute = route.query.person as string | undefined;
+  if (personRoute) {
+    const person = agentsStore.agents.find((agent) => agent.route === personRoute);
+    if (person) {
+      selectedPerson.value = person;
+      await openModal(person, 'default');
+      return;
+    }
+  }
   // preload first agent
   selectedPerson.value = agentsStore.agents[0];
 });

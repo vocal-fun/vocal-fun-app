@@ -170,9 +170,9 @@ class AudioService {
 
   /** Initialize audio cache with default settings for background, click, and calling sounds */
   initCache(): void {
-    this.load(this.clickUrl);
+    this.load(this.clickUrl, false, 0.5);
     this.load(this.backgroundUrl, true, 0.1, 2_000, 500);
-    this.load(this.callingUrl);
+    this.load(this.callingUrl, true, 0.75);
   }
 
   /** Clear audio cache and stop all audio */
@@ -229,6 +229,10 @@ class AudioService {
   /** Play calling sound */
   calling(): void {
     this.play(this.callingUrl);
+  }
+
+  stopCalling(): void {
+    this.pause(this.callingUrl);
   }
 }
 
