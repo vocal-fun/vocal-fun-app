@@ -118,6 +118,7 @@ const emit = defineEmits(['close']);
 
 let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
+let callInit = false;
 let cancelCurrentCall: (() => void) | null = null;
 const callD = icons.call;
 const audio = shallowRef<Howl | null>(null);
@@ -201,6 +202,7 @@ const resetCallData = (keepError = false) => {
 }
 
 const call = async (signal: AbortSignal) => {
+  callInit = true;
   callStatus.value = 'calling';
   playCurrentSound(audioService.callingUrl, true); // Play the calling audio in parallel
   const startInitTime = Date.now();
@@ -226,6 +228,8 @@ const call = async (signal: AbortSignal) => {
       hasCallError.value = true;
       console.warn('[VOCAL.FUN] Error during call:', error);
     }
+  } finally {
+    callInit = false;
   }
 }
 
@@ -248,12 +252,14 @@ const startCall = async (click = true) => {
 }
 
 const hangUp = (keepError = false) => {
-  resetCallData(keepError);
-  stopCurrentSound();
   cancelCurrentCall?.();
-  closeCallSession();
-  callStatus.value = 'idle';
-  audioService.resumeBgMusic();
+  stopCurrentSound();
+  waitForCallInit().then(() => {
+    resetCallData(keepError);
+    closeCallSession();
+    callStatus.value = 'idle';
+    audioService.resumeBgMusic();
+  });
 }
 
 const hangUpWithClickSound = () => {
@@ -282,8 +288,15 @@ const updateTimerDisplay = () => {
   timerText.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
+const waitForCallInit = async () => {
+  while (callInit) {
+    await new Promise<void>((resolve) => setTimeout(resolve, 500));
+  }
+}
+
 const onOpen = async (state: OpenModalState) => {
   await nextTick();
+  cancelCurrentCall = null;
   await agentsStore.getAgentPreview(props.person);
   if (preview.value) {
     audioService.load(preview.value);
@@ -311,7 +324,7 @@ watch(hasError, (value) => {
 
 defineExpose({
   onOpen,
-  close: hangUp,
+  onClose: hangUp,
 });
 </script>
 
