@@ -449,6 +449,7 @@ defineExpose({
   }
   > span {
     width: 50px;
+    font-variant-numeric: tabular-nums;
   }
   &:hover {
     cursor: default;
