@@ -67,9 +67,9 @@
   </div>
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : 'footer-idle']">
     <template v-if="idleOrError">
-      <GreenModalButton icon="call" :disabled="!user" @click="startCall">Call</GreenModalButton>
+      <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
-      <GreenModalButton v-else icon="play" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
+      <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
     </template>
 
     <template v-else-if="callingOrOnCall">
@@ -125,6 +125,7 @@ const audio = shallowRef<Howl | null>(null);
 
 const callStatus = ref<CallStatusType>('idle');
 const timerText = ref<string>('00:00');
+const previewLoading = ref(false);
 
 const idle = computed(() => callStatus.value === 'idle');
 const calling = computed(() => callStatus.value === 'calling');
@@ -142,6 +143,7 @@ const preview = computed<Preview | null>(() =>
 
 const buyStore = useBuyStore();
 const authStore = useAuthStore();
+const { handleConnectClick } = useWalletConnect();
 
 const user = computed(() => authStore.user);
 
@@ -234,11 +236,13 @@ const call = async (signal: AbortSignal) => {
 }
 
 const startCall = async (click = true) => {
-  if (!user.value) {
-    return; // Do nothing if user is not logged in
-  }
   if (click) {
     await audioService.click();
+  }
+  if (!user.value) {
+    handleConnectClick();
+    onModalClose();
+    return; // Do nothing if user is not logged in
   }
   const controller = new AbortController(); // Create an AbortController
   const signal = controller.signal; // Get the signal
@@ -297,10 +301,12 @@ const waitForCallInit = async () => {
 const onOpen = async (state: OpenModalState) => {
   await nextTick();
   cancelCurrentCall = null;
+  previewLoading.value = true;
   await agentsStore.getAgentPreview(props.person);
   if (preview.value) {
     audioService.load(preview.value);
   }
+  previewLoading.value = false;
   switch (state) {
     case 'default':
       break;

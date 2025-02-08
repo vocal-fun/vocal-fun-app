@@ -11,6 +11,8 @@
 </template>
 
 <script setup lang="ts">
+import { audioService } from '~/services/audio';
+
 const props = defineProps<{ isOpen: boolean }>();
 
 const emit = defineEmits(['close']);
@@ -38,6 +40,7 @@ watch(() => props.isOpen, (isOpen) => {
 });
 
 const close = () => {
+  audioService.click();
   emit('close');
 };
 </script>

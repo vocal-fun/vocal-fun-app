@@ -1,7 +1,12 @@
 <template>
-  <button class="modal-button" :disabled="disabled">
+  <button class="modal-button" :disabled="disabled || loading">
     <span>
-      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" :class="icon">
+      <svg v-if="loading" width="22" height="22" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#000" stroke-width="8">
+        <circle cx="25" cy="25" r="20" stroke-dasharray="140" stroke-dashoffset="90" stroke-linecap="round" stroke-opacity="1">
+          <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+      <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" :class="icon">
         <path :d="d" fill="black"/>
       </svg>
     </span>
@@ -15,6 +20,7 @@ import { icons } from '~/consts';
 const props = defineProps<{
   icon: 'play' | 'stop' | 'call',
   disabled?: boolean,
+  loading?: boolean,
 }>();
 
 const d = computed(() => icons[props.icon]);

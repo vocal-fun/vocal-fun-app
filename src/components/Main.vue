@@ -27,9 +27,10 @@ import type { Agent, OpenModalState } from '~/types';
 
 const modalContent = useTemplateRef('modalContent');
 const agentsStore = useAgentsStore();
-const { isLoggedIn, handleConnectClick } = useWalletConnect();
+const authStore = useAuthStore();
+const { handleConnectClick } = useWalletConnect();
+const user = computed(() => authStore.user);
 const route = useRoute();
-const router = useRouter();
 
 const modalLoading = ref<boolean>(false);
 const isModalOpen = ref<boolean>(false);
@@ -38,7 +39,7 @@ const selectedPerson = ref<Agent | undefined>(undefined);
 const agents = computed(() => agentsStore.agents);
 
 const openModal = async (person: Agent, state: OpenModalState) => {
-  if (state === 'call' && !isLoggedIn.value) {
+  if (state === 'call' && !user.value) {
     handleConnectClick();
     return;
   }
