@@ -45,6 +45,21 @@ body {
   transition: transform .7s 0.7s ease, opacity .7s 0.7s ease;
 }
 
+@keyframes shimmer {
+  100% {
+    mask-position: left;
+  }
+}
+
+.image-placeholder {
+  color: grey;
+  display: inline-block;
+  filter: blur(5px);
+  mask: linear-gradient(-60deg, #000 30%, #0005, #000 70%) right/350% 100%;
+  animation: shimmer 2.5s infinite;
+  max-width: 200px;
+}
+
 .image.preload {
   transform: translateY(2rem);
   opacity: 0;

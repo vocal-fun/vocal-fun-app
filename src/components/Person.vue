@@ -8,6 +8,7 @@
         loading="lazy"
         width="100%"
         placeholder="/img/user-avatar.png"
+        placeholder-class="image-placeholder"
         :src="image"
         :alt="name"
       />
