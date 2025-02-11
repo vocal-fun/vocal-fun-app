@@ -1,17 +1,19 @@
-import type { AgentDto, PreviewDto } from '~/types';
+import type { AgentDto, Agent, PreviewDto } from '~/types';
 
 export const useAgentsStore = defineStore('agents', () => {
   const loading = ref(false);
-  const agents = ref<AgentDto[]>([]);
+  const agents = ref<Agent[]>([]);
   const previews = ref<Record<string, PreviewDto>>({}); // agentId -> preview
 
   async function getAgents(): Promise<void> {
     try {
       loading.value = true;
       const res = await $fetch<AgentDto[]>('/api/v1/agents');
-      agents.value = res;
+      agents.value = res.map(({ _id, name, rate, image, createdAt }) => {
+        return { id: _id, name, rate, image, createdAt, route: name.toLowerCase().replace(/\s/g, '-') };
+      });
     } catch (error) {
-      console.warn('Error fetching agents:', error);
+      console.warn('[AGENTS] Error fetching agents:', error);
       agents.value = [];
     } finally {
       loading.value = false;
@@ -21,16 +23,17 @@ export const useAgentsStore = defineStore('agents', () => {
   /**
    * Fetches the agent preview data. Returns base64 wav audio data.
    */
-  async function getAgentPreview(agent: AgentDto): Promise<void> {
-    if (previews.value[agent._id]) return; // Already fetched
+  async function getAgentPreview(agent: Agent): Promise<void> {
+    const agentId = agent.id;
+    if (previews.value[agentId]) return; // Already fetched
     try {
       loading.value = true;
-      const res = await $fetch<PreviewDto>(`/api/v1/agents/preview?agentId=${agent._id}`, {
+      const res = await $fetch<PreviewDto>(`/api/v1/agents/preview?agentId=${agentId}`, {
         method: 'POST',
       });
-      previews.value[agent._id] = res;
+      previews.value[agentId] = res;
     } catch (error) {
-      console.warn(`Error fetching ${agent.name} (id: ${agent._id}) agent preview:`, error);
+      console.warn(`[PREVIEW] Error fetching ${agent.name} (id: ${agentId}) agent preview:`, error);
     } finally {
       loading.value = false;
     }

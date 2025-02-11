@@ -9,41 +9,47 @@
         v-for="person in agents"
         :key="person.name"
         :name="person.name"
-        :twitter="person.twitter"
         :image="person.image"
-        :_id="person._id"
+        :id="person.id"
         :rate="person.rate"
         :disabled="modalLoading"
         @open-modal="openModal(person, $event)"
       />
       <Modal :isOpen="isModalOpen" @close="closeModal">
-        <ModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
+        <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
       </Modal>
+      <MainLoader :loading="!agents.length" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import type { AgentDto, OpenModalState } from '~/types';
+import type { Agent, OpenModalState } from '~/types';
 
 const modalContent = useTemplateRef('modalContent');
 const agentsStore = useAgentsStore();
-const { isLoggedIn, handleConnectClick } = useWalletConnect();
+const authStore = useAuthStore();
+const { handleConnectClick } = useWalletConnect();
+const user = computed(() => authStore.user);
+const route = useRoute();
 
 const modalLoading = ref<boolean>(false);
 const isModalOpen = ref<boolean>(false);
-const selectedPerson = ref<AgentDto | undefined>(undefined);
+const selectedPerson = ref<Agent | undefined>(undefined);
 
 const agents = computed(() => agentsStore.agents);
 
-const openModal = async (person: AgentDto, state: OpenModalState) => {
-  if (state === 'call' && !isLoggedIn.value) {
+const openModal = async (person: Agent, state: OpenModalState) => {
+  if (state === 'call' && !user.value) {
     handleConnectClick();
     return;
   }
 
   modalLoading.value = true;
   selectedPerson.value = person;
+  if (route.params.id !== person.route) {
+    history.replaceState(null, '', `/${person.route}`);
+  }
   isModalOpen.value = true; // TODO: move this line after await if need to wait
   await modalContent.value?.onOpen(state);
   modalLoading.value = false;
@@ -51,11 +57,21 @@ const openModal = async (person: AgentDto, state: OpenModalState) => {
 
 const closeModal = () => {
   isModalOpen.value = false;
-  modalContent.value?.close();
+  modalContent.value?.onClose();
+  history.replaceState(null, '', '/');
 };
 
 onBeforeMount(async () => {
   await agentsStore.getAgents();
+  const agentRoute = route.params.slug?.[0] as string | undefined;
+  if (agentRoute) {
+    const person = agentsStore.agents.find((agent) => agent.route === agentRoute);
+    if (person) {
+      selectedPerson.value = person;
+      await openModal(person, 'default');
+      return;
+    }
+  }
   // preload first agent
   selectedPerson.value = agentsStore.agents[0];
 });

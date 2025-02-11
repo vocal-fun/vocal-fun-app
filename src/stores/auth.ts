@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 import type { NonceDto, UserDto } from '~/types';
 
 export const useAuthStore = defineStore('auth', () => {
+  const { $toast } = useNuxtApp();
   const loading = ref(false);
   const loggedInAddress = ref('');
   const nonceData = ref<NonceDto | null>(null);
@@ -133,11 +134,17 @@ export const useAuthStore = defineStore('auth', () => {
           console.warn('[USER API] [WARN] User data is not available but balance updated');
           return;
         }
+        const balanceBefore = user.value.balance;
         console.log('[USER API] Balance updated: ', args.balance);
         user.value = {
           ...user.value,
           balance: args.balance,
         };
+        if (balanceBefore < args.balance) {
+          $toast.success(`${args.balance - balanceBefore} $VOCAL has been received`);
+        } else if (balanceBefore > args.balance) {
+          $toast.info(`${balanceBefore - args.balance} $VOCAL has been spent`);
+        }
       });
     } catch (error) {
       console.warn('[USER API] Error connecting to server:', error);

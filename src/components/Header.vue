@@ -43,7 +43,7 @@
 
     <div class="user">
       <button v-if="user" v-play-click-sound class="account" @click="buyStore.openBuyModal">
-        YOUR BALANCE: ${{ user.balance }}
+        BALANCE: {{ user.balance }} $VOCAL
       </button>
       <ConnectWallet class="wallet" />
     </div>

@@ -4,7 +4,7 @@
   </div>
   <div class="info">
     <template v-if="user">
-      <div class="balance">YOUR MINUTES: {{ user.balance }}</div>
+      <div class="balance">BALANCE: {{ user.balance }} $VOCAL</div>
       <button v-play-click-sound class="buy-more" @click="openBuyModal">
         BUY MORE
       </button>
@@ -23,7 +23,7 @@
         />
       </div>
       <div class="name">{{ person.name }}</div>
-      <div class="price">${{ person.rate }} / min</div>
+      <div class="price">{{ person.rate }} $VOCAL / min</div>
       <div v-show="hasError" class="error alert-color">some error happened</div>
     </template>
 
@@ -65,12 +65,11 @@
       </div>
     </transition>
   </div>
-  <!-- <div v-show="!error" class="recognition" :class="{ hidden: !speechRecResult }">- {{ speechRecResult }}</div> -->
   <div :class="['footer', callingOrOnCall ? 'footer-on-call' : 'footer-idle']">
     <template v-if="idleOrError">
-      <GreenModalButton icon="call" :disabled="!user" @click="startCall">Call</GreenModalButton>
+      <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
-      <GreenModalButton v-else icon="play" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
+      <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
     </template>
 
     <template v-else-if="callingOrOnCall">
@@ -95,23 +94,22 @@ import type { Howl } from 'howler';
 
 import { icons } from '~/consts';
 import { audioService } from '~/services/audio';
-import type { AgentDto, OpenModalState, Preview } from '~/types';
+import type { Agent, OpenModalState, Preview } from '~/types';
 
 type CallStatusType = 'calling' | 'idle' | 'on-call';
 
 const props = withDefaults(
   defineProps<{
-    person?: AgentDto,
+    person?: Agent,
   }>(),
   {
     person: () => ({
       name: '',
       image: '',
-      twitter: '',
-      __v: 0,
       rate: 1,
       createdAt: '',
-      _id: '',
+      id: '',
+      route: '',
     }),
   }
 );
@@ -120,12 +118,14 @@ const emit = defineEmits(['close']);
 
 let seconds = 0;
 let timer: ReturnType<typeof setInterval> | null = null;
+let callInit = false;
 let cancelCurrentCall: (() => void) | null = null;
 const callD = icons.call;
 const audio = shallowRef<Howl | null>(null);
 
 const callStatus = ref<CallStatusType>('idle');
 const timerText = ref<string>('00:00');
+const previewLoading = ref(false);
 
 const idle = computed(() => callStatus.value === 'idle');
 const calling = computed(() => callStatus.value === 'calling');
@@ -136,13 +136,14 @@ const callingOrOnCall = computed(() => (calling.value || onCall.value) && !hasEr
 
 const agentsStore = useAgentsStore();
 const preview = computed<Preview | null>(() =>
-  agentsStore.previews[props.person._id]
-  ? { ...agentsStore.previews[props.person._id], agentId: props.person._id }
+  agentsStore.previews[props.person.id]
+  ? { ...agentsStore.previews[props.person.id], agentId: props.person.id }
   : null
 );
 
 const buyStore = useBuyStore();
 const authStore = useAuthStore();
+const { handleConnectClick } = useWalletConnect();
 
 const user = computed(() => authStore.user);
 
@@ -183,12 +184,6 @@ const stopCurrentSound = () => {
 const onModalClose = () => {
   emit('close');
   hangUp();
-  closeCallSession();
-}
-
-const close = () => {
-  hangUp();
-  closeCallSession();
 }
 
 const resetTimer = () => {
@@ -208,70 +203,67 @@ const resetCallData = (keepError = false) => {
   }
 }
 
-const call = async (click = true) => {
-  const controller = new AbortController(); // Create an AbortController
-  const signal = controller.signal; // Get the signal
-
-  // Handle cleanup in case of cancellation
-  const cancelCurrentCall = () => {
-    controller.abort(); // Abort the call when needed
-  };
-  resetCallData();
-  if (click) {
-    await audioService.click();
-  }
+const call = async (signal: AbortSignal) => {
+  callInit = true;
   callStatus.value = 'calling';
-
-  // For demo purposes: Play the calling audio
-  playCurrentSound(audioService.callingUrl, true);
-  // Initiate the call session and web socket connection
-  await initCallSession(props.person._id);
-
-  // Add the abort signal to your Promise
-  new Promise<void>((resolve, reject) => {
-    const timeoutId = setTimeout(() => resolve(), 9_000); // Simulate a delay of 9 seconds
-    // Check if the operation should be aborted
-    signal.addEventListener('abort', () => {
-      clearTimeout(timeoutId); // Clear the timeout if aborted
-      reject(new Error('Call was cancelled')); // Reject with an error
-    });
-  }).then(() => {
+  playCurrentSound(audioService.callingUrl, true); // Play the calling audio in parallel
+  const startInitTime = Date.now();
+  try {
+    // Initiate the call session and web socket connection
+    await initCallSession(props.person.id);
+    signal.throwIfAborted(); // Check if the call was cancelled
+    const callDurationLeft = 2_000 - (Date.now() - startInitTime);
+    await new Promise<void>((resolve) => setTimeout(resolve, callDurationLeft < 0 ? 0 : callDurationLeft));
     callStatus.value = 'on-call';
-    resetTimer();
-
+    stopCurrentSound();
+    signal.throwIfAborted(); // Check if the call was cancelled
     console.info(`[VOCAL.FUN] Call with ${props.person.name} started`);
-
-    startRecording();
-
+    await startRecording();
     timer = setInterval(() => {
       seconds++;
       updateTimerDisplay();
     }, 1_000);
-  }).catch((error) => {
-    if ((error as Error).message === 'Call was cancelled') {
-      console.log('Call was cancelled before completion');
+  } catch (error) {
+    if (error == 'cancelled') {
+      console.log('[VOCAL.FUN] Call was cancelled before completion');
     } else {
-      error.value = true;
+      hasCallError.value = true;
       console.warn('[VOCAL.FUN] Error during call:', error);
     }
-  });
-
-  return cancelCurrentCall; // Return the cancel function for later use
-};
+  } finally {
+    callInit = false;
+  }
+}
 
 const startCall = async (click = true) => {
+  if (click) {
+    await audioService.click();
+  }
   if (!user.value) {
+    handleConnectClick();
+    onModalClose();
     return; // Do nothing if user is not logged in
   }
-  cancelCurrentCall = await call(click);
+  const controller = new AbortController(); // Create an AbortController
+  const signal = controller.signal; // Get the signal
+  // Handle cleanup in case of cancellation
+  const _cancelCurrentCall = () => {
+    controller.abort('cancelled'); // Abort the call when needed
+  };
+  resetCallData();
+  call(signal);
+  cancelCurrentCall = _cancelCurrentCall;
 }
 
 const hangUp = (keepError = false) => {
-  resetCallData(keepError);
-  stopCurrentSound();
   cancelCurrentCall?.();
-  callStatus.value = 'idle';
-  audioService.resumeBgMusic();
+  stopCurrentSound();
+  waitForCallInit().then(() => {
+    resetCallData(keepError);
+    closeCallSession();
+    callStatus.value = 'idle';
+    audioService.resumeBgMusic();
+  });
 }
 
 const hangUpWithClickSound = () => {
@@ -283,8 +275,8 @@ const playPreview = async (click = true) => {
   if (click) {
     await audioService.click();
   }
-  if (props.person._id) {
-    await playCurrentSound(props.person._id);
+  if (props.person.id) {
+    await playCurrentSound(props.person.id);
   }
 }
 
@@ -300,17 +292,29 @@ const updateTimerDisplay = () => {
   timerText.value = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
+const waitForCallInit = async () => {
+  while (callInit) {
+    await new Promise<void>((resolve) => setTimeout(resolve, 500));
+  }
+}
+
 const onOpen = async (state: OpenModalState) => {
   await nextTick();
+  cancelCurrentCall = null;
+  previewLoading.value = true;
   await agentsStore.getAgentPreview(props.person);
   if (preview.value) {
     audioService.load(preview.value);
   }
+  previewLoading.value = false;
   switch (state) {
     case 'default':
       break;
     case 'preview':
       await playPreview(false);
+      if (!preview.value) {
+        stopCurrentSound(); // to show play button again if no preview
+      }
       break;
     case 'call':
       await startCall(false);
@@ -326,7 +330,7 @@ watch(hasError, (value) => {
 
 defineExpose({
   onOpen,
-  close,
+  onClose: hangUp,
 });
 </script>
 
@@ -433,7 +437,7 @@ defineExpose({
     border-bottom: 1px solid transparent;
     transition: border-bottom 0.3s ease-in-out;
     &:hover {
-      border-bottom-color: #FA6400;
+      border-bottom-color: var(--color-warn);
     }
   }
 }
@@ -445,6 +449,7 @@ defineExpose({
   }
   > span {
     width: 50px;
+    font-variant-numeric: tabular-nums;
   }
   &:hover {
     cursor: default;
@@ -452,9 +457,9 @@ defineExpose({
 }
 
 .alert-color {
-  color: #FA6400;
-  text-shadow: 0 0 6.09px 0 #FA6400,
-  0 0.55px 6.65px 0 #FA6400;
+  color: var(--color-warn);
+  text-shadow: 0 0 6.09px 0 var(--color-warn),
+  0 0.55px 6.65px 0 var(--color-warn);
 }
 
 .fade-enter-active {

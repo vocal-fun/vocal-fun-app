@@ -9,8 +9,6 @@ export function useBuyModal() {
   const modal = useWeb3Modal();
   const { $toast } = useNuxtApp();
 
-  // const { success, info, warning } = useNotification();
-
   const amount = ref(1);
 
   const buyOptions = computed(() => buyStore.buyOptions);
@@ -56,45 +54,46 @@ export function useBuyModal() {
   }
 
   const _buy = async () => {
+    let message = '';
     sendLoading.value = true;
     const option = selectedOption.value;
     try {
       const user = authStore.user;
       if (!user) {
-        console.info('User not logged in to purchase');
-        // info('Please connect your wallet to proceed');
-        // return;
-        throw 'User not logged in to purchase';
+        message = 'User not logged in to purchase';
+        console.info(message);
+        throw message;
       }
       if (!option) {
-        console.info('No payment option selected to purchase');
-        // info('Please select a payment option');
-        // return;
-        throw 'No payment option selected to purchase';
+        message = 'No payment option selected to purchase';
+        console.info(message);
+        throw message;
       }
       const contractAddress = option.address;
       const to = option.recipient;
       await transfer(contractAddress, to, amount.value);
       closeBuyModal();
-      console.info(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
-      return `Purchase successful! ${amount.value} ${option.symbol} has been sent`;
-      // success(`Purchase successful! ${amount.value} ${option.symbol} has been sent`);
+      message = `Purchase successful! ${amount.value} ${option.symbol} has been sent`;
+      console.info(message);
+      return message;
     } catch (error) {
       const errorMessage = (error as Error).message;
       if (errorMessage.includes('user rejected action')) {
-        console.info('Purchase cancelled by user');
-        // warning('Purchase cancelled');
-        // return;
-        throw 'Purchase cancelled by user';
+        message = 'Purchase cancelled by user';
+        console.info(message);
+        throw message;
       }
       if (errorMessage.includes('transfer amount exceeds balance')) {
-        console.info('Insufficient balance');
-        // warning('Insufficient balance');
-        // return;
-        throw `Insufficient ${option?.symbol} balance`;
+        message = `Insufficient ${option?.symbol} balance`;
+        console.info(message);
+        throw message;
+      }
+      if (errorMessage.includes('account has not been authorized by the user')) {
+        message = 'User not logged in to purchase';
+        console.info(message);
+        throw message;
       }
       console.warn('Error signing transfer ERC20 tx:', error);
-      // warning('An error occurred while processing your purchase');
       throw 'An error occurred while processing your purchase';
     } finally {
       sendLoading.value = false;

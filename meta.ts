@@ -1,5 +1,5 @@
 export const meta = {
-  url: 'https://vocal.fun',
+  url: 'https://app.vocal.fun',
   domain: 'vocal.fun',
   title: 'Vocal Fun - Talk to realtime AI agents',
   description: 'Vocal Fun is a platform that allows you to talk to realtime AI agents. You can ask them anything and they will respond to you in real-time.',

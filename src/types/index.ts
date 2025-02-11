@@ -13,6 +13,15 @@ export type AgentDto = {
   __v: number;
 };
 
+export type Agent = {
+  id: string;
+  name: string;
+  image: string;
+  rate: number;
+  createdAt: string;
+  route: string;
+};
+
 export type PreviewDto = {
   /** Base64 encoded audio data */
   audio: string;
