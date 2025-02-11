@@ -18,6 +18,7 @@
       <Modal :isOpen="isModalOpen" @close="closeModal">
         <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
       </Modal>
+      <MainLoader :loading="!agents.length" />
     </div>
   </section>
 </template>
