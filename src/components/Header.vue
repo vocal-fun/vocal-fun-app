@@ -146,6 +146,10 @@ const toggleBackgroundSound = () => {
       &:first-child {
         margin-right: 2px;
       }
+
+      &:last-child {
+        margin-left: 2px;
+      }
     }
   }
 
