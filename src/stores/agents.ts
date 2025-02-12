@@ -8,7 +8,9 @@ export const useAgentsStore = defineStore('agents', () => {
   async function getAgents(): Promise<void> {
     try {
       loading.value = true;
-      const res = await $fetch<AgentDto[]>('/api/v1/agents');
+      const res = await $fetch<AgentDto[]>('/api/v1/agents', {
+        headers: { 'Cache-Control': 'max-age=86400' }, // Cache for 1 day
+      });
       agents.value = res.map(({ _id, name, rate, image, createdAt }) => {
         return { id: _id, name, rate, image, createdAt, route: name.toLowerCase().replace(/\s/g, '-') };
       });
@@ -30,6 +32,7 @@ export const useAgentsStore = defineStore('agents', () => {
       loading.value = true;
       const res = await $fetch<PreviewDto>(`/api/v1/agents/preview?agentId=${agentId}`, {
         method: 'POST',
+        headers: { 'Cache-Control': 'max-age=86400' }, // Cache for 1 day
       });
       previews.value[agentId] = res;
     } catch (error) {

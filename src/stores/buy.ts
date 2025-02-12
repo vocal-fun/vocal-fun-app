@@ -8,7 +8,9 @@ export const useBuyStore = defineStore('buy', () => {
   async function getBuyOptions(): Promise<void> {
     try {
       loading.value = true;
-      const res = await $fetch<{ paymentMethods: BuyOptionDto[] }>('/api/v1/vocal/buy-credits');
+      const res = await $fetch<{ paymentMethods: BuyOptionDto[] }>('/api/v1/vocal/buy-credits', {
+        headers: { 'Cache-Control': 'max-age=86400' }, // Cache for 1 day
+      });
       buyOptions.value = res.paymentMethods;
     } catch (error) {
       console.warn(`Error fetching buy options:`, error);
