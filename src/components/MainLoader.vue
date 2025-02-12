@@ -22,12 +22,12 @@ $pixelGap: 0.5rem;
 $pixelRadius: 0.25rem;
 $pixelsCount: 5;
 $loaderHeight: $pixelSize;
-$loaderWidth: $pixelSize * $pixelsCount + $pixelGap * ($pixelsCount - 1);
+$loaderWidth: ($pixelSize * $pixelsCount) + $pixelGap * ($pixelsCount - 1);
 
 .pixel-loader {
   position: fixed;
-  top: calc(50% - (#{$loaderHeight} / 2));
-  left: calc(50% - (#{$loaderWidth} / 2));
+  top: calc(50svh - (#{$loaderHeight} / 2));
+  left: calc(50vw - (#{$loaderWidth} / 2));
   display: flex;
   justify-content: center;
   align-items: center;
