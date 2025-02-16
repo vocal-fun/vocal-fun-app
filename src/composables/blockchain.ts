@@ -1,4 +1,6 @@
-import { BrowserProvider, ethers, Contract, type Eip1193Provider, type ContractTransactionResponse } from 'ethers';
+import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
+import { BrowserProvider, ethers, Contract, type Eip1193Provider, type ContractTransactionResponse, JsonRpcProvider } from 'ethers';
+import { defaultRpcUrl } from '~/consts';
 
 interface IERC20 {
   balanceOf(owner: string): Promise<bigint>;
@@ -17,12 +19,16 @@ const ERC20_ABI = [
 ];
 
 export function useBlockchain() {
+  let fallbackProvider: JsonRpcProvider | null = null;
+  const { walletProvider } = useWeb3ModalProvider();
   const getProvider = () => {
-    const ethereum = (window as any).ethereum as Eip1193Provider | undefined;
-    if (!ethereum) {
-      throw new Error('No Ethereum provider detected. Please install MetaMask.');
+    if (walletProvider.value) {
+      return new BrowserProvider(walletProvider.value);
     }
-    return new BrowserProvider(ethereum);
+    if (!fallbackProvider) {
+      fallbackProvider = new JsonRpcProvider(defaultRpcUrl);
+    }
+    return fallbackProvider;
   }
 
   const getSigner = async () => {
