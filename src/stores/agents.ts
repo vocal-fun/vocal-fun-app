@@ -3,7 +3,9 @@ import type { AgentDto, Agent, PreviewDto } from '~/types';
 
 export const useAgentsStore = defineStore('agents', () => {
   const loading = ref(false);
-  const agents = ref<Agent[]>([]);
+  const agents = ref<Agent[]>(
+    Array.from({ length: 33 }, (_, index) => ({ id: index.toString(), name: '', rate: 0, image: '', createdAt: '', route: '' })),
+  );
   const previews = ref<Record<string, PreviewDto>>({}); // agentId -> preview
 
   async function getAgents(): Promise<void> {

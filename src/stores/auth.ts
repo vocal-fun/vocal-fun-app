@@ -46,6 +46,33 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /** Temporary solution to avoid WalletConnect usage */
+  async function fakeAuthorize(): Promise<void> {
+    const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzk4ODkzM2FkNGEwM2UxZDEyZmExODciLCJhZGRyZXNzIjoiMHgxNmIxMDI1Y2QxYTgzMTQxYmY5M2U0N2RiYzMxNmYzNGYyN2YyZTc2IiwiaWF0IjoxNzM4MDUxNTI3LCJleHAiOjE3NDAxMjUxMjd9.Jq5PgQ9_EvW1hcomp5Hx2udZZ_JevyYY54Kw9SJw2co';
+    const tokenCookie = useCookie('token');
+    tokenCookie.value = fakeToken;
+
+    const tokenData = JSON.parse(atob(fakeToken.split('.')[1]));
+    const expires = tokenData.exp * 1000;
+
+    if (Date.now() >= expires) {
+      clearCookie();
+
+      return;
+    }
+
+    token.value = fakeToken;
+    loggedInAddress.value = tokenData.address;
+
+    loading.value = true;
+
+    try {
+      await getUser();
+    } finally {
+      loading.value = false;
+    }
+  }
+
   async function authorize(): Promise<void> {
     const tokenCookie = useCookie('token');
 
@@ -196,5 +223,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     isLoggedInAddress,
     destroy,
+    fakeAuthorize,
   };
 });

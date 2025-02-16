@@ -1,5 +1,5 @@
 <template>
-  <div class="person shake-little" :class="{ disabled }" @click="openModal('default')">
+  <div class="person shake-little" :class="{ disabled: isDisabled }" @click="openModal('default')">
     <div class="avatar-block">
       <NuxtImg
         class="avatar-img"
@@ -18,8 +18,8 @@
       <span>{{ rate }} $VOCAL / min</span>
     </div>
     <div class="buttons">
-      <button class="preview shake" :disabled="disabled" @click.stop="openModal('preview')">PREVIEW</button>
-      <button class="shake" :disabled="disabled" @click.stop="openModal('call')">CALL</button>
+      <button class="preview shake" :disabled="isDisabled" @click.stop="openModal('preview')">PREVIEW</button>
+      <button class="shake" :disabled="isDisabled" @click.stop="openModal('call')">CALL</button>
     </div>
   </div>
 </template>
@@ -29,6 +29,8 @@ import { audioService } from '~/services/audio';
 import type { Agent, OpenModalState } from '~/types';
 
 const props = defineProps<Omit<Agent, 'route' | 'createdAt' | 'id'> & { disabled: boolean }>();
+
+const isDisabled = computed(() => props.disabled || !props.name);
 
 const emit = defineEmits<{
   'open-modal': [state: OpenModalState],
@@ -44,6 +46,15 @@ const openModal = (state: OpenModalState = 'default') => {
 </script>
 
 <style scoped lang="scss">
+@keyframes textShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 .person {
   cursor: pointer;
   color: var(--color-primary);
@@ -57,10 +68,6 @@ const openModal = (state: OpenModalState = 'default') => {
       -3px 3px 0 0 #1B1B2A,
       3px 0 0 0 #59596D,
       0 -1.5px 0 0 #000000;
-
-  &.disabled {
-    cursor: not-allowed;
-  }
 
   > * {
     flex: 1 1 50%;
@@ -82,6 +89,8 @@ const openModal = (state: OpenModalState = 'default') => {
 
       &[disabled] {
         cursor: not-allowed;
+        color: #1b1b2a64;
+        opacity: 0.8;
       }
 
       &:hover {
@@ -93,6 +102,10 @@ const openModal = (state: OpenModalState = 'default') => {
     .preview {
       background-color: #37D33933;
       color: var(--color-primary);
+
+      &[disabled] {
+        color: #37d33a66;
+      }
     }
   }
 
@@ -118,6 +131,25 @@ const openModal = (state: OpenModalState = 'default') => {
   &:hover {
     transform: scale(1.035);
     z-index: 99;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+
+    .info > span {
+      height: 1.5rem;
+      color: transparent;
+      box-shadow: 0 0 1.4rem rgba(55, 211, 57, 0.3);
+      border-radius: 4px;
+      background: linear-gradient(
+        90deg, 
+        rgba(42, 42, 46, 0.9) 25%, 
+        rgba(55, 211, 57, 0.2) 50%, 
+        rgba(42, 42, 46, 0.9) 75%
+      );
+      background-size: 200% 100%;
+      animation: textShimmer 1.5s infinite;
+    }
   }
 }
 

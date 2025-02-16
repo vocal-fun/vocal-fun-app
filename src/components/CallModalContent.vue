@@ -5,7 +5,7 @@
   <div class="info">
     <template v-if="user">
       <div class="balance">BALANCE: {{ user.balance }} $VOCAL</div>
-      <button v-play-click-sound class="buy-more" @click="openBuyModal">
+      <button v-if="false" v-play-click-sound class="buy-more" @click="openBuyModal">
         BUY MORE
       </button>
     </template>

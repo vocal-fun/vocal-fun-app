@@ -25,7 +25,7 @@
       </a>
     </div>
 
-    <button class="logo" @click="toggleBackgroundSound">
+    <a v-play-click-sound class="logo" href="https://vocal.fun" aria-label="Home" target="_blank" rel="noopener noreferrer">
       <span class="logo-bar"><span class="logo-bar-element"></span></span>
       <NuxtImg
         class="shake-little shake-constant"
@@ -39,13 +39,14 @@
       />
       vocal.fun
       <span class="logo-bar"><span class="logo-bar-element"></span></span>
-    </button>
+    </a>
 
     <div class="user">
-      <button v-if="user" v-play-click-sound class="account" @click="buyStore.openBuyModal">
-        BALANCE: {{ user.balance }} $VOCAL
+      <button v-if="false" v-play-click-sound class="account" @click="buyStore.openBuyModal">
+        BALANCE: {{ user?.balance }} $VOCAL
       </button>
-      <ConnectWallet class="wallet" />
+      <span v-if="user" class="account">BALANCE: {{ user.balance }} $VOCAL</span>
+      <ConnectWallet v-if="false" class="wallet" />
     </div>
 
     <Modal :isOpen="isBuyModalOpen" @close="buyStore.closeBuyModal">
@@ -55,9 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { audioService } from '~/services/audio';
+// import { audioService } from '~/services/audio';
 
-const isPlaying = ref<boolean>(false);
+// let isPlaying = false;
 
 const buyStore = useBuyStore();
 const authStore = useAuthStore();
@@ -65,15 +66,15 @@ const authStore = useAuthStore();
 const user = computed(() => authStore.user);
 const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 
-const toggleBackgroundSound = () => {
-  audioService.click();
-  if (isPlaying.value) {
-    audioService.pauseBgMusic();
-  } else {
-    audioService.playBgMusic();
-  }
-  isPlaying.value = !isPlaying.value;
-};
+// const toggleBackgroundSound = () => {
+//   audioService.click();
+//   if (isPlaying) {
+//     audioService.pauseBgMusic();
+//   } else {
+//     audioService.playBgMusic();
+//   }
+//   isPlaying = !isPlaying;
+// };
 </script>
 
 <style scoped lang="scss">
@@ -197,15 +198,14 @@ const toggleBackgroundSound = () => {
   }
 
   .account {
-    cursor: pointer;
     text-align: center;
     white-space: nowrap;
     text-decoration: none;
-    transition: color 0.3s ease-in-out, text-decoration 0.3s ease-in-out;
-    &:hover {
-      text-decoration: underline;
-      color: white;
-    }
+    // transition: color 0.3s ease-in-out, text-decoration 0.3s ease-in-out;
+    // &:hover {
+    //   text-decoration: underline;
+    //   color: white;
+    // }
   }
 }
 
