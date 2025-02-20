@@ -6,7 +6,7 @@
           <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/>
         </circle>
       </svg>
-      <svg v-else width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" :class="icon">
+      <svg v-else :width="w" :height="h" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" :class="icon">
         <path :d="d" fill="black"/>
       </svg>
     </span>
@@ -18,12 +18,15 @@
 import { icons } from '~/consts';
 
 const props = defineProps<{
-  icon: 'play' | 'stop' | 'call',
+  icon: 'play' | 'stop' | 'call' | 'download',
   disabled?: boolean,
   loading?: boolean,
 }>();
 
 const d = computed(() => icons[props.icon]);
+
+const w = computed(() => props.icon === 'download' ? '13' : '10');
+const h = computed(() => props.icon === 'download' ? '14' : '10');
 </script>
 
 <style scoped lang="scss">
