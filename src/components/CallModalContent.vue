@@ -5,7 +5,7 @@
   <div class="info">
     <template v-if="user">
       <div class="balance">BALANCE: {{ user.balance }} $VOCAL</div>
-      <button v-play-click-sound class="buy-more" @click="openBuyModal">
+      <button v-if="false" v-play-click-sound class="buy-more" @click="openBuyModal">
         BUY MORE
       </button>
     </template>
@@ -70,6 +70,9 @@
       <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
       <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
+      <GreenModalButton icon="download" :loading="isDownloading" :disabled="isDownloadDisabled" @click="download">Download</GreenModalButton>
+      <GreenModalButton v-if="isShareAvailable" icon="twitter" :loading="isDownloading" :disabled="isDownloadDisabled" @click="share">Share</GreenModalButton>
+      <GreenModalButton v-else tag="a" icon="twitter" :href="tweetHref">Share</GreenModalButton>
     </template>
 
     <template v-else-if="callingOrOnCall">
@@ -90,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import { useShare } from '@vueuse/core';
 import type { Howl } from 'howler';
 
 import { icons } from '~/consts';
@@ -147,7 +151,59 @@ const { handleConnectClick } = useWalletConnect();
 
 const user = computed(() => authStore.user);
 
-const { hasError, hasCallError, initCallSession, closeCallSession, startRecording, stopRecording } = useCallApi();
+const route = useRoute();
+const tweetHref = computed(() => {
+  const pageUrl = encodeURIComponent(route.fullPath);
+  return `https://twitter.com/intent/tweet?text=I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
+});
+const { share: _share, isSupported: isShareAvailable } = useShare();
+
+const {
+  hasError,
+  hasCallError,
+  isDownloadDisabled,
+  isDownloading,
+  initCallSession,
+  closeCallSession,
+  startRecording,
+  stopRecording,
+  downloadMp4
+} = useCallApi();
+
+const share = async () => {
+  if (!isShareAvailable.value) {
+    return;
+  }
+  const options: ShareData = {
+    title: 'VOCAL.FUN',
+    text: `I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!`,
+    url: route.fullPath,
+  };
+  try {
+    const mp4Blob = await downloadMp4(props.person.image);
+    if (mp4Blob) {
+      options.files = [new File([mp4Blob], `${props.person.route}.mp4`, { type: 'video/mp4' })];
+    }
+    await _share(options);
+  } catch (error) {
+    console.warn('[SHARE] Error sharing:', error);
+  }
+};
+
+const download = async () => {
+  const mp4Blob = await downloadMp4(props.person.image);
+  if (!mp4Blob) {
+    return;
+  }
+  const url = URL.createObjectURL(mp4Blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${props.person.route}.mp4`;
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
 
 const playCurrentSound = async (path: string, withoutResume = false) => {
   try {
@@ -425,7 +481,7 @@ defineExpose({
 
   &.footer-idle {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 2fr);
   }
 
   &.footer-on-call {

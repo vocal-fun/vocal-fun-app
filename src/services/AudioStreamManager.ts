@@ -1,3 +1,5 @@
+import { Sound } from '~/consts';
+
 export class AudioStreamPlayer {
   private audioContext: AudioContext | null = null;
   private sourceNode: AudioBufferSourceNode | null = null;
@@ -20,7 +22,7 @@ export class AudioStreamPlayer {
     if (typeof window !== 'undefined') {
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioContextClass) {
-        this.audioContext = new AudioContextClass({ sampleRate: 24000 }); // Match server sample rate
+        this.audioContext = new AudioContextClass({ sampleRate: Sound.SampleRate });
       } else {
         console.error('Web Audio API is not supported in this browser');
       }

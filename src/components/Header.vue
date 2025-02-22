@@ -25,8 +25,8 @@
       </a>
     </div>
 
-    <button class="logo" @click="toggleBackgroundSound">
-      <span class="logo-bar-element"></span>
+    <a v-play-click-sound class="logo" href="https://vocal.fun" aria-label="Home" target="_blank" rel="noopener noreferrer">
+      <span class="logo-bar"><span class="logo-bar-element"></span></span>
       <NuxtImg
         class="shake-little shake-constant"
         src="/logo/logo.png"
@@ -38,14 +38,15 @@
         loading="lazy"
       />
       vocal.fun
-      <span class="logo-bar-element"></span>
-    </button>
+      <span class="logo-bar"><span class="logo-bar-element"></span></span>
+    </a>
 
     <div class="user">
-      <button v-if="user" v-play-click-sound class="account" @click="buyStore.openBuyModal">
-        BALANCE: {{ user.balance }} $VOCAL
+      <button v-if="false" v-play-click-sound class="account" @click="buyStore.openBuyModal">
+        BALANCE: {{ user?.balance }} $VOCAL
       </button>
-      <ConnectWallet class="wallet" />
+      <span v-if="user" class="account">BALANCE: {{ user.balance }} $VOCAL</span>
+      <ConnectWallet v-if="false" class="wallet" />
     </div>
 
     <Modal :isOpen="isBuyModalOpen" @close="buyStore.closeBuyModal">
@@ -55,9 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { audioService } from '~/services/audio';
+// import { audioService } from '~/services/audio';
 
-const isPlaying = ref<boolean>(false);
+// let isPlaying = false;
 
 const buyStore = useBuyStore();
 const authStore = useAuthStore();
@@ -65,15 +66,15 @@ const authStore = useAuthStore();
 const user = computed(() => authStore.user);
 const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 
-const toggleBackgroundSound = () => {
-  audioService.click();
-  if (isPlaying.value) {
-    audioService.pauseBgMusic();
-  } else {
-    audioService.playBgMusic();
-  }
-  isPlaying.value = !isPlaying.value;
-};
+// const toggleBackgroundSound = () => {
+//   audioService.click();
+//   if (isPlaying) {
+//     audioService.pauseBgMusic();
+//   } else {
+//     audioService.playBgMusic();
+//   }
+//   isPlaying = !isPlaying;
+// };
 </script>
 
 <style scoped lang="scss">
@@ -87,12 +88,10 @@ const toggleBackgroundSound = () => {
 
     .socials {
       order: 1;
-      flex-grow: 1;
     }
 
     .user {
       order: 1;
-      flex-grow: 1;
       text-align: right;
       @if ($without-account == true) {
         margin-left: 1.25rem;
@@ -102,7 +101,7 @@ const toggleBackgroundSound = () => {
 
     .logo {
       order: 2;
-      flex-grow: 2;
+      flex-basis: 100%;
       justify-content: center;
 
       .logo-bar-element {
@@ -117,31 +116,46 @@ const toggleBackgroundSound = () => {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin: 1.25em;
-  height: 41px;
+  margin: 1.25rem;
 
   .logo {
+    flex: 1;
     cursor: pointer;
     margin: 0.5rem;
     font-size: 1.2rem;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     text-transform: uppercase;
 
-    .logo-bar-element {
-      width: 6rem;
-      border-radius: 2px;
-      height: 0.5rem;
-      background: linear-gradient(180deg, #ECCF7A 0%, #ECCF7A 20%, #FFFFFF 21%, #FFFFFF 40%, #3F422B 41%, #3F422B 60%, #A3956A 61%, #A3956A 80%, #ECCF7A 81%, #ECCF7A 100%);
+    .logo-bar {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      max-width: 6rem;
+
+      &-element {
+        flex: 1;
+        width: 100%;
+        border-radius: 2px;
+        height: 0.5rem;
+        padding: 2px;
+        background: linear-gradient(180deg, #ECCF7A 0%, #ECCF7A 20%, #FFFFFF 21%, #FFFFFF 40%, #3F422B 41%, #3F422B 60%, #A3956A 61%, #A3956A 80%, #ECCF7A 81%, #ECCF7A 100%);
+      }
 
       &:first-child {
         margin-right: 2px;
+      }
+
+      &:last-child {
+        margin-left: 2px;
       }
     }
   }
 
   .socials {
+    flex: 1;
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -177,22 +191,21 @@ const toggleBackgroundSound = () => {
   }
 
   .user {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 1.25rem;
-    margin-left: 1.25rem;
   }
 
   .account {
-    cursor: pointer;
     text-align: center;
     white-space: nowrap;
     text-decoration: none;
-    transition: color 0.3s ease-in-out, text-decoration 0.3s ease-in-out;
-    &:hover {
-      text-decoration: underline;
-      color: white;
-    }
+    // transition: color 0.3s ease-in-out, text-decoration 0.3s ease-in-out;
+    // &:hover {
+    //   text-decoration: underline;
+    //   color: white;
+    // }
   }
 }
 
@@ -208,12 +221,25 @@ const toggleBackgroundSound = () => {
   }
 }
 
-@media (max-width: 655px) {
-  .header {
+@media (max-width: 724px) {
+  .header.header--with-account {
+    .user,
     .socials {
+      flex-basis: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 655px) {
+  .header:not(.header--with-account),
+  .header.header--with-account {
+    .socials,
+    .user {
       justify-content: center;
     }
     .user {
+      flex-basis: 100%;
       margin-left: 0;
     }
   }

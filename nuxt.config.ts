@@ -112,6 +112,18 @@ export default defineNuxtConfig({
   nitro: {
     routeRules: {
       "/api/v1/**": { proxy: "https://api.vocal.fun/api/v1/**" },
+      "/api/image/**": { proxy: "https://vocal-fun.s3.ap-south-1.amazonaws.com/agents/**" },
+    },
+  },
+
+  vite: {
+    optimizeDeps: {
+      exclude: ['@ffmpeg/ffmpeg'],
+    },
+    build: {
+      rollupOptions: {
+        external: ['@ffmpeg/ffmpeg'],
+      },
     },
   },
 });
