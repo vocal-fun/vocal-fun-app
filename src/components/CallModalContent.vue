@@ -71,7 +71,8 @@
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
       <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
       <GreenModalButton icon="download" :loading="isDownloading" :disabled="isDownloadDisabled" @click="download">Download</GreenModalButton>
-      <GreenModalButton tag="a" icon="twitter" :href="tweetHref">Share</GreenModalButton>
+      <GreenModalButton v-if="isShareAvailable" icon="twitter" :loading="isDownloading" :disabled="isDownloadDisabled" @click="share">Share</GreenModalButton>
+      <GreenModalButton v-else tag="a" icon="twitter" :href="tweetHref">Share</GreenModalButton>
     </template>
 
     <template v-else-if="callingOrOnCall">
@@ -92,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import { useShare } from '@vueuse/core';
 import type { Howl } from 'howler';
 
 import { icons } from '~/consts';
@@ -154,6 +156,7 @@ const tweetHref = computed(() => {
   const pageUrl = encodeURIComponent(route.fullPath);
   return `https://twitter.com/intent/tweet?text=I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
 });
+const { share: _share, isSupported: isShareAvailable } = useShare();
 
 const {
   hasError,
@@ -166,6 +169,26 @@ const {
   stopRecording,
   downloadMp4
 } = useCallApi();
+
+const share = async () => {
+  if (!isShareAvailable.value) {
+    return;
+  }
+  const options: ShareData = {
+    title: 'VOCAL.FUN',
+    text: `I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!`,
+    url: route.fullPath,
+  };
+  try {
+    const mp4Blob = await downloadMp4(props.person.image);
+    if (mp4Blob) {
+      options.files = [new File([mp4Blob], `${props.person.route}.mp4`, { type: 'video/mp4' })];
+    }
+    await _share(options);
+  } catch (error) {
+    console.warn('[SHARE] Error sharing:', error);
+  }
+};
 
 const download = async () => {
   const mp4Blob = await downloadMp4(props.person.image);
