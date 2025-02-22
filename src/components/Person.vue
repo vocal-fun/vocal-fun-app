@@ -182,6 +182,7 @@ const openModal = (state: OpenModalState = 'default') => {
 
     .avatar-block {
       width: 100%;
+      text-align: center;
 
       img {
         width: 100%;
