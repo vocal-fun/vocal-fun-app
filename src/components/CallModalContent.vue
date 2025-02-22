@@ -71,7 +71,7 @@
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
       <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
       <GreenModalButton icon="download" :loading="isDownloading" :disabled="isDownloadDisabled" @click="download">Download</GreenModalButton>
-      <GreenModalButton icon="download">Share</GreenModalButton>
+      <GreenModalButton tag="a" icon="twitter" :href="tweetHref">Share</GreenModalButton>
     </template>
 
     <template v-else-if="callingOrOnCall">
@@ -148,6 +148,12 @@ const authStore = useAuthStore();
 const { handleConnectClick } = useWalletConnect();
 
 const user = computed(() => authStore.user);
+
+const route = useRoute();
+const tweetHref = computed(() => {
+  const pageUrl = encodeURIComponent(route.fullPath);
+  return `https://twitter.com/intent/tweet?text=I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
+});
 
 const {
   hasError,
