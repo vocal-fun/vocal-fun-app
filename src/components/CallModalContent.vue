@@ -70,6 +70,8 @@
       <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
       <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
+      <GreenModalButton icon="download" :loading="isDownloading" :disabled="isDownloadDisabled" @click="download">Download</GreenModalButton>
+      <GreenModalButton icon="download">Share</GreenModalButton>
     </template>
 
     <template v-else-if="callingOrOnCall">
@@ -147,7 +149,32 @@ const { handleConnectClick } = useWalletConnect();
 
 const user = computed(() => authStore.user);
 
-const { hasError, hasCallError, initCallSession, closeCallSession, startRecording, stopRecording } = useCallApi();
+const {
+  hasError,
+  hasCallError,
+  isDownloadDisabled,
+  isDownloading,
+  initCallSession,
+  closeCallSession,
+  startRecording,
+  stopRecording,
+  downloadMp4
+} = useCallApi();
+
+const download = async () => {
+  const mp4Blob = await downloadMp4(props.person.image);
+  if (!mp4Blob) {
+    return;
+  }
+  const url = URL.createObjectURL(mp4Blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${props.person.route}.mp4`;
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
 
 const playCurrentSound = async (path: string, withoutResume = false) => {
   try {
@@ -425,7 +452,7 @@ defineExpose({
 
   &.footer-idle {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 2fr);
   }
 
   &.footer-on-call {

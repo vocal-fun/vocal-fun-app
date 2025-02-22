@@ -16,7 +16,9 @@
         @open-modal="openModal(person, $event)"
       />
       <Modal :isOpen="isModalOpen" @close="closeModal">
-        <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
+        <ClientOnly>
+          <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
+        </ClientOnly>
       </Modal>
     </div>
   </section>

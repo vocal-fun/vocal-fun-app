@@ -21,3 +21,13 @@ export const defaultChainId = baseNetwork.chainId;
 export const endpoint = 'https://api.vocal.fun/api/v1';
 export const wsEndpoint = 'https://api.vocal.fun';
 export const wsCallEndpoint = 'https://api.vocal.fun/call';
+
+/** Sound params based on server settings */
+export const Sound = {
+  SampleRate: 24000,
+  SampleSize: 32,
+  Channels: 1,
+};
+
+/** Agent Images base URL */
+export const BASE_IMAGE_URL = 'https://vocal-fun.s3.ap-south-1.amazonaws.com/agents/';
