@@ -98,6 +98,7 @@
 import { useShare } from '@vueuse/core';
 import type { Howl } from 'howler';
 
+import { meta } from '~~/meta';
 import { icons } from '~/consts';
 import { audioService } from '~/services/audio';
 import type { Agent, OpenModalState, Preview } from '~/types';
@@ -153,9 +154,8 @@ const { handleConnectClick } = useWalletConnect();
 
 const user = computed(() => authStore.user);
 
-const route = useRoute();
 const tweetHref = computed(() => {
-  const pageUrl = encodeURIComponent(route.fullPath);
+  const pageUrl = encodeURIComponent(url.value);
   return `https://twitter.com/intent/tweet?text=I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
 });
 const { share: _share, isSupported: _isShareAvailable } = useShare();
@@ -177,14 +177,16 @@ const { $device } = useNuxtApp();
 
 const isShareAvailable = computed(() => _isShareAvailable.value && $device.isMobileOrTablet);
 
+const url = computed(() => `${meta.url}/${props.person.route}`);
+
 const share = async () => {
   if (!isShareAvailable.value) {
     return;
   }
   const options: ShareData = {
     title: 'VOCAL.FUN',
-    text: `I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!\n${route.fullPath}`,
-    url: route.fullPath,
+    text: `I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!\n${url.value}`,
+    url: url.value,
   };
   try {
     const mp4Blob = await downloadMp4(props.person.image);
