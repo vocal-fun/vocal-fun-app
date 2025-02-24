@@ -1015,6 +1015,13 @@
     vite-plugin-checker "^0.8.0"
     vue-bundle-renderer "^2.1.1"
 
+"@nuxtjs/device@3.2.4":
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/@nuxtjs/device/-/device-3.2.4.tgz#574a0beefa207fa19fc992d116f731274e710eb4"
+  integrity sha512-jIvN6QeodBNrUrL/1FCHk4bebsiLsGHlJd8c/m2ksLrGY4IZ0npA8IYhDTdYV92epGxoe8+3iZOzCjav+6TshQ==
+  dependencies:
+    defu "^6.1.4"
+
 "@nuxtjs/sitemap@^7.0.0":
   version "7.0.2"
   resolved "https://registry.yarnpkg.com/@nuxtjs/sitemap/-/sitemap-7.0.2.tgz#e2b7a4c97dfd90d343b9f98fb0fbc6a4086b2b43"

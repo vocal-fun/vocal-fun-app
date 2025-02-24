@@ -15,7 +15,7 @@
     </div>
     <div class="info">
       <span>{{ name }}</span>
-      <span>{{ rate }} $VOCAL / min</span>
+      <span>${{ rate }} / min</span>
     </div>
     <div class="buttons">
       <button class="preview shake" :disabled="isDisabled" @click.stop="openModal('preview')">PREVIEW</button>

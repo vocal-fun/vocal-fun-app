@@ -4,7 +4,7 @@
   </div>
   <div class="info">
     <template v-if="user">
-      <div class="balance">BALANCE: {{ user.balance }} $VOCAL</div>
+      <div class="balance">BALANCE: ${{ user.balance }}</div>
       <button v-if="false" v-play-click-sound class="buy-more" @click="openBuyModal">
         BUY MORE
       </button>
@@ -23,7 +23,7 @@
         />
       </div>
       <div class="name">{{ person.name }}</div>
-      <div class="price">{{ person.rate }} $VOCAL / min</div>
+      <div class="price">${{ person.rate }} / min</div>
       <div v-show="hasError" class="error alert-color">some error happened</div>
     </template>
 
@@ -70,9 +70,11 @@
       <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
       <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
-      <GreenModalButton icon="download" :loading="isDownloading" :disabled="isDownloadDisabled" @click="download">Download</GreenModalButton>
-      <GreenModalButton v-if="isShareAvailable" icon="twitter" :loading="isDownloading" :disabled="isDownloadDisabled" @click="share">Share</GreenModalButton>
-      <GreenModalButton v-else tag="a" icon="twitter" :href="tweetHref">Share</GreenModalButton>
+      <template v-if="isDownloadable">
+        <GreenModalButton icon="download" :loading="isDownloading" @click="download">Download</GreenModalButton>
+        <GreenModalButton v-if="isShareAvailable" icon="twitter" :loading="isDownloading" @click="share">Share</GreenModalButton>
+        <GreenModalButton v-else tag="a" icon="twitter" :href="tweetHref">Tweet</GreenModalButton>
+      </template>
     </template>
 
     <template v-else-if="callingOrOnCall">
@@ -156,19 +158,24 @@ const tweetHref = computed(() => {
   const pageUrl = encodeURIComponent(route.fullPath);
   return `https://twitter.com/intent/tweet?text=I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
 });
-const { share: _share, isSupported: isShareAvailable } = useShare();
+const { share: _share, isSupported: _isShareAvailable } = useShare();
 
 const {
   hasError,
   hasCallError,
-  isDownloadDisabled,
+  isDownloadable,
   isDownloading,
+  audioChunks,
   initCallSession,
   closeCallSession,
   startRecording,
   stopRecording,
   downloadMp4
 } = useCallApi();
+
+const { $device } = useNuxtApp();
+
+const isShareAvailable = computed(() => _isShareAvailable.value && $device.isMobileOrTablet);
 
 const share = async () => {
   if (!isShareAvailable.value) {
@@ -356,6 +363,7 @@ const waitForCallInit = async () => {
 
 const onOpen = async (state: OpenModalState) => {
   await nextTick();
+  audioChunks.value = new Float32Array(0);
   cancelCurrentCall = null;
   previewLoading.value = true;
   await agentsStore.getAgentPreview(props.person);

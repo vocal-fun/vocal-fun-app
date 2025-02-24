@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="account">
-      <span>BALANCE: {{ balance }} $VOCAL</span>
+      <span>BALANCE: ${{ balance }}</span>
       <button v-play-click-sound @click="openWallet">{{ formattedAddress }}</button>
     </div>
     <button v-play-click-sound class="close" @click="onModalClose">X</button>

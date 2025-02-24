@@ -168,9 +168,9 @@ export const useAuthStore = defineStore('auth', () => {
           balance: args.balance,
         };
         if (balanceBefore < args.balance) {
-          $toast.success(`${args.balance - balanceBefore} $VOCAL has been received`);
+          $toast.success(`$${args.balance - balanceBefore} has been received`);
         } else if (balanceBefore > args.balance) {
-          $toast.info(`${balanceBefore - args.balance} $VOCAL has been spent`);
+          $toast.info(`$${balanceBefore - args.balance} has been spent`);
         }
       });
     } catch (error) {

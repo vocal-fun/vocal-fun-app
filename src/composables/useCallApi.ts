@@ -23,7 +23,7 @@ export function useCallApi() {
   const micPermission = usePermission('microphone');
   const isMicAllowed = computed(() => micPermission.value === 'granted');
   const hasError = computed(() => !isMicAllowed || hasCallError.value);
-  const isDownloadDisabled = computed(() => isDownloading.value || audioChunks.value.length === 0);
+  const isDownloadable = computed(() => audioChunks.value.length !== 0);
 
   const isRecording = ref(false);
   const isDownloading = ref(false);
@@ -202,7 +202,7 @@ export function useCallApi() {
   }
 
   const downloadMp4 = async (agentImg: string): Promise<Blob | null> => {
-    if (isDownloadDisabled.value) {
+    if (!isDownloadable.value || isDownloading.value) {
       return null;
     }
     try {
@@ -218,11 +218,12 @@ export function useCallApi() {
   };
 
   return {
+    audioChunks,
     isRecording,
     isConnected,
     hasCallError,
     hasError,
-    isDownloadDisabled,
+    isDownloadable,
     isDownloading,
     getCallSession,
     initCallSession,

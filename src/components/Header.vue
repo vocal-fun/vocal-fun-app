@@ -43,9 +43,9 @@
 
     <div class="user">
       <button v-if="false" v-play-click-sound class="account" @click="buyStore.openBuyModal">
-        BALANCE: {{ user?.balance }} $VOCAL
+        BALANCE: ${{ user?.balance }}
       </button>
-      <span v-if="user" class="account">BALANCE: {{ user.balance }} $VOCAL</span>
+      <span v-if="user" class="account">BALANCE: ${{ user.balance }}</span>
       <ConnectWallet v-if="false" class="wallet" />
     </div>
 
