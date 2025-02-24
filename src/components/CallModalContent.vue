@@ -183,7 +183,7 @@ const share = async () => {
   }
   const options: ShareData = {
     title: 'VOCAL.FUN',
-    text: `I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!`,
+    text: `I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!\n${route.fullPath}`,
     url: route.fullPath,
   };
   try {
