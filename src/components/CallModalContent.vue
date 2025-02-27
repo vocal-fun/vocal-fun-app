@@ -19,11 +19,11 @@
           sizes="90vw md:400px"
           format="webp"
           loading="lazy"
-          :src="person.image"
+          :src="personSafe.image"
         />
       </div>
-      <div class="name">{{ person.name }}</div>
-      <div class="price">${{ person.rate }} / min</div>
+      <div class="name">{{ personSafe.name }}</div>
+      <div class="price">${{ personSafe.rate }} / min</div>
       <div v-show="hasError" class="error alert-color">some error happened</div>
     </template>
 
@@ -36,9 +36,9 @@
             sizes="90vw md:400px"
             format="webp"
             loading="lazy"
-            :src="person.image"
+            :src="personSafe.image"
           />
-          <div class="name">{{ person.name }}</div>
+          <div class="name">{{ personSafe.name }}</div>
         </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -121,6 +121,7 @@ const props = withDefaults(
   }
 );
 
+const personSafe = computed(() => personSafe.value || { name: '', image: '', rate: 1, createdAt: '', id: '', route: '' });
 const emit = defineEmits(['close']);
 
 let seconds = 0;
@@ -143,8 +144,8 @@ const callingOrOnCall = computed(() => (calling.value || onCall.value) && !hasEr
 
 const agentsStore = useAgentsStore();
 const preview = computed<Preview | null>(() =>
-  agentsStore.previews[props.person.id]
-  ? { ...agentsStore.previews[props.person.id], agentId: props.person.id }
+  agentsStore.previews[personSafe.value.id]
+  ? { ...agentsStore.previews[personSafe.value.id], agentId: personSafe.value.id }
   : null
 );
 
@@ -156,7 +157,7 @@ const user = computed(() => authStore.user);
 
 const tweetHref = computed(() => {
   const pageUrl = encodeURIComponent(url.value);
-  return `https://twitter.com/intent/tweet?text=I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
+  return `https://twitter.com/intent/tweet?text=I had a legendary call with ${personSafe.value.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
 });
 const { share: _share, isSupported: _isShareAvailable } = useShare();
 
@@ -177,7 +178,7 @@ const { $device } = useNuxtApp();
 
 const isShareAvailable = computed(() => _isShareAvailable.value && $device.isMobileOrTablet);
 
-const url = computed(() => `${meta.url}/${props.person.route}`);
+const url = computed(() => `${meta.url}/${personSafe.value.route}`);
 
 const share = async () => {
   if (!isShareAvailable.value) {
@@ -185,13 +186,13 @@ const share = async () => {
   }
   const options: ShareData = {
     title: 'VOCAL.FUN',
-    text: `I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!\n${url.value}`,
+    text: `I had a legendary call with ${personSafe.value.name} on VOCAL.FUN... You gotta try this!\n${url.value}`,
     url: url.value,
   };
   try {
-    const mp4Blob = await downloadMp4(props.person.image);
+    const mp4Blob = await downloadMp4(personSafe.value.image);
     if (mp4Blob) {
-      options.files = [new File([mp4Blob], `${props.person.route}.mp4`, { type: 'video/mp4' })];
+      options.files = [new File([mp4Blob], `${personSafe.value.route}.mp4`, { type: 'video/mp4' })];
     }
     await _share(options);
   } catch (error) {
@@ -200,14 +201,14 @@ const share = async () => {
 };
 
 const download = async () => {
-  const mp4Blob = await downloadMp4(props.person.image);
+  const mp4Blob = await downloadMp4(personSafe.value.image);
   if (!mp4Blob) {
     return;
   }
   const url = URL.createObjectURL(mp4Blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${props.person.route}.mp4`;
+  a.download = `${personSafe.value.route}.mp4`;
   document.body.appendChild(a);
   a.click();
   URL.revokeObjectURL(url);
@@ -275,14 +276,14 @@ const call = async (signal: AbortSignal) => {
   const startInitTime = Date.now();
   try {
     // Initiate the call session and web socket connection
-    await initCallSession(props.person.id);
+    await initCallSession(personSafe.value.id);
     signal.throwIfAborted(); // Check if the call was cancelled
     const callDurationLeft = 2_000 - (Date.now() - startInitTime);
     await new Promise<void>((resolve) => setTimeout(resolve, callDurationLeft < 0 ? 0 : callDurationLeft));
     callStatus.value = 'on-call';
     stopCurrentSound();
     signal.throwIfAborted(); // Check if the call was cancelled
-    console.info(`[VOCAL.FUN] Call with ${props.person.name} started`);
+    console.info(`[VOCAL.FUN] Call with ${personSafe.value.name} started`);
     await startRecording();
     timer = setInterval(() => {
       seconds++;
@@ -340,8 +341,8 @@ const playPreview = async (click = true) => {
   if (click) {
     await audioService.click();
   }
-  if (props.person.id) {
-    await playCurrentSound(props.person.id);
+  if (personSafe.value.id) {
+    await playCurrentSound(personSafe.value.id);
   }
 }
 
@@ -368,7 +369,7 @@ const onOpen = async (state: OpenModalState) => {
   audioChunks.value = new Float32Array(0);
   cancelCurrentCall = null;
   previewLoading.value = true;
-  await agentsStore.getAgentPreview(props.person);
+  await agentsStore.getAgentPreview(personSafe.value);
   if (preview.value) {
     audioService.load(preview.value);
   }
