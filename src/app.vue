@@ -19,8 +19,8 @@ const toastStyle = {
 onBeforeMount(async () => {
   audioService.initCache();
   try {
-    // await authStore.authorize();
-    await authStore.fakeAuthorize();
+    await authStore.authorize();
+    // await authStore.fakeAuthorize();
   } catch (e) {
     $toast.info('Your session has expired. Please log in again.');
     console.info(e);
