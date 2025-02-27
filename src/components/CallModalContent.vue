@@ -121,7 +121,7 @@ const props = withDefaults(
   }
 );
 
-const personSafe = computed(() => personSafe.value || { name: '', image: '', rate: 1, createdAt: '', id: '', route: '' });
+const personSafe = computed(() => props.person || { name: '', image: '', rate: 1, createdAt: '', id: '', route: '' });
 const emit = defineEmits(['close']);
 
 let seconds = 0;
