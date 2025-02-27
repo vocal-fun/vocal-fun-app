@@ -1,25 +1,35 @@
 <template>
   <div class="toolbar">
-    <!-- Sort -->
+    <div class="view-toggle">
+      <button :class="{ active: viewMode === 'grid' }" @click="$emit('update:viewMode', 'grid')">
+        <NuxtImg class="grid" src="/img/grid.png" alt="Grid button" format="webp" sizes="48px" loading="lazy" />
+      </button>
+      <button :class="{ active: viewMode === 'table' }" @click="$emit('update:viewMode', 'table')">
+        <NuxtImg class="table" src="/img/table.png" alt="Table button" format="webp" sizes="48px" loading="lazy" />
+      </button>
+    </div>
+    <div class="divider" />
     <div class="sort">
-      <label for="sort">Sort by:</label>
-      <select
-        id="sort"
-        :value="sortBy"
-        @input="$emit('update:sortBy', $event.target.value)"
-      >
-        <option value="mcap">Top mcap 24h</option>
-        <option value="price">Price</option>
-        <!-- Add other sort fields as needed -->
-      </select>
+      <label>Sort by:</label>
+      <div class="dropdown">
+        <button class="dropdown-trigger" @click="toggleDropdown">
+          {{ currentLabel }}
+          <span class="arrow" />
+        </button>
+        <ul v-if="isOpen" class="dropdown-menu">
+          <li
+            v-for="option in options"
+            :key="option.value"
+            :class="{ active: option.value === sortBy }"
+            @click="selectOption(option.value)"
+          >
+            {{ option.label }}
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <!-- Watchlist toggle -->
-    <button @click="$emit('toggle-watchlist')">
-      {{ showWatchlist ? 'Hide' : 'Show' }} Watchlist
-    </button>
-
-    <!-- Search -->
+    <p>Watchlist</p>
     <div class="search">
       <input
         type="text"
@@ -28,27 +38,13 @@
         placeholder="Search agents…"
       />
     </div>
-
-    <!-- View toggle (Grid / Table) -->
-    <div class="view-toggle">
-      <button
-        :class="{ active: viewMode === 'grid' }"
-        @click="$emit('update:viewMode', 'grid')"
-      >
-        Grid View
-      </button>
-      <button
-        :class="{ active: viewMode === 'table' }"
-        @click="$emit('update:viewMode', 'table')"
-      >
-        Table View
-      </button>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps({
+import { ref, computed } from 'vue';
+
+const props = defineProps({
   searchQuery: {
     type: String,
     required: true,
@@ -66,21 +62,66 @@ defineProps({
     required: true,
   },
 });
-defineEmits([
+const emit = defineEmits([
   'update:searchQuery',
   'update:sortBy',
   'toggle-watchlist',
   'update:viewMode'
 ]);
+
+const options = [
+  { value: 'mcap',       label: 'Top mcap 24h' },
+  { value: 'price',      label: 'Price' },
+  { value: '24hvol',     label: '24h vol.' },
+  { value: '24hpercent', label: '24h %' },
+  { value: '7dpercent',  label: '7d %' },
+  { value: 'holders',    label: 'Holders' },
+];
+
+const isOpen = ref(false);
+
+function toggleDropdown() {
+  isOpen.value = !isOpen.value;
+}
+
+function selectOption(value: string) {
+  emit('update:sortBy', value);
+  isOpen.value = false;
+}
+
+const currentLabel = computed(() => {
+  const found = options.find(o => o.value === props.sortBy);
+  return found ? found.label : 'Select an option';
+});
 </script>
 
 <style scoped lang="scss">
 .toolbar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 1.5rem;
   margin-bottom: 1rem;
+  border-bottom: 1px solid #59596d;
+  height: 64px;
+  padding: 0px 24px;
+  background-color: #161622;
+}
+
+.divider {
+  align-self: stretch;
+  width: 1px;
+  background: #59596d;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 20px;
+
+  .grid,
+  .table {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .sort,
@@ -90,18 +131,69 @@ defineEmits([
   gap: 0.5rem;
 }
 
-.view-toggle {
-  display: flex;
-  gap: 0.5rem;
+.sort {
+  label {
+    margin-right: 0.5rem;
+    color: #00fa00;
+  }
 }
 
-.view-toggle button {
-  padding: 0.5rem 1rem;
+.dropdown {
+  position: relative;
+}
+
+.dropdown-trigger {
+  background-color: transparent;
+  color: #00fa00;
+  cursor: pointer;
+  padding: 4px 8px;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  
+  .arrow {
+    margin-left: 8px;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #00fa00;
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #161622;
+  border: 1px solid #00fa00;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 140px;
+  z-index: 1000;
+}
+
+.dropdown-menu li {
+  padding: 8px;
+  color: #00fa00;
   cursor: pointer;
 }
 
-.view-toggle button.active {
-  background-color: #444;
-  color: #fff;
+.dropdown-menu li:hover {
+  background: #00fa00;
+  color: #161622;
+}
+
+.dropdown-menu li.active {
+  font-weight: bold;
+}
+
+.search {
+  margin-left: auto;
+  
+  &:focus-visible {
+    outline: unset;
+  }
 }
 </style>
