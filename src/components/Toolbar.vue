@@ -17,26 +17,26 @@
           <span class="arrow" />
         </button>
         <ul v-if="isOpen" class="dropdown-menu">
-          <li
-            v-for="option in options"
-            :key="option.value"
-            :class="{ active: option.value === sortBy }"
-            @click="selectOption(option.value)"
-          >
+          <li v-for="option in options" :key="option.value" :class="{ active: option.value === sortBy }"
+            @click="selectOption(option.value)">
             {{ option.label }}
           </li>
         </ul>
       </div>
     </div>
 
-    <p>Watchlist</p>
+    <p class="watchlist">Watchlist</p>
     <div class="search">
-      <input
-        type="text"
-        :value="searchQuery"
-        @input="$emit('update:searchQuery', $event.target.value)"
-        placeholder="Search agents…"
+      <NuxtImg
+          class="icon"
+          src="/img/search.png"
+          alt="Search Icon"
+          format="webp"
+          sizes="16px"
+          loading="lazy"
       />
+      <input type="text" :value="searchQuery" @input="$emit('update:searchQuery', $event.target.value)"
+        placeholder="Search" />
     </div>
   </div>
 </template>
@@ -70,12 +70,12 @@ const emit = defineEmits([
 ]);
 
 const options = [
-  { value: 'mcap',       label: 'Top mcap 24h' },
-  { value: 'price',      label: 'Price' },
-  { value: '24hvol',     label: '24h vol.' },
+  { value: 'mcap', label: 'Top mcap 24h' },
+  { value: 'price', label: 'Price' },
+  { value: '24hvol', label: '24h vol.' },
   { value: '24hpercent', label: '24h %' },
-  { value: '7dpercent',  label: '7d %' },
-  { value: 'holders',    label: 'Holders' },
+  { value: '7dpercent', label: '7d %' },
+  { value: 'holders', label: 'Holders' },
 ];
 
 const isOpen = ref(false);
@@ -100,8 +100,7 @@ const currentLabel = computed(() => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #59596d;
+  border-bottom: 2px solid #59596d;
   height: 64px;
   padding: 0px 24px;
   background-color: #161622;
@@ -131,6 +130,38 @@ const currentLabel = computed(() => {
   gap: 0.5rem;
 }
 
+.watchlist {
+  opacity: 0.5;
+}
+
+.search {
+  background-color: transparent;
+  padding: 12px 10px;
+  gap: 12px;
+  margin-left: auto;
+  border: 2px solid #59596D;
+
+  input {
+    background-color: transparent;
+    color: white;
+    border: none;
+    outline: none;
+
+    &:focus-visible {
+      outline: unset;
+    }
+
+    &::placeholder {
+      color: white;
+    }
+  }
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+}
+
 .sort {
   label {
     margin-right: 0.5rem;
@@ -150,7 +181,7 @@ const currentLabel = computed(() => {
   font: inherit;
   display: inline-flex;
   align-items: center;
-  
+
   .arrow {
     margin-left: 8px;
     width: 0;
@@ -187,13 +218,5 @@ const currentLabel = computed(() => {
 
 .dropdown-menu li.active {
   font-weight: bold;
-}
-
-.search {
-  margin-left: auto;
-  
-  &:focus-visible {
-    outline: unset;
-  }
 }
 </style>

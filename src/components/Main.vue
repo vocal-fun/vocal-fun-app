@@ -6,86 +6,63 @@
     </div>
 
     <!-- Toolbar for sorting, watchlist, search, and layout toggle -->
-    <Toolbar
-      v-model:sortBy="sortBy"
-      v-model:searchQuery="searchQuery"
-      :showWatchlist="showWatchlist"
-      v-model:viewMode="viewMode"
-      @toggle-watchlist="toggleWatchlist"
-    />
+    <div class="table-agents">
+      <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
+        v-model:viewMode="viewMode" @toggle-watchlist="toggleWatchlist" />
 
-    <!-- GRID LAYOUT -->
-    <div v-if="viewMode === 'grid'" class="content-main grid-layout">
-      <Person
-        v-for="person in filteredAgents"
-        :key="person.id"
-        :name="person.name"
-        :image="person.image"
-        :id="person.id"
-        :rate="person.rate"
-        :disabled="modalLoading"
-        @open-modal="openModal(person, $event)"
-      />
+      <!-- GRID LAYOUT -->
+      <div v-if="viewMode === 'grid'" class="content-main grid-layout">
+        <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
+          :id="person.id" :rate="person.rate" :disabled="modalLoading" @open-modal="openModal(person, $event)" />
+      </div>
+
+      <!-- TABLE LAYOUT -->
+      <table v-else class="content-main agents-table">
+        <thead>
+          <tr>
+            <th>Vocal agent</th>
+            <th>Price</th>
+            <th>mcap</th>
+            <th>24h vol.</th>
+            <th>24h %</th>
+            <th>7d %</th>
+            <th>Holders</th>
+            <th>Preview</th>
+            <th>Call</th>
+            <th>Buy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="person in filteredAgents" :key="person.id">
+            <td>
+              <Person :name="person.name" :image="person.image" :id="person.id" :rate="person.rate"
+                :disabled="modalLoading" @open-modal="openModal(person, $event)" />
+            </td>
+            <td>{{ person.price }}</td>
+            <td>{{ person.mcap }}</td>
+            <td>{{ person.volume24h }}</td>
+            <td>{{ person.change24h }}</td>
+            <td>{{ person.change7d }}</td>
+            <td>{{ person.holders }}</td>
+            <td>
+              <button @click="openModal(person, 'preview')">Preview</button>
+            </td>
+            <td>
+              <button @click="openModal(person, 'call')">Call</button>
+            </td>
+            <td>
+              <button @click="openModal(person, 'buy')">Buy</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <!-- TABLE LAYOUT -->
-    <table v-else class="content-main agents-table">
-      <thead>
-        <tr>
-          <th>Vocal agent</th>
-          <th>Price</th>
-          <th>mcap</th>
-          <th>24h vol.</th>
-          <th>24h %</th>
-          <th>7d %</th>
-          <th>Holders</th>
-          <th>Preview</th>
-          <th>Call</th>
-          <th>Buy</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="person in filteredAgents"
-          :key="person.id"
-        >
-          <td>
-            <Person
-              :name="person.name"
-              :image="person.image"
-              :id="person.id"
-              :rate="person.rate"
-              :disabled="modalLoading"
-              @open-modal="openModal(person, $event)"
-            />
-          </td>
-          <td>{{ person.price }}</td>
-          <td>{{ person.mcap }}</td>
-          <td>{{ person.volume24h }}</td>
-          <td>{{ person.change24h }}</td>
-          <td>{{ person.change7d }}</td>
-          <td>{{ person.holders }}</td>
-          <td>
-            <button @click="openModal(person, 'preview')">Preview</button>
-          </td>
-          <td>
-            <button @click="openModal(person, 'call')">Call</button>
-          </td>
-          <td>
-            <button @click="openModal(person, 'buy')">Buy</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
 
     <!-- Modal with CallModalContent -->
     <Modal :isOpen="isModalOpen" @close="closeModal">
       <ClientOnly>
-        <CallModalContent
-          ref="modalContent"
-          :person="selectedPerson"
-          @close="closeModal"
-        />
+        <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
       </ClientOnly>
     </Modal>
   </section>
@@ -229,6 +206,14 @@ section.main {
     gap: 1rem;
   }
 
+  .table-agents {
+    box-shadow:
+      1.39px 1.39px 0 0 #59596D,
+      1.39px -2.09px 0 0 #1B1B2A,
+      -1.39px -1.39px 0 0 #1B1B2A,
+      1.39px 0 0 0 #59596D,
+      0 -0.7px 0 0 #000000;
+  }
   /* Toolbar is placed above the .content-main in template */
 
   /* GRID layout (when viewMode === 'grid') */
@@ -237,12 +222,7 @@ section.main {
     max-width: 2048px;
     margin: auto;
     background: #161622;
-    box-shadow:
-      1.39px 1.39px 0 0 #59596D,
-      1.39px -2.09px 0 0 #1B1B2A,
-      -1.39px -1.39px 0 0 #1B1B2A,
-      1.39px 0 0 0 #59596D,
-      0 -0.7px 0 0 #000000;
+
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -265,17 +245,21 @@ section.main {
 
     thead {
       background: #1f1f2d;
+
       th {
         padding: 0.75rem 1rem;
         text-align: left;
       }
     }
+
     tbody {
       tr {
         border-bottom: 1px solid #333;
+
         &:hover {
           background: #2b2b3b;
         }
+
         td {
           padding: 0.75rem 1rem;
         }
@@ -318,6 +302,7 @@ section.main {
     .equalizer {
       height: 80px;
     }
+
     .grid-layout,
     .agents-table {
       padding: 0.75rem;
