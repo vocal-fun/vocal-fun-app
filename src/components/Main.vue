@@ -57,9 +57,7 @@
         </tbody>
       </table>
     </div>
-
-
-    <!-- Modal with CallModalContent -->
+    
     <Modal :isOpen="isModalOpen" @close="closeModal">
       <ClientOnly>
         <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
@@ -82,65 +80,66 @@ import Modal from '~/components/Modal.vue'
 import CallModalContent from '~/components/CallModalContent.vue'
 import Toolbar from '~/components/Toolbar.vue'
 
-// Refs & Stores
 const modalContent = useTemplateRef('modalContent')
 const agentsStore = useAgentsStore()
 const authStore = useAuthStore()
 const { handleConnectClick } = useWalletConnect()
 const route = useRoute()
 
-// Reactive State
 const user = computed(() => authStore.user)
 const modalLoading = ref(false)
 const isModalOpen = ref(false)
 const selectedPerson = ref(null)
 
-// Toolbar states
 const searchQuery = ref('')
 const sortBy = ref('mcap')
 const showWatchlist = ref(false)
 const viewMode = ref<'grid' | 'table'>('grid')
 
-// Agents
 const agents = computed(() => agentsStore.agents)
 
-/** Filter + sort logic */
 const filteredAgents = computed(() => {
-  let results = [...agents.value]
+  let results = [...agents.value];
 
   if (showWatchlist.value) {
-    results = results.filter(agent => agent.isInWatchlist)
+    results = results.filter(agent => agent.isInWatchlist);
   }
 
   if (searchQuery.value.trim() !== '') {
     results = results.filter(agent =>
       agent.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
+    );
   }
 
   switch (sortBy.value) {
     case 'mcap':
-      results.sort((a, b) => b.mcap - a.mcap)
-      break
+      results.sort((a, b) => b.mcap - a.mcap);
+      break;
     case 'price':
-      results.sort((a, b) => b.price - a.price)
-      break
-    // add other sort cases if needed
+      results.sort((a, b) => b.price - a.price);
+      break;
+    case '24hvol':
+      results.sort((a, b) => b.volume24h - a.volume24h);
+      break;
+    case '24h%':
+      results.sort((a, b) => b.change24h - a.change24h);
+      break;
+    case '7day%':
+      results.sort((a, b) => b.change7d - a.change7d);
+      break;
+    case 'holders':
+      results.sort((a, b) => b.holders - a.holders);
+      break;
   }
 
-  return results
-})
+  return results;
+});
 
-/** Toggle watchlist in the toolbar */
+
 function toggleWatchlist() {
   showWatchlist.value = !showWatchlist.value
 }
 
-/**
- * Opens the modal for a person, with a specified state
- * (e.g., 'preview', 'call', 'buy'). If user not connected,
- * triggers wallet connect for 'call' only.
- */
 async function openModal(person, state) {
   if (state === 'call' && !user.value) {
     handleConnectClick()
@@ -149,32 +148,21 @@ async function openModal(person, state) {
 
   modalLoading.value = true
   selectedPerson.value = person
-
-  // If using 'slug' param in the route, compare with person's route
   const currentSlug = route.params.slug?.[0]
   if (currentSlug !== person.route) {
     history.replaceState(null, '', `/${person.route}`)
   }
-
-  // Show modal, then let CallModalContent do any "onOpen" logic
   isModalOpen.value = true
   await modalContent.value?.onOpen(state)
   modalLoading.value = false
 }
 
-/** Close the modal & reset the URL to `/` */
 function closeModal() {
   isModalOpen.value = false
   modalContent.value?.onClose()
   history.replaceState(null, '', '/')
 }
 
-/**
- * On first mount:
- * 1) Load agents.
- * 2) If a route param is present, find that agent and open automatically.
- * 3) Otherwise, "preload" the first agent (optional).
- */
 onBeforeMount(async () => {
   await agentsStore.getAgents()
 
@@ -188,7 +176,6 @@ onBeforeMount(async () => {
     }
   }
 
-  // preload the first agent if desired
   selectedPerson.value = agentsStore.agents[0]
 })
 </script>
@@ -214,9 +201,6 @@ section.main {
       1.39px 0 0 0 #59596D,
       0 -0.7px 0 0 #000000;
   }
-  /* Toolbar is placed above the .content-main in template */
-
-  /* GRID layout (when viewMode === 'grid') */
   .grid-layout {
     min-height: 700px;
     max-width: 2048px;
@@ -231,7 +215,6 @@ section.main {
     margin-bottom: 1rem;
   }
 
-  /* TABLE layout (when viewMode === 'table') */
   .agents-table {
     width: 100%;
     border-collapse: collapse;
@@ -266,15 +249,12 @@ section.main {
       }
     }
   }
-
-  /* Example style for the equalizer component */
   .equalizer {
     height: 120px;
     width: 430px;
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 1024px) {
   section.main {
     margin: 0.75rem 1.25px 1.25px 1.25px;

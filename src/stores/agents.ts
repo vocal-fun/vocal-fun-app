@@ -4,7 +4,20 @@ import type { AgentDto, Agent, PreviewDto } from '~/types';
 export const useAgentsStore = defineStore('agents', () => {
   const loading = ref(false);
   const agents = ref<Agent[]>(
-    Array.from({ length: 33 }, (_, index) => ({ id: index.toString(), name: '', rate: 0, image: '', createdAt: '', route: '' })),
+    Array.from({ length: 33 }, (_, index) => ({
+      id: index.toString(),
+      name: ``,
+      rate: 0,
+      image: '',
+      createdAt: '',
+      route: '',
+      price: Number((Math.random() * 100).toFixed(2)),
+      mcap: Number((Math.random() * 10000).toFixed(2)),
+      volume24h: Number((Math.random() * 500).toFixed(2)),
+      change24h: Number((Math.random() * 10).toFixed(2)),
+      change7d: Number((Math.random() * 20).toFixed(2)),
+      holders: Math.floor(Math.random() * 1000)
+    }))
   );
   const previews = ref<Record<string, PreviewDto>>({}); // agentId -> preview
 
@@ -12,10 +25,23 @@ export const useAgentsStore = defineStore('agents', () => {
     try {
       loading.value = true;
       const res = await $fetch<AgentDto[]>('/api/v1/agents', {
-        headers: { 'Cache-Control': 'max-age=86400' }, // Cache for 1 day
+        headers: { 'Cache-Control': 'max-age=86400' },
       });
       agents.value = res.map(({ _id, name, rate, image, createdAt }) => {
-        return { id: _id, name, rate, image, createdAt, route: name.toLowerCase().replace(/\s/g, '-') };
+        return {
+          id: _id,
+          name,
+          rate,
+          image,
+          createdAt,
+          route: name.toLowerCase().replace(/\s/g, '-'),
+          price: Number((Math.random() * 100).toFixed(2)),
+          mcap: Number((Math.random() * 10000).toFixed(2)),
+          volume24h: Number((Math.random() * 500).toFixed(2)),
+          change24h: Number((Math.random() * 10).toFixed(2)),
+          change7d: Number((Math.random() * 20).toFixed(2)),
+          holders: Math.floor(Math.random() * 1000)
+        };
       });
     } catch (error) {
       console.warn('[AGENTS] Error fetching agents:', error);
