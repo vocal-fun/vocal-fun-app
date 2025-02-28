@@ -83,7 +83,7 @@ const emit = defineEmits([
 ])
 
 const options = [
-  { value: 'Mcap', label: 'Top Mcap 24h' },
+  { value: 'mcap', label: 'Top mcap 24h' },
   { value: 'price', label: 'Price' },
   { value: '24hvol', label: '24h vol.' },
   { value: '24hpercent', label: '24h %' },

@@ -11,22 +11,22 @@
 
       <div v-if="viewMode === 'grid'" class="agents-grid">
         <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
-          :id="person.id" :rate="person.rate" :disabled="modalLoading" @open-modal="openModal(person, $event)" />
-      </div>
+          :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap" :createdAt="person.createdAt"   :disabled="modalLoading" @open-modal="openModal(person, $event)" />
+        </div>
 
-      <table v-else class="agents-table" style="height: 100%;">
+      <table v-else class="agents-table">
         <thead>
           <tr>
             <th>Vocal agent</th>
-            <th v-for="col in columns" :key="col.key" :class="{ 'sorted': sortField === col.key, 'sorting': true }"
+            <th v-for="col in columns" :key="col.key" :class="{ 'sorted': sortBy === col.key, 'sorting': true }"
               @click="setSort(col.key)">
               <div class="label-wrapper">
                 <p class="column-title">{{ col.label }}</p>
                 <div class="sort-arrows">
-                  <NuxtImg class="arrow-up" src="/img/arrow-up.png" width="10" height="6" alt="Up arrow" :style="(sortField === col.key && sortDirection === 'asc')
+                  <NuxtImg class="arrow-up" src="/img/arrow-up.png" width="10" height="6" alt="Up arrow" :style="(sortBy === col.key && sortDirection === 'asc')
                     ? 'opacity:1;'
                     : 'opacity:0.4;'" />
-                  <NuxtImg class="arrow-down" src="/img/arrow-up.png" width="10" height="6" alt="Down arrow" :style="(sortField === col.key && sortDirection === 'desc')
+                  <NuxtImg class="arrow-down" src="/img/arrow-up.png" width="10" height="6" alt="Down arrow" :style="(sortBy === col.key && sortDirection === 'desc')
                     ? 'opacity:1; transform:rotate(180deg);'
                     : 'opacity:0.4; transform:rotate(180deg);'" />
                 </div>
@@ -47,7 +47,7 @@
               </div>
             </td>
             <td>${{ person.price }}</td>
-            <td>${{ person.Mcap }}</td>
+            <td>${{ person.mcap }}</td>
             <td>${{ person.volume24h }}</td>
             <td :class="{ negative: person.change24h < 0 }">
               {{ person.change24h > 0 ? `+${person.change24h}` : person.change24h }}%
@@ -102,15 +102,14 @@ const isModalOpen = ref(false)
 const selectedPerson = ref(null)
 
 const searchQuery = ref('')
-const sortBy = ref('Mcap')
 const showWatchlist = ref(false)
 const viewMode = ref<'grid' | 'table'>('grid')
-const sortField = ref('Mcap')
-const sortDirection = ref('desc')
+const sortBy = ref('mcap')
+const sortDirection = ref<'asc' | 'desc'>('desc')
 
 const columns = [
   { key: 'price', label: 'Price' },
-  { key: 'Mcap', label: 'Mcap' },
+  { key: 'mcap', label: 'mcap' },
   { key: 'volume24h', label: '24h vol.' },
   { key: 'change24h', label: '24h %' },
   { key: 'change7d', label: '7d %' },
@@ -119,35 +118,21 @@ const columns = [
 
 const agents = computed(() => agentsStore.agents)
 
-function setSort(field) {
-  if (sortField.value === field) {
-    // If the same header is clicked again, toggle asc/desc
-    sortDirection.value = sortDirection.value === 'desc' ? 'asc' : 'desc'
+function setSort(field: string) {
+  if (sortBy.value === field) {
+    sortDirection.value = (sortDirection.value === 'desc') ? 'asc' : 'desc'
   } else {
-    // If a different header is clicked, sort descending by default
-    sortField.value = field
+    sortBy.value = field
     sortDirection.value = 'desc'
   }
 }
 
 
 const filteredAgents = computed(() => {
-  let results = [...agents.value]
-
-  if (showWatchlist.value) {
-    results = results.filter(agent => agent.isInWatchlist)
-  }
-
-  if (searchQuery.value.trim()) {
-    results = results.filter(agent =>
-      agent.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
-  }
-
-  // Sort according to sortField
-  switch (sortField.value) {
-    case 'Mcap':
-      results.sort((a, b) => b.Mcap - a.Mcap)
+  let results = [...agentsStore.agents]
+  switch (sortBy.value) {
+    case 'mcap':
+      results.sort((a, b) => b.mcap - a.mcap)
       break
     case 'price':
       results.sort((a, b) => b.price - a.price)
@@ -165,16 +150,9 @@ const filteredAgents = computed(() => {
       results.sort((a, b) => b.holders - a.holders)
       break
   }
-
-  // If direction is "asc", just reverse
-  if (sortDirection.value === 'asc') {
-    results.reverse()
-  }
-
+  if (sortDirection.value === 'asc') results.reverse()
   return results
 })
-
-
 
 function toggleWatchlist() {
   showWatchlist.value = !showWatchlist.value
@@ -247,7 +225,7 @@ section.main {
     max-width: 2048px;
     margin: auto;
     background: #161622;
-
+    border-top: 2px solid #59596D;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

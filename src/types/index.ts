@@ -20,6 +20,8 @@ export type Agent = {
   rate: number;
   createdAt: string;
   route: string;
+  tokenName: string;
+  mcap: string;
 };
 
 export type PreviewDto = {
