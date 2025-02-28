@@ -1,10 +1,12 @@
 <template>
   <div class="person shake-little" :class="{ disabled: isDisabled }" @click="openModal('default')">
     <div class="info">
-      <span>{{ name }}</span>
-      <span>{{ tokenName }}</span>
-      <span>mcap ${{ mcap }} </span>
-      <span> {{ createdAt }}</span>
+      <div>
+        <p>{{ name }}</p>
+        <p>{{ tokenName }}</p>
+      </div>
+      <p><span class="dim">mcap </span>${{ mcap }} </p>
+      <p class="dim">{{ createdAt }}</p>
     </div>
 
     <div class="avatar-block">
@@ -14,7 +16,8 @@
 
     <div class="buttons">
       <button class="preview shake" :disabled="isDisabled" @click.stop="openModal('preview')">PREVIEW</button>
-      <button class="shake" :disabled="isDisabled" @click.stop="openModal('call')">CALL</button>
+      <button class="preview shake" :disabled="isDisabled" @click.stop="openModal('call')">CALL</button>
+      <button class="shake">BUY</button>
     </div>
   </div>
 </template>
@@ -41,12 +44,10 @@ const openModal = (state: OpenModalState = 'default') => {
 </script>
 
 <style scoped lang="scss">
-$circle-gradient: linear-gradient(
-  180deg,
-  rgba(0, 250, 0, 0) 0%,
-  rgba(0, 250, 0, 0.3) 54.12%,
-  rgba(0, 250, 0, 0) 100%
-);
+$circle-gradient: linear-gradient(180deg,
+    rgba(0, 250, 0, 0) 0%,
+    rgba(0, 250, 0, 0.3) 54.12%,
+    rgba(0, 250, 0, 0) 100%);
 
 @keyframes textShimmer {
   0% {
@@ -63,10 +64,9 @@ $circle-gradient: linear-gradient(
   color: var(--color-primary);
   display: flex;
   flex-wrap: wrap;
-  width: 380px;
+  width: 480px;
   background-color: #000000;
   transition: transform 0.3s ease-in-out;
-  padding-left: 18px;
   padding-top: 14px;
   box-shadow:
     3px 3px 0 0 #59596D,
@@ -83,6 +83,7 @@ $circle-gradient: linear-gradient(
     flex: 1 1 100%;
     display: flex;
     z-index: 1;
+    border-top: 1px solid #37D339;
 
     >button {
       flex: 1 1 50%;
@@ -92,6 +93,11 @@ $circle-gradient: linear-gradient(
       border: none;
       cursor: pointer;
       justify-content: center;
+
+      &:first-child {
+        border-right: 1px solid #37D339;
+      }
+
 
       &[disabled] {
         cursor: not-allowed;
@@ -115,56 +121,63 @@ $circle-gradient: linear-gradient(
     }
   }
 
-.avatar-block {
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-
-  .avatar-img {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    margin-right: 10px;
-    object-fit: cover;
+  .avatar-block {
     position: relative;
-    z-index: 1;
-  }
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 24px;
 
-  &::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-40%, -50%);
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    background: $circle-gradient;
-    opacity: 0.3;
-  }
+    .avatar-img {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      margin-right: 10px;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+    }
 
-  &::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-40%, -50%);
-    width: 150px;  
-    height: 150px;
-    border-radius: 50%;
-    background: $circle-gradient;
-    opacity: 0.56;
-  }
-}
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-25%, -50%);
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: $circle-gradient;
+      opacity: 0.3;
+    }
 
+    &::after {
+      transform: translate(-10%, -50%);
+      width: 120px;
+      height: 120px;
+      opacity: 0.56;
+    }
+  }
 
 
   .info {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 1rem;
+    padding-left: 18px;
+    padding-bottom: 24px;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .dim {
+      opacity: 0.5;
+    }
   }
 
   &:hover {
