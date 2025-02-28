@@ -5,44 +5,55 @@
       <EQ class="equalizer" />
     </div>
 
-    <!-- Toolbar for sorting, watchlist, search, and layout toggle -->
     <div class="table-agents">
       <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
         v-model:viewMode="viewMode" @toggle-watchlist="toggleWatchlist" />
 
-      <!-- GRID LAYOUT -->
-      <div v-if="viewMode === 'grid'" class="content-main grid-layout">
+      <div v-if="viewMode === 'grid'" class="agents-grid">
         <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
           :id="person.id" :rate="person.rate" :disabled="modalLoading" @open-modal="openModal(person, $event)" />
       </div>
 
-      <!-- TABLE LAYOUT -->
-      <table v-else class="content-main agents-table">
+      <table v-else class="agents-table">
         <thead>
           <tr>
             <th>Vocal agent</th>
-            <th>Price</th>
-            <th>mcap</th>
-            <th>24h vol.</th>
-            <th>24h %</th>
-            <th>7d %</th>
-            <th>Holders</th>
-            <th>Preview</th>
-            <th>Call</th>
-            <th>Buy</th>
+            <th v-for="col in columns" :key="col.key" :class="{ 'sorted': sortField === col.key, 'sorting': true }"
+              @click="setSort(col.key)">
+              <div class="label-wrapper">
+                <p class="column-title">{{ col.label }}</p>
+                <div class="sort-arrows">
+                  <NuxtImg class="arrow-up" src="/img/arrow-up.png" width="10" height="6" alt="Up arrow" :style="(sortField === col.key && sortDirection === 'asc')
+                    ? 'opacity:1;'
+                    : 'opacity:0.4;'" />
+                  <NuxtImg class="arrow-down" src="/img/arrow-up.png" width="10" height="6" alt="Down arrow" :style="(sortField === col.key && sortDirection === 'desc')
+                    ? 'opacity:1; transform:rotate(180deg);'
+                    : 'opacity:0.4; transform:rotate(180deg);'" />
+                </div>
+              </div>
+            </th>
           </tr>
         </thead>
+
         <tbody>
           <tr v-for="person in filteredAgents" :key="person.id">
-            <td>
-              <Person :name="person.name" :image="person.image" :id="person.id" :rate="person.rate"
-                :disabled="modalLoading" @open-modal="openModal(person, $event)" />
+            <td class="table-avatar-column">
+              <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
+                placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
+                :alt="person.name" />
+              <span class="table-person-name">{{ person.name }}</span>
             </td>
-            <td>{{ person.price }}</td>
-            <td>{{ person.mcap }}</td>
-            <td>{{ person.volume24h }}</td>
-            <td>{{ person.change24h }}</td>
-            <td>{{ person.change7d }}</td>
+            <td>${{ person.price }}</td>
+            <td>${{ person.Mcap }}</td>
+            <td>${{ person.volume24h }}</td>
+            <td :class="{ negative: person.change24h < 0 }">
+              {{ person.change24h > 0 ? `+${person.change24h}` : person.change24h }}%
+            </td>
+            <td :class="{ negative: person.change7d < 0 }">
+              {{ person.change7d > 0 ? `+${person.change7d}` : person.change7d }}%
+            </td>
+
+
             <td>{{ person.holders }}</td>
             <td>
               <button @click="openModal(person, 'preview')">Preview</button>
@@ -51,13 +62,13 @@
               <button @click="openModal(person, 'call')">Call</button>
             </td>
             <td>
-              <button @click="openModal(person, 'buy')">Buy</button>
+              <button>Buy</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    
+
     <Modal :isOpen="isModalOpen" @close="closeModal">
       <ClientOnly>
         <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
@@ -92,48 +103,78 @@ const isModalOpen = ref(false)
 const selectedPerson = ref(null)
 
 const searchQuery = ref('')
-const sortBy = ref('mcap')
+const sortBy = ref('Mcap')
 const showWatchlist = ref(false)
 const viewMode = ref<'grid' | 'table'>('grid')
+const sortField = ref('Mcap')
+const sortDirection = ref('desc')
+
+const columns = [
+  { key: 'price', label: 'Price' },
+  { key: 'Mcap', label: 'Mcap' },
+  { key: 'volume24h', label: '24h vol.' },
+  { key: 'change24h', label: '24h %' },
+  { key: 'change7d', label: '7d %' },
+  { key: 'holders', label: 'Holders' }
+]
 
 const agents = computed(() => agentsStore.agents)
 
+function setSort(field) {
+  if (sortField.value === field) {
+    // If the same header is clicked again, toggle asc/desc
+    sortDirection.value = sortDirection.value === 'desc' ? 'asc' : 'desc'
+  } else {
+    // If a different header is clicked, sort descending by default
+    sortField.value = field
+    sortDirection.value = 'desc'
+  }
+}
+
+
 const filteredAgents = computed(() => {
-  let results = [...agents.value];
+  let results = [...agents.value]
 
   if (showWatchlist.value) {
-    results = results.filter(agent => agent.isInWatchlist);
+    results = results.filter(agent => agent.isInWatchlist)
   }
 
-  if (searchQuery.value.trim() !== '') {
+  if (searchQuery.value.trim()) {
     results = results.filter(agent =>
       agent.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    );
+    )
   }
 
-  switch (sortBy.value) {
-    case 'mcap':
-      results.sort((a, b) => b.mcap - a.mcap);
-      break;
+  // Sort according to sortField
+  switch (sortField.value) {
+    case 'Mcap':
+      results.sort((a, b) => b.Mcap - a.Mcap)
+      break
     case 'price':
-      results.sort((a, b) => b.price - a.price);
-      break;
-    case '24hvol':
-      results.sort((a, b) => b.volume24h - a.volume24h);
-      break;
-    case '24h%':
-      results.sort((a, b) => b.change24h - a.change24h);
-      break;
-    case '7day%':
-      results.sort((a, b) => b.change7d - a.change7d);
-      break;
+      results.sort((a, b) => b.price - a.price)
+      break
+    case 'volume24h':
+      results.sort((a, b) => b.volume24h - a.volume24h)
+      break
+    case 'change24h':
+      results.sort((a, b) => b.change24h - a.change24h)
+      break
+    case 'change7d':
+      results.sort((a, b) => b.change7d - a.change7d)
+      break
     case 'holders':
-      results.sort((a, b) => b.holders - a.holders);
-      break;
+      results.sort((a, b) => b.holders - a.holders)
+      break
   }
 
-  return results;
-});
+  // If direction is "asc", just reverse
+  if (sortDirection.value === 'asc') {
+    results.reverse()
+  }
+
+  return results
+})
+
 
 
 function toggleWatchlist() {
@@ -201,7 +242,8 @@ section.main {
       1.39px 0 0 0 #59596D,
       0 -0.7px 0 0 #000000;
   }
-  .grid-layout {
+
+  .agents-grid {
     min-height: 700px;
     max-width: 2048px;
     margin: auto;
@@ -219,6 +261,7 @@ section.main {
     width: 100%;
     border-collapse: collapse;
     background: #161622;
+    border-top: 2px solid #59596d;
     box-shadow:
       1.39px 1.39px 0 0 #59596D,
       1.39px -2.09px 0 0 #1B1B2A,
@@ -226,16 +269,37 @@ section.main {
       1.39px 0 0 0 #59596D,
       0 -0.7px 0 0 #000000;
 
+    .label-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+    }
+
     thead {
-      background: #1f1f2d;
+      background: #161622;
+      color: #8989AB;
+      font-size: 12px;
 
       th {
-        padding: 0.75rem 1rem;
+        padding: 1.25rem 0.75rem;
         text-align: left;
+        cursor: pointer;
+
+
+        &.sorted {
+          color: white;
+        }
+
+        &:hover {
+          opacity: 0.8;
+        }
       }
     }
 
     tbody {
+      background-color: #000000;
+
       tr {
         border-bottom: 1px solid #333;
 
@@ -248,7 +312,25 @@ section.main {
         }
       }
     }
+
+    .negative {
+      color: #FA6400;
+    }
+
   }
+
+  .table-avatar-column {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+
+    .avatar-img {
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
   .equalizer {
     height: 120px;
     width: 430px;
@@ -283,7 +365,7 @@ section.main {
       height: 80px;
     }
 
-    .grid-layout,
+    .agents-grid,
     .agents-table {
       padding: 0.75rem;
     }

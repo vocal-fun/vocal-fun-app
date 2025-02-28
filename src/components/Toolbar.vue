@@ -70,7 +70,7 @@ const emit = defineEmits([
 ]);
 
 const options = [
-  { value: 'mcap', label: 'Top mcap 24h' },
+  { value: 'Mcap', label: 'Top Mcap 24h' },
   { value: 'price', label: 'Price' },
   { value: '24hvol', label: '24h vol.' },
   { value: '24hpercent', label: '24h %' },
@@ -100,7 +100,6 @@ const currentLabel = computed(() => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  border-bottom: 2px solid #59596d;
   height: 64px;
   padding: 0px 24px;
   background-color: #161622;
