@@ -121,7 +121,7 @@ export function useCallApi() {
       });
       const audioContext = new AudioContext({ sampleRate: Sound.SampleRate });
       const source = audioContext.createMediaStreamSource(stream);
-      const processor = audioContext.createScriptProcessor(2048, Sound.Channels, Sound.Channels);
+      const processor = audioContext.createScriptProcessor(4096, Sound.Channels, Sound.Channels);
 
       source.connect(processor);
       processor.connect(audioContext.destination);
