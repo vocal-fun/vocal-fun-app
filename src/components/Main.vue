@@ -7,14 +7,14 @@
 
     <div class="table-agents">
       <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
-        v-model:viewMode="viewMode" @toggle-watchlist="toggleWatchlist" />
+        v-model:viewMode="viewMode" :showSort="viewMode === 'grid'" @toggle-watchlist="toggleWatchlist" />
 
       <div v-if="viewMode === 'grid'" class="agents-grid">
         <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
           :id="person.id" :rate="person.rate" :disabled="modalLoading" @open-modal="openModal(person, $event)" />
       </div>
 
-      <table v-else class="agents-table">
+      <table v-else class="agents-table" style="height: 100%;">
         <thead>
           <tr>
             <th>Vocal agent</th>
@@ -41,7 +41,10 @@
               <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
                 placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
                 :alt="person.name" />
-              <span class="table-person-name">{{ person.name }}</span>
+              <div class="person-info">
+                <p class="table-person-name">{{ person.name }}</p>
+                <p class="token-name">${{ person.tokenName }}</p>
+              </div>
             </td>
             <td>${{ person.price }}</td>
             <td>${{ person.Mcap }}</td>
@@ -55,14 +58,10 @@
 
 
             <td>{{ person.holders }}</td>
-            <td>
-              <button @click="openModal(person, 'preview')">Preview</button>
-            </td>
-            <td>
-              <button @click="openModal(person, 'call')">Call</button>
-            </td>
-            <td>
-              <button>Buy</button>
+            <td class="actions-buttons">
+              <button @click="openModal(person, 'preview')" class="preview-btn">Preview</button>
+              <button @click="openModal(person, 'call')" class="call-btn">Call</button>
+              <button class="buy-btn">Buy</button>
             </td>
           </tr>
         </tbody>
@@ -324,12 +323,66 @@ section.main {
     flex-direction: row;
     gap: 16px;
     align-items: center;
+    margin-top: 16px;
 
     .avatar-img {
       border-radius: 50%;
       object-fit: cover;
     }
+    .person-info {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
   }
+
+  .actions-buttons {
+    display: flex;
+    margin-bottom: 16px;
+
+    .preview-btn {
+      padding-right: 0;
+      border-right: 1px solid #37D339;
+    }
+
+    .call-btn {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .buy-btn {
+      padding-left: 0;
+    }
+
+    .preview-btn,
+    .call-btn,
+    .buy-btn {
+      padding: 14px;
+      background-color: #37D33933;
+      display: flex;
+      cursor: pointer;
+      /* Ensures a pointer on hover */
+      transition: background 0.2s;
+      /* Smooth transition */
+
+      &:hover {
+        background-color: #37D339;
+        color: #121212;
+      }
+    }
+
+    .buy-btn {
+      background-color: #00FA00;
+      color: #121212;
+
+      &:hover {
+        background-color: #60FF60;
+        color: #000;
+      }
+    }
+  }
+
 
   .equalizer {
     height: 120px;

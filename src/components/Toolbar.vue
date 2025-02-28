@@ -8,8 +8,10 @@
         <NuxtImg class="table" src="/img/table.png" alt="Table button" format="webp" sizes="48px" loading="lazy" />
       </button>
     </div>
+
     <div class="divider" />
-    <div class="sort">
+
+    <div v-if="viewMode === 'grid'" class="sort">
       <label>Sort by:</label>
       <div class="dropdown">
         <button class="dropdown-trigger" @click="toggleDropdown">
@@ -17,8 +19,12 @@
           <span class="arrow" />
         </button>
         <ul v-if="isOpen" class="dropdown-menu">
-          <li v-for="option in options" :key="option.value" :class="{ active: option.value === sortBy }"
-            @click="selectOption(option.value)">
+          <li
+            v-for="option in options"
+            :key="option.value"
+            :class="{ active: option.value === sortBy }"
+            @click="selectOption(option.value)"
+          >
             {{ option.label }}
           </li>
         </ul>
@@ -26,48 +32,55 @@
     </div>
 
     <p class="watchlist">Watchlist</p>
+    <p v-if="viewMode === 'table'" class="clips">My clips</p>
+
     <div class="search">
       <NuxtImg
-          class="icon"
-          src="/img/search.png"
-          alt="Search Icon"
-          format="webp"
-          sizes="16px"
-          loading="lazy"
+        class="icon"
+        src="/img/search.png"
+        alt="Search Icon"
+        format="webp"
+        sizes="16px"
+        loading="lazy"
       />
-      <input type="text" :value="searchQuery" @input="$emit('update:searchQuery', $event.target.value)"
-        placeholder="Search" />
+      <input
+        type="text"
+        :value="searchQuery"
+        @input="$emit('update:searchQuery', $event.target.value)"
+        placeholder="Search"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue'
 
 const props = defineProps({
   searchQuery: {
     type: String,
-    required: true,
+    required: true
   },
   sortBy: {
     type: String,
-    required: true,
+    required: true
   },
   showWatchlist: {
     type: Boolean,
-    required: true,
+    required: true
   },
   viewMode: {
     type: String,
-    required: true,
-  },
-});
+    required: true
+  }
+})
+
 const emit = defineEmits([
   'update:searchQuery',
   'update:sortBy',
   'toggle-watchlist',
   'update:viewMode'
-]);
+])
 
 const options = [
   { value: 'Mcap', label: 'Top Mcap 24h' },
@@ -75,24 +88,24 @@ const options = [
   { value: '24hvol', label: '24h vol.' },
   { value: '24hpercent', label: '24h %' },
   { value: '7dpercent', label: '7d %' },
-  { value: 'holders', label: 'Holders' },
-];
+  { value: 'holders', label: 'Holders' }
+]
 
-const isOpen = ref(false);
+const isOpen = ref(false)
 
 function toggleDropdown() {
-  isOpen.value = !isOpen.value;
+  isOpen.value = !isOpen.value
 }
 
 function selectOption(value: string) {
-  emit('update:sortBy', value);
-  isOpen.value = false;
+  emit('update:sortBy', value)
+  isOpen.value = false
 }
 
 const currentLabel = computed(() => {
-  const found = options.find(o => o.value === props.sortBy);
-  return found ? found.label : 'Select an option';
-});
+  const found = options.find(o => o.value === props.sortBy)
+  return found ? found.label : 'Select an option'
+})
 </script>
 
 <style scoped lang="scss">
@@ -129,7 +142,8 @@ const currentLabel = computed(() => {
   gap: 0.5rem;
 }
 
-.watchlist {
+.watchlist,
+.clips {
   opacity: 0.5;
 }
 
@@ -158,7 +172,6 @@ const currentLabel = computed(() => {
     width: 16px;
     height: 16px;
   }
-
 }
 
 .sort {
