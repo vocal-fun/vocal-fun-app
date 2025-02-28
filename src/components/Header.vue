@@ -42,11 +42,10 @@
     </a>
 
     <div class="user">
-      <button v-if="false" v-play-click-sound class="account" @click="buyStore.openBuyModal">
-        BALANCE: ${{ user?.balance }}
+      <button v-if="user" v-play-click-sound class="account" @click="buyStore.openBuyModal">
+        BALANCE: {{ user.balance }} $VOCAL
       </button>
-      <span v-if="user" class="account">BALANCE: ${{ user.balance }}</span>
-      <ConnectWallet v-if="false" class="wallet" />
+      <ConnectWallet class="wallet" />
     </div>
 
     <Modal :isOpen="isBuyModalOpen" @close="buyStore.closeBuyModal">

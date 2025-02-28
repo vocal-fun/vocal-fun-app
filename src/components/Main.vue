@@ -2,80 +2,200 @@
   <section class="main">
     <div class="content-header">
       <h2>Talk to realtime AI agents</h2>
-      <EQ />
+      <EQ class="equalizer" />
     </div>
-    <div class="content-main">
-      <Person
-        v-for="person in agents"
-        :key="person.id"
-        :name="person.name"
-        :image="person.image"
-        :id="person.id"
-        :rate="person.rate"
-        :disabled="modalLoading"
-        @open-modal="openModal(person, $event)"
-      />
-      <Modal :isOpen="isModalOpen" @close="closeModal">
-        <ClientOnly>
-          <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
-        </ClientOnly>
-      </Modal>
+
+    <div class="table-agents">
+      <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
+        v-model:viewMode="viewMode" :showSort="viewMode === 'grid'" @toggle-watchlist="toggleWatchlist" />
+
+      <div v-if="viewMode === 'grid'" class="agents-grid">
+        <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
+          :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap" :createdAt="person.createdAt"   :disabled="modalLoading" @open-modal="openModal(person, $event)" />
+        </div>
+
+      <table v-else class="agents-table">
+        <thead>
+          <tr>
+            <th>Vocal agent</th>
+            <th v-for="col in columns" :key="col.key" :class="{ 'sorted': sortBy === col.key, 'sorting': true }"
+              @click="setSort(col.key)">
+              <div class="label-wrapper">
+                <p class="column-title">{{ col.label }}</p>
+                <div class="sort-arrows">
+                  <NuxtImg class="arrow-up" src="/img/arrow-up.png" width="10" height="6" alt="Up arrow" :style="(sortBy === col.key && sortDirection === 'asc')
+                    ? 'opacity:1;'
+                    : 'opacity:0.4;'" />
+                  <NuxtImg class="arrow-down" src="/img/arrow-up.png" width="10" height="6" alt="Down arrow" :style="(sortBy === col.key && sortDirection === 'desc')
+                    ? 'opacity:1; transform:rotate(180deg);'
+                    : 'opacity:0.4; transform:rotate(180deg);'" />
+                </div>
+              </div>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr v-for="person in filteredAgents" :key="person.id">
+            <td class="table-avatar-column">
+              <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
+                placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
+                :alt="person.name" />
+              <div class="person-info">
+                <p class="table-person-name">{{ person.name }}</p>
+                <p class="token-name">${{ person.tokenName }}</p>
+              </div>
+            </td>
+            <td>${{ person.price }}</td>
+            <td>${{ person.mcap }}</td>
+            <td>${{ person.volume24h }}</td>
+            <td :class="{ negative: person.change24h < 0 }">
+              {{ person.change24h > 0 ? `+${person.change24h}` : person.change24h }}%
+            </td>
+            <td :class="{ negative: person.change7d < 0 }">
+              {{ person.change7d > 0 ? `+${person.change7d}` : person.change7d }}%
+            </td>
+
+
+            <td>{{ person.holders }}</td>
+            <td class="actions-buttons">
+              <button @click="openModal(person, 'preview')" class="preview-btn">Preview</button>
+              <button @click="openModal(person, 'call')" class="call-btn">Call</button>
+              <button class="buy-btn">Buy</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+
+    <Modal :isOpen="isModalOpen" @close="closeModal">
+      <ClientOnly>
+        <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
+      </ClientOnly>
+    </Modal>
   </section>
 </template>
 
 <script setup lang="ts">
-import type { Agent, OpenModalState } from '~/types';
+import { ref, computed, onBeforeMount } from 'vue'
+import { useRoute } from 'vue-router'
 
-const modalContent = useTemplateRef('modalContent');
-const agentsStore = useAgentsStore();
-const authStore = useAuthStore();
-const { handleConnectClick } = useWalletConnect();
-const user = computed(() => authStore.user);
-const route = useRoute();
+import { useAgentsStore } from '~/stores/agents'
+import { useAuthStore } from '~/stores/auth'
+import { useWalletConnect } from '~/composables/useWalletConnect'
 
-const modalLoading = ref<boolean>(false);
-const isModalOpen = ref<boolean>(false);
-const selectedPerson = ref<Agent | undefined>(undefined);
+import EQ from '~/components/EQ.vue'
+import Person from '~/components/Person.vue'
+import Modal from '~/components/Modal.vue'
+import CallModalContent from '~/components/CallModalContent.vue'
+import Toolbar from '~/components/Toolbar.vue'
 
-const agents = computed(() => agentsStore.agents);
+const modalContent = useTemplateRef('modalContent')
+const agentsStore = useAgentsStore()
+const authStore = useAuthStore()
+const { handleConnectClick } = useWalletConnect()
+const route = useRoute()
 
-const openModal = async (person: Agent, state: OpenModalState) => {
+const user = computed(() => authStore.user)
+const modalLoading = ref(false)
+const isModalOpen = ref(false)
+const selectedPerson = ref(null)
+
+const searchQuery = ref('')
+const showWatchlist = ref(false)
+const viewMode = ref<'grid' | 'table'>('grid')
+const sortBy = ref('mcap')
+const sortDirection = ref<'asc' | 'desc'>('desc')
+
+const columns = [
+  { key: 'price', label: 'Price' },
+  { key: 'mcap', label: 'mcap' },
+  { key: 'volume24h', label: '24h vol.' },
+  { key: 'change24h', label: '24h %' },
+  { key: 'change7d', label: '7d %' },
+  { key: 'holders', label: 'Holders' }
+]
+
+const agents = computed(() => agentsStore.agents)
+
+function setSort(field: string) {
+  if (sortBy.value === field) {
+    sortDirection.value = (sortDirection.value === 'desc') ? 'asc' : 'desc'
+  } else {
+    sortBy.value = field
+    sortDirection.value = 'desc'
+  }
+}
+
+
+const filteredAgents = computed(() => {
+  let results = [...agentsStore.agents]
+  switch (sortBy.value) {
+    case 'mcap':
+      results.sort((a, b) => b.mcap - a.mcap)
+      break
+    case 'price':
+      results.sort((a, b) => b.price - a.price)
+      break
+    case 'volume24h':
+      results.sort((a, b) => b.volume24h - a.volume24h)
+      break
+    case 'change24h':
+      results.sort((a, b) => b.change24h - a.change24h)
+      break
+    case 'change7d':
+      results.sort((a, b) => b.change7d - a.change7d)
+      break
+    case 'holders':
+      results.sort((a, b) => b.holders - a.holders)
+      break
+  }
+  if (sortDirection.value === 'asc') results.reverse()
+  return results
+})
+
+function toggleWatchlist() {
+  showWatchlist.value = !showWatchlist.value
+}
+
+async function openModal(person, state) {
   if (state === 'call' && !user.value) {
-    handleConnectClick();
-    return;
+    handleConnectClick()
+    return
   }
 
-  modalLoading.value = true;
-  selectedPerson.value = person;
-  if (route.params.id !== person.route) {
-    history.replaceState(null, '', `/${person.route}`);
+  modalLoading.value = true
+  selectedPerson.value = person
+  const currentSlug = route.params.slug?.[0]
+  if (currentSlug !== person.route) {
+    history.replaceState(null, '', `/${person.route}`)
   }
-  isModalOpen.value = true; // TODO: move this line after await if need to wait
-  await modalContent.value?.onOpen(state);
-  modalLoading.value = false;
-};
+  isModalOpen.value = true
+  await modalContent.value?.onOpen(state)
+  modalLoading.value = false
+}
 
-const closeModal = () => {
-  isModalOpen.value = false;
-  modalContent.value?.onClose();
-  history.replaceState(null, '', '/');
-};
+function closeModal() {
+  isModalOpen.value = false
+  modalContent.value?.onClose()
+  history.replaceState(null, '', '/')
+}
 
 onBeforeMount(async () => {
-  await agentsStore.getAgents();
-  const agentRoute = route.params.slug?.[0] as string | undefined;
+  await agentsStore.getAgents()
+
+  const agentRoute = route.params.slug?.[0] as string | undefined
   if (agentRoute) {
-    const person = agentsStore.agents.find((agent) => agent.route === agentRoute);
+    const person = agentsStore.agents.find(a => a.route === agentRoute)
     if (person) {
-      selectedPerson.value = person;
-      await openModal(person, 'default');
-      return;
+      selectedPerson.value = person
+      await openModal(person, 'default')
+      return
     }
   }
-  // preload first agent
-  selectedPerson.value = agentsStore.agents[0];
-});
+
+  selectedPerson.value = agentsStore.agents[0]
+})
 </script>
 
 <style scoped lang="scss">
@@ -91,18 +211,21 @@ section.main {
     gap: 1rem;
   }
 
-  .content-main {
+  .table-agents {
+    box-shadow:
+      1.39px 1.39px 0 0 #59596D,
+      1.39px -2.09px 0 0 #1B1B2A,
+      -1.39px -1.39px 0 0 #1B1B2A,
+      1.39px 0 0 0 #59596D,
+      0 -0.7px 0 0 #000000;
+  }
+
+  .agents-grid {
     min-height: 700px;
     max-width: 2048px;
     margin: auto;
     background: #161622;
-    box-shadow:
-        1.39px 1.39px 0 0 #59596D,
-        1.39px -2.09px 0 0 #1B1B2A,
-        -1.39px -1.39px 0 0 #1B1B2A,
-        1.39px 0 0 0 #59596D,
-        0 -0.7px 0 0 #000000;
-
+    border-top: 2px solid #59596D;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -110,6 +233,134 @@ section.main {
     padding: 1.875rem;
     margin-bottom: 1rem;
   }
+
+  .agents-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #161622;
+    border-top: 2px solid #59596d;
+    box-shadow:
+      1.39px 1.39px 0 0 #59596D,
+      1.39px -2.09px 0 0 #1B1B2A,
+      -1.39px -1.39px 0 0 #1B1B2A,
+      1.39px 0 0 0 #59596D,
+      0 -0.7px 0 0 #000000;
+
+    .label-wrapper {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 6px;
+    }
+
+    thead {
+      background: #161622;
+      color: #8989AB;
+      font-size: 12px;
+
+      th {
+        padding: 1.25rem 0.75rem;
+        text-align: left;
+        cursor: pointer;
+
+
+        &.sorted {
+          color: white;
+        }
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+
+    tbody {
+      background-color: #000000;
+
+      tr {
+        border-bottom: 1px solid #333;
+
+        &:hover {
+          background: #2b2b3b;
+        }
+
+        td {
+          padding: 0.75rem 1rem;
+        }
+      }
+    }
+
+    .negative {
+      color: #FA6400;
+    }
+
+  }
+
+  .table-avatar-column {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+    margin-top: 16px;
+
+    .avatar-img {
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .person-info {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+  }
+
+  .actions-buttons {
+    display: flex;
+    margin-bottom: 16px;
+
+    .preview-btn {
+      padding-right: 0;
+      border-right: 1px solid #37D339;
+    }
+
+    .call-btn {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .buy-btn {
+      padding-left: 0;
+    }
+
+    .preview-btn,
+    .call-btn,
+    .buy-btn {
+      padding: 14px;
+      background-color: #37D33933;
+      display: flex;
+      cursor: pointer;
+      /* Ensures a pointer on hover */
+      transition: background 0.2s;
+      /* Smooth transition */
+
+      &:hover {
+        background-color: #37D339;
+        color: #121212;
+      }
+    }
+
+    .buy-btn {
+      background-color: #00FA00;
+      color: #121212;
+
+      &:hover {
+        background-color: #60FF60;
+        color: #000;
+      }
+    }
+  }
+
 
   .equalizer {
     height: 120px;
@@ -119,7 +370,7 @@ section.main {
 
 @media (max-width: 1024px) {
   section.main {
-    margin: .75rem 1.25px 1.25px 1.25px;
+    margin: 0.75rem 1.25px 1.25px 1.25px;
 
     .content-header {
       flex-direction: column;
@@ -144,8 +395,10 @@ section.main {
     .equalizer {
       height: 80px;
     }
-    .content-main {
-      padding: .75rem;
+
+    .agents-grid,
+    .agents-table {
+      padding: 0.75rem;
     }
   }
 }
