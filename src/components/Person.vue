@@ -69,7 +69,8 @@ $circle-gradient: linear-gradient(180deg,
   color: var(--color-primary);
   display: flex;
   flex-wrap: wrap;
-  width: 480px;
+  max-width: 480px;
+  width: 100%;
   background-color: #000000;
   transition: transform 0.3s ease-in-out;
   padding-top: 14px;

@@ -275,7 +275,8 @@ section.main {
   }
 
   .agents-grid {
-    min-height: 700px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     max-width: 2048px;
     margin: auto;
     background: #161622;
@@ -291,7 +292,6 @@ section.main {
   .table-container {
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch
   }
 
   .agents-table {
@@ -452,6 +452,7 @@ section.main {
     }
   }
 }
+
 
 @media (max-width: 500px) {
   section.main {
