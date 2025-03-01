@@ -253,6 +253,15 @@ section.main {
       gap: 6px;
     }
 
+    .sort-arrows {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      .arrow-down {
+        margin-right: 1.5px;
+      }
+    }
+
     thead {
       background: #161622;
       color: #8989AB;

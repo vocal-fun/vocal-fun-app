@@ -10,7 +10,6 @@
     </div>
 
     <div class="divider" />
-
     <div v-if="viewMode === 'grid'" class="sort">
       <label>Sort by:</label>
       <div class="dropdown">
@@ -19,12 +18,8 @@
           <span class="arrow" />
         </button>
         <ul v-if="isOpen" class="dropdown-menu">
-          <li
-            v-for="option in options"
-            :key="option.value"
-            :class="{ active: option.value === sortBy }"
-            @click="selectOption(option.value)"
-          >
+          <li v-for="option in options" :key="option.value" :class="{ active: option.value === sortBy }"
+            @click="selectOption(option.value)">
             {{ option.label }}
           </li>
         </ul>
@@ -35,20 +30,9 @@
     <p v-if="viewMode === 'table'" class="clips">My clips</p>
 
     <div class="search">
-      <NuxtImg
-        class="icon"
-        src="/img/search.png"
-        alt="Search Icon"
-        format="webp"
-        sizes="16px"
-        loading="lazy"
-      />
-      <input
-        type="text"
-        :value="searchQuery"
-        @input="$emit('update:searchQuery', $event.target.value)"
-        placeholder="Search"
-      />
+      <NuxtImg class="icon" src="/img/search.png" alt="Search Icon" format="webp" sizes="16px" loading="lazy" />
+      <input type="text" :value="searchQuery" @input="$emit('update:searchQuery', $event.target.value)"
+        placeholder="Search" />
     </div>
   </div>
 </template>
@@ -113,8 +97,7 @@ const currentLabel = computed(() => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  height: 64px;
-  padding: 0px 24px;
+  padding: 12px 24px;
   background-color: #161622;
 }
 
@@ -122,16 +105,39 @@ const currentLabel = computed(() => {
   align-self: stretch;
   width: 1px;
   background: #59596d;
+  margin-top: -12px;
+  margin-bottom: -12px;
 }
 
 .view-toggle {
   display: flex;
   gap: 20px;
 
+  button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
   .grid,
   .table {
     width: 24px;
     height: 24px;
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0.5;
+
+  }
+  .active .grid,
+  .active .table {
+    opacity: 1;
   }
 }
 
@@ -156,6 +162,7 @@ const currentLabel = computed(() => {
 
   input {
     background-color: transparent;
+    box-sizing: border-box;
     color: white;
     border: none;
     outline: none;
@@ -168,6 +175,7 @@ const currentLabel = computed(() => {
       color: white;
     }
   }
+
   .icon {
     width: 16px;
     height: 16px;
