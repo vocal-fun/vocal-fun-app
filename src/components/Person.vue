@@ -5,7 +5,7 @@
         <p>{{ name }}</p>
         <p>{{ tokenName }}</p>
       </div>
-      <p><span class="dim">mcap </span>${{ mcap }} </p>
+      <p><span class="dim">mcap </span>${{ formatShortNumber(mcap) }} </p>
       <p class="dim">{{ createdAt }}</p>
     </div>
 
@@ -25,8 +25,13 @@
 <script setup lang="ts">
 import { audioService } from '~/services/audio';
 import type { Agent, OpenModalState } from '~/types';
+import { formatShortNumber } from '~/utils/formatters'
 
-const props = defineProps<Omit<Agent, 'route' | 'id'> & { disabled: boolean }>();
+type PersonProps = Pick<Agent, 'name' | 'createdAt' | 'image' | 'rate' | 'tokenName' | 'mcap'> & { disabled: boolean };
+
+const props = defineProps<PersonProps>();
+
+
 
 const isDisabled = computed(() => props.disabled || !props.name);
 

@@ -21,7 +21,12 @@ export type Agent = {
   createdAt: string;
   route: string;
   tokenName: string;
-  mcap: string;
+  mcap: number; 
+  price: number;
+  volume24h: number;
+  change24h: number;
+  change7d: number;
+  holders: number;
 };
 
 export type PreviewDto = {

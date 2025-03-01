@@ -6,71 +6,115 @@
     </div>
 
     <div class="table-agents">
-      <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
-        v-model:viewMode="viewMode" :showSort="viewMode === 'grid'" @toggle-watchlist="toggleWatchlist" />
+      <Toolbar
+        v-model:sortBy="sortBy"
+        v-model:searchQuery="searchQuery"
+        :showWatchlist="showWatchlist"
+        v-model:viewMode="viewMode"
+        :showSort="viewMode === 'grid'"
+        @toggle-watchlist="toggleWatchlist"
+      />
 
       <div v-if="viewMode === 'grid'" class="agents-grid">
-        <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
-          :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap" :createdAt="person.createdAt"   :disabled="modalLoading" @open-modal="openModal(person, $event)" />
-        </div>
+        <Person
+          v-for="person in filteredAgents"
+          :key="person.id"
+          :name="person.name"
+          :image="person.image"
+          :id="person.id"
+          :rate="person.rate"
+          :tokenName="person.tokenName"
+          :mcap="person.mcap"
+          :createdAt="person.createdAt"
+          :disabled="modalLoading"
+          @open-modal="openModal(person, $event)"
+        />
+      </div>
 
-      <table v-else class="agents-table">
-        <thead>
-          <tr>
-            <th>Vocal agent</th>
-            <th v-for="col in columns" :key="col.key" :class="{ 'sorted': sortBy === col.key, 'sorting': true }"
-              @click="setSort(col.key)">
-              <div class="label-wrapper">
-                <p class="column-title">{{ col.label }}</p>
-                <div class="sort-arrows">
-                  <NuxtImg class="arrow-up" src="/img/arrow-up.png" width="10" height="6" alt="Up arrow" :style="(sortBy === col.key && sortDirection === 'asc')
-                    ? 'opacity:1;'
-                    : 'opacity:0.4;'" />
-                  <NuxtImg class="arrow-down" src="/img/arrow-up.png" width="10" height="6" alt="Down arrow" :style="(sortBy === col.key && sortDirection === 'desc')
-                    ? 'opacity:1; transform:rotate(180deg);'
-                    : 'opacity:0.4; transform:rotate(180deg);'" />
+      <div v-else class="table-container">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Vocal agent</th>
+              <th
+                v-for="col in columns"
+                :key="col.key"
+                :class="{ sorted: sortBy === col.key, sorting: true }"
+                @click="setSort(col.key)"
+              >
+                <div class="label-wrapper">
+                  <p class="column-title">{{ col.label }}</p>
+                  <div class="sort-arrows">
+                    <NuxtImg
+                      class="arrow-up"
+                      src="/img/arrow-up.png"
+                      width="10"
+                      height="6"
+                      alt="Up arrow"
+                      :style="(sortBy === col.key && sortDirection === 'asc') ? 'opacity:1;' : 'opacity:0.4;'"
+                    />
+                    <NuxtImg
+                      class="arrow-down"
+                      src="/img/arrow-up.png"
+                      width="10"
+                      height="6"
+                      alt="Down arrow"
+                      :style="(sortBy === col.key && sortDirection === 'desc') ? 'opacity:1; transform:rotate(180deg);' : 'opacity:0.4; transform:rotate(180deg);'"
+                    />
+                  </div>
                 </div>
-              </div>
-            </th>
-          </tr>
-        </thead>
+              </th>
+            </tr>
+          </thead>
 
-        <tbody>
-          <tr v-for="person in filteredAgents" :key="person.id">
-            <td class="table-avatar-column">
-              <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
-                placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
-                :alt="person.name" />
-              <div class="person-info">
-                <p class="table-person-name">{{ person.name }}</p>
-                <p class="token-name">${{ person.tokenName }}</p>
-              </div>
-            </td>
-            <td>${{ person.price }}</td>
-            <td>${{ person.mcap }}</td>
-            <td>${{ person.volume24h }}</td>
-            <td :class="{ negative: person.change24h < 0 }">
-              {{ person.change24h > 0 ? `+${person.change24h}` : person.change24h }}%
-            </td>
-            <td :class="{ negative: person.change7d < 0 }">
-              {{ person.change7d > 0 ? `+${person.change7d}` : person.change7d }}%
-            </td>
-
-
-            <td>{{ person.holders }}</td>
-            <td class="actions-buttons">
-              <button @click="openModal(person, 'preview')" class="preview-btn">Preview</button>
-              <button @click="openModal(person, 'call')" class="call-btn">Call</button>
-              <button class="buy-btn">Buy</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+          <tbody>
+            <tr v-for="person in filteredAgents" :key="person.id">
+              <td class="table-avatar-column">
+                <NuxtImg
+                  class="avatar-img"
+                  sizes="90vw md:400px"
+                  format="webp"
+                  loading="lazy"
+                  width="48"
+                  height="48"
+                  placeholder="/img/user-avatar.png"
+                  placeholder-class="image-placeholder"
+                  :src="person.image"
+                  :alt="person.name"
+                />
+                <div class="person-info">
+                  <p class="table-person-name">{{ person.name }}</p>
+                  <p class="token-name">${{ person.tokenName }}</p>
+                </div>
+              </td>
+              <td>${{ person.price }}</td>
+              <td>${{ formatShortNumber(person.mcap) }}</td>
+              <td>${{ person.volume24h }}</td>
+              <td :class="{ negative: person.change24h < 0 }">
+                {{ person.change24h > 0 ? `+${person.change24h}` : person.change24h }}%
+              </td>
+              <td :class="{ negative: person.change7d < 0 }">
+                {{ person.change7d > 0 ? `+${person.change7d}` : person.change7d }}%
+              </td>
+              <td>{{ person.holders }}</td>
+              <td class="actions-buttons">
+                <button @click="openModal(person, 'preview')" class="preview-btn">Preview</button>
+                <button @click="openModal(person, 'call')" class="call-btn">Call</button>
+                <button class="buy-btn">Buy</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <Modal :isOpen="isModalOpen" @close="closeModal">
       <ClientOnly>
-        <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
+        <CallModalContent
+          ref="modalContent"
+          :person="selectedPerson"
+          @close="closeModal"
+        />
       </ClientOnly>
     </Modal>
   </section>
@@ -83,12 +127,13 @@ import { useRoute } from 'vue-router'
 import { useAgentsStore } from '~/stores/agents'
 import { useAuthStore } from '~/stores/auth'
 import { useWalletConnect } from '~/composables/useWalletConnect'
-
+import { formatShortNumber } from '~/utils/formatters'
 import EQ from '~/components/EQ.vue'
 import Person from '~/components/Person.vue'
 import Modal from '~/components/Modal.vue'
 import CallModalContent from '~/components/CallModalContent.vue'
 import Toolbar from '~/components/Toolbar.vue'
+import type { Agent, OpenModalState } from '~/types'
 
 const modalContent = useTemplateRef('modalContent')
 const agentsStore = useAgentsStore()
@@ -99,7 +144,8 @@ const route = useRoute()
 const user = computed(() => authStore.user)
 const modalLoading = ref(false)
 const isModalOpen = ref(false)
-const selectedPerson = ref(null)
+const selectedPerson = ref<Agent | undefined>(undefined)
+
 
 const searchQuery = ref('')
 const showWatchlist = ref(false)
@@ -127,9 +173,15 @@ function setSort(field: string) {
   }
 }
 
-
 const filteredAgents = computed(() => {
   let results = [...agentsStore.agents]
+
+  if (searchQuery.value) {
+    results = results.filter(agent =>
+      agent.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  }
+
   switch (sortBy.value) {
     case 'mcap':
       results.sort((a, b) => b.mcap - a.mcap)
@@ -151,14 +203,16 @@ const filteredAgents = computed(() => {
       break
   }
   if (sortDirection.value === 'asc') results.reverse()
+
   return results
 })
+
 
 function toggleWatchlist() {
   showWatchlist.value = !showWatchlist.value
 }
 
-async function openModal(person, state) {
+async function openModal(person: Agent, state: OpenModalState) {
   if (state === 'call' && !user.value) {
     handleConnectClick()
     return
@@ -234,6 +288,12 @@ section.main {
     margin-bottom: 1rem;
   }
 
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch
+  }
+
   .agents-table {
     width: 100%;
     border-collapse: collapse;
@@ -272,7 +332,6 @@ section.main {
         text-align: left;
         cursor: pointer;
 
-
         &.sorted {
           color: white;
         }
@@ -302,7 +361,6 @@ section.main {
     .negative {
       color: #FA6400;
     }
-
   }
 
   .table-avatar-column {
@@ -321,7 +379,6 @@ section.main {
       flex-direction: column;
       gap: 14px;
     }
-
   }
 
   .actions-buttons {
@@ -349,9 +406,7 @@ section.main {
       background-color: #37D33933;
       display: flex;
       cursor: pointer;
-      /* Ensures a pointer on hover */
       transition: background 0.2s;
-      /* Smooth transition */
 
       &:hover {
         background-color: #37D339;
@@ -369,7 +424,6 @@ section.main {
       }
     }
   }
-
 
   .equalizer {
     height: 120px;
@@ -406,7 +460,7 @@ section.main {
     }
 
     .agents-grid,
-    .agents-table {
+    .table-container {
       padding: 0.75rem;
     }
   }

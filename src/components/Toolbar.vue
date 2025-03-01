@@ -31,8 +31,13 @@
 
     <div class="search">
       <NuxtImg class="icon" src="/img/search.png" alt="Search Icon" format="webp" sizes="16px" loading="lazy" />
-      <input type="text" :value="searchQuery" @input="$emit('update:searchQuery', $event.target.value)"
-        placeholder="Search" />
+<input
+  type="text"
+  :value="searchQuery"
+  @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
+  placeholder="Search"
+/>
+
     </div>
   </div>
 </template>

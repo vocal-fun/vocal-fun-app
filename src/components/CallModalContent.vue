@@ -110,13 +110,20 @@ const props = withDefaults(
     person?: Agent,
   }>(),
   {
-    person: () => ({
+   person: () => ({
+      id: '',
       name: '',
       image: '',
-      rate: 1,
+      rate: 0,
       createdAt: '',
-      id: '',
       route: '',
+      tokenName: '',
+      mcap: 0,
+      price: 0,
+      volume24h: 0,
+      change24h: 0,
+      change7d: 0,
+      holders: 0,
     }),
   }
 );
