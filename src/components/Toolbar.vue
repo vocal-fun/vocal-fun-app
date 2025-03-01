@@ -96,9 +96,10 @@ const currentLabel = computed(() => {
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.4rem;
   padding: 12px 24px;
   background-color: #161622;
+  flex-wrap: wrap;
 }
 
 .divider {
@@ -133,7 +134,6 @@ const currentLabel = computed(() => {
     height: 24px;
     transition: opacity 0.2s ease-in-out;
     opacity: 0.5;
-
   }
   .active .grid,
   .active .table {
@@ -159,13 +159,14 @@ const currentLabel = computed(() => {
   gap: 12px;
   margin-left: auto;
   border: 2px solid #59596D;
-
+  max-width: 240px;
   input {
     background-color: transparent;
     box-sizing: border-box;
     color: white;
     border: none;
     outline: none;
+    min-width: 150px;
 
     &:focus-visible {
       outline: unset;
@@ -238,5 +239,44 @@ const currentLabel = computed(() => {
 
 .dropdown-menu li.active {
   font-weight: bold;
+}
+
+@media (max-width: 900px) {
+  .toolbar {
+    padding: 8px 12px;
+    gap: 1rem;
+  }
+  .view-toggle {
+    button {
+      .grid,
+      .table {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+  .search {
+    max-width: unset;
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .view-toggle,
+  .sort,
+  .search,
+  .watchlist,
+  .clips {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 0.5rem;
+  }
+  .divider {
+    display: none;
+  }
 }
 </style>

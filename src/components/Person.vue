@@ -210,7 +210,7 @@ $circle-gradient: linear-gradient(180deg,
 @media (max-width: 680px) {
   .person {
     flex-direction: column;
-    width: 70%;
+    width: 90%;
     align-items: center;
 
     >* {
@@ -224,25 +224,29 @@ $circle-gradient: linear-gradient(180deg,
 
     .info {
       gap: 1rem;
-      align-items: center;
+      align-items: start;
       width: 100%;
+    }
+  }
+
+  .avatar-block {
+    &::before {
+      transform: translate(-55%, -50%) !important;
+      width: 160px !important;
+      height: 160px !important;
+    }
+
+    &::after {
+      transform: translate(-55%, -50%) !important;
+      width: 130px !important;
+      height: 130px !important;
     }
   }
 }
 
 @media (max-width: 540px) {
-  .person {
-    width: 90%;
-
-    .avatar-block {
-      width: 100%;
-      text-align: center;
-
-      img {
-        width: 100%;
-        height: 100%;
-      }
-    }
+  .shake {
+    padding: 6px !important;
   }
 }
 </style>
