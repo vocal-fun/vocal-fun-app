@@ -1,34 +1,21 @@
 <template>
   <section class="main">
     <div class="content-header">
-      <h2>Talk to realtime AI agents</h2>
+      <div>
+        <h2>Voice AI agent coins</h2>
+        <button>Launch my coin</button>
+      </div>
       <EQ class="equalizer" />
     </div>
 
     <div class="table-agents">
-      <Toolbar
-        v-model:sortBy="sortBy"
-        v-model:searchQuery="searchQuery"
-        :showWatchlist="showWatchlist"
-        v-model:viewMode="viewMode"
-        :showSort="viewMode === 'grid'"
-        @toggle-watchlist="toggleWatchlist"
-      />
+      <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
+        v-model:viewMode="viewMode" :showSort="viewMode === 'grid'" @toggle-watchlist="toggleWatchlist" />
 
       <div v-if="viewMode === 'grid'" class="agents-grid">
-        <Person
-          v-for="person in filteredAgents"
-          :key="person.id"
-          :name="person.name"
-          :image="person.image"
-          :id="person.id"
-          :rate="person.rate"
-          :tokenName="person.tokenName"
-          :mcap="person.mcap"
-          :createdAt="person.createdAt"
-          :disabled="modalLoading"
-          @open-modal="openModal(person, $event)"
-        />
+        <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
+          :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap"
+          :createdAt="person.createdAt" :disabled="modalLoading" @open-modal="openModal(person, $event)" />
       </div>
 
       <div v-else class="table-container">
@@ -36,31 +23,15 @@
           <thead>
             <tr>
               <th>Vocal agent</th>
-              <th
-                v-for="col in columns"
-                :key="col.key"
-                :class="{ sorted: sortBy === col.key, sorting: true }"
-                @click="setSort(col.key)"
-              >
+              <th v-for="col in columns" :key="col.key" :class="{ sorted: sortBy === col.key, sorting: true }"
+                @click="setSort(col.key)">
                 <div class="label-wrapper">
                   <p class="column-title">{{ col.label }}</p>
                   <div class="sort-arrows">
-                    <NuxtImg
-                      class="arrow-up"
-                      src="/img/arrow-up.png"
-                      width="10"
-                      height="6"
-                      alt="Up arrow"
-                      :style="(sortBy === col.key && sortDirection === 'asc') ? 'opacity:1;' : 'opacity:0.4;'"
-                    />
-                    <NuxtImg
-                      class="arrow-down"
-                      src="/img/arrow-up.png"
-                      width="10"
-                      height="6"
-                      alt="Down arrow"
-                      :style="(sortBy === col.key && sortDirection === 'desc') ? 'opacity:1; transform:rotate(180deg);' : 'opacity:0.4; transform:rotate(180deg);'"
-                    />
+                    <NuxtImg class="arrow-up" src="/img/arrow-up.png" width="10" height="6" alt="Up arrow"
+                      :style="(sortBy === col.key && sortDirection === 'asc') ? 'opacity:1;' : 'opacity:0.4;'" />
+                    <NuxtImg class="arrow-down" src="/img/arrow-up.png" width="10" height="6" alt="Down arrow"
+                      :style="(sortBy === col.key && sortDirection === 'desc') ? 'opacity:1; transform:rotate(180deg);' : 'opacity:0.4; transform:rotate(180deg);'" />
                   </div>
                 </div>
               </th>
@@ -70,18 +41,9 @@
           <tbody>
             <tr v-for="person in filteredAgents" :key="person.id">
               <td class="table-avatar-column">
-                <NuxtImg
-                  class="avatar-img"
-                  sizes="90vw md:400px"
-                  format="webp"
-                  loading="lazy"
-                  width="48"
-                  height="48"
-                  placeholder="/img/user-avatar.png"
-                  placeholder-class="image-placeholder"
-                  :src="person.image"
-                  :alt="person.name"
-                />
+                <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
+                  placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
+                  :alt="person.name" />
                 <div class="person-info">
                   <p class="table-person-name">{{ person.name }}</p>
                   <p class="token-name">${{ person.tokenName }}</p>
@@ -110,11 +72,7 @@
 
     <Modal :isOpen="isModalOpen" @close="closeModal">
       <ClientOnly>
-        <CallModalContent
-          ref="modalContent"
-          :person="selectedPerson"
-          @close="closeModal"
-        />
+        <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
       </ClientOnly>
     </Modal>
   </section>
@@ -263,6 +221,24 @@ section.main {
     align-items: center;
     margin-bottom: 1rem;
     gap: 1rem;
+
+    div:first-child {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      font-size: 20px;
+
+      &:hover {
+        transition: color 0.2s;
+        color: #60FF60;
+      }
+
+      h2 {
+        color: #FFFFFF;
+      }
+    }
+
+
   }
 
   .table-agents {
@@ -318,6 +294,7 @@ section.main {
       display: flex;
       flex-direction: column;
       align-items: center;
+
       .arrow-down {
         margin-right: 1.5px;
       }
@@ -365,15 +342,17 @@ section.main {
   }
 
   .table-avatar-column {
-  display: flex;
-  flex-direction: row;
-  gap: 16px;
-  align-items: center;
-  height: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    align-items: center;
+    height: 100%;
+
     .avatar-img {
       border-radius: 50%;
       object-fit: cover;
     }
+
     .person-info {
       display: flex;
       flex-direction: column;
