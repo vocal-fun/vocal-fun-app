@@ -296,6 +296,7 @@ section.main {
 
   .agents-table {
     width: 100%;
+    min-width: 1200px;
     border-collapse: collapse;
     background: #161622;
     border-top: 2px solid #59596d;
@@ -364,12 +365,11 @@ section.main {
   }
 
   .table-avatar-column {
-    display: flex;
-    flex-direction: row;
-    gap: 16px;
-    align-items: center;
-    margin-top: 16px;
-
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  height: 100%;
     .avatar-img {
       border-radius: 50%;
       object-fit: cover;
