@@ -17,7 +17,7 @@
     <div class="buttons">
       <button class="preview shake" :disabled="isDisabled" @click.stop="openModal('preview')">PREVIEW</button>
       <button class="preview shake" :disabled="isDisabled" @click.stop="openModal('call')">CALL</button>
-      <button class="shake">BUY</button>
+      <button class="shake" @click.stop="handleBuy">BUY</button>
     </div>
   </div>
 </template>
@@ -30,9 +30,6 @@ import { formatShortNumber } from '~/utils/formatters'
 type PersonProps = Pick<Agent, 'name' | 'createdAt' | 'image' | 'rate' | 'tokenName' | 'mcap'> & { disabled: boolean };
 
 const props = defineProps<PersonProps>();
-
-
-
 const isDisabled = computed(() => props.disabled || !props.name);
 
 const emit = defineEmits<{
@@ -46,6 +43,12 @@ const openModal = (state: OpenModalState = 'default') => {
   playClickSound();
   emit('open-modal', state);
 };
+
+const handleBuy = () => {
+  console.log("Buy button clicked!");
+  // Add your logic here, e.g., open a modal, send a request, etc.
+};
+
 </script>
 
 <style scoped lang="scss">
