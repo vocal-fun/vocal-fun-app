@@ -2,7 +2,7 @@
   <div class="agent-details-card">
     <div class="header-info">
       <div class="header">
-        <NuxtImg class="avatar-img" :src="agent.image" alt="Agent Avatar" width="90" height="90" />
+        <NuxtImg class="avatar-img" :src="agent.image" alt="Agent Avatar"/>
         <div class="header-text">
           <h3>{{ agent.tokenName }} OFFICIAL COIN</h3>
           <p class="token">${{ agent.tokenName }}</p>
@@ -109,13 +109,6 @@ function formatChange(value: number): { formatted: string; color: string } {
     return { formatted: `-${absValue}%`, color: '#FF886A' };
   }
 }
-
-const changes = computed(() => ({
-  change5m: formatChange(props.agent.change5m),
-  change1h: formatChange(props.agent.change1h),
-  change24h: formatChange(props.agent.change24h),
-  change7d: formatChange(props.agent.change7d),
-}));
 </script>
 
 <style scoped lang="scss">
@@ -130,30 +123,25 @@ const changes = computed(() => ({
     flex-direction: column;
     padding: 8px 16px 16px 8px;
     background: linear-gradient(180deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
-
     .header {
       display: flex;
       align-items: center;
       gap: 1rem;
       padding-bottom: 38px;
       border-bottom: 1px solid #37D339;
-
       .avatar-img {
         border-radius: 50%;
         object-fit: cover;
         width: 74px;
         height: 74px;
       }
-
       &-text {
         display: flex;
         flex-direction: column;
         gap: 12px;
-
         h3 {
           font-size: 14px;
         }
-
         p {
           font-size: 12px;
         }
@@ -165,22 +153,17 @@ const changes = computed(() => ({
       flex-direction: column;
       margin-top: 12px;
       gap: 0.8rem;
-
       .info-row {
         display: flex;
         justify-content: space-between;
-
         &:first-child {
           padding-bottom: 14px;
           border-bottom: 1px solid #37D339;
         }
-
         .value {
           cursor: pointer;
-
           &:hover {
             text-decoration: underline;
-
           }
         }
       }
@@ -190,7 +173,6 @@ const changes = computed(() => ({
   .actions {
     display: flex;
     flex-direction: row;
-
     button {
       width: 100%;
       text-align: center;
@@ -198,12 +180,10 @@ const changes = computed(() => ({
       background-color: #37D33933;
       padding: 22px;
       transition: background 0.2s;
-
       &:hover {
         background-color: #37D339;
         color: #121212;
       }
-
       &:first-child {
         border-right: 1px solid #00FA00;
       }
@@ -215,26 +195,22 @@ const changes = computed(() => ({
     display: flex;
     flex-direction: column;
     gap: 28px;
-
     .prices,
     .stats {
       margin-left: 20px;
       font-size: 12px;
-      color: #FFFFFF;
+      color: white;
       display: grid;
-      grid-template-columns: repeat(3, auto);
       gap: 14px;
-
+      grid-template-columns: 1fr 1fr 1fr;
       .titles,
       .values {
         display: contents;
-
         img {
           width: 13px;
           height: 13px;
         }
       }
-
       .titles {
         .img-solana {
           display: flex;
@@ -252,17 +228,15 @@ const changes = computed(() => ({
       flex-direction: row;
       border-top: 1px solid #59596D;
       justify-content: space-between;
-      color: #FFFFFF;
+      color: white;
       opacity: 0.5;
       font-size: 11px;
-
       div {
         display: flex;
         flex-direction: column;
         gap: 8px;
         padding: 14px;
         align-items: center;
-
         &:not(:last-child) {
           border-right: 1px solid #59596D;
         }

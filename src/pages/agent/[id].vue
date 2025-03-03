@@ -71,6 +71,7 @@ onMounted(async () => {
   &> :nth-child(1) {
     max-width: 320px;
     flex: 1;
+    background-color: #212133;
   }
 
   &> :nth-child(2) {

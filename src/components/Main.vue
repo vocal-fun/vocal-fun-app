@@ -237,7 +237,7 @@ section.main {
       }
 
       h2 {
-        color: #FFFFFF;
+        color: white;
       }
     }
   }
