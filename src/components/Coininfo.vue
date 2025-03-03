@@ -28,46 +28,38 @@
     <div class="coin-info">
       <div class="prices">
         <div class="titles">
-          <p><span>$ </span>PRICE</p>
-          <p>PRICE</p>
-          <p>AGE</p>
+          <p v-for="(title, index) in pricesData.titles" :key="`title-${index}`" :class="{ 'img-solana': index === 1 }">
+            <span>
+              <NuxtImg v-if="index === 1" class="solana-icon" alt="Solana icon" format="webp" loading="lazy"
+                src="/img/solana.png" />
+            </span>{{ title }}
+          </p>
         </div>
         <div class="values">
-          <p>${{ agent.price }}</p>
-          <p>${{ agent.price }}</p>
-          <p>{{ agent.createdAt.toUpperCase() }} AGO</p>
+          <p v-for="(value, index) in pricesData.values" :key="`value-${index}`">
+            {{ value }}
+          </p>
         </div>
       </div>
       <div class="stats">
         <div class="titles">
-          <p>MKAT CAP</p>
-          <p>LIQUIDITY</p>
-          <p>HOLDERS</p>
+          <p v-for="(title, index) in statsData.titles" :key="`stat-title-${index}`">
+            {{ title }}
+          </p>
         </div>
         <div class="values">
-          <p>${{ formatShortNumber(agent.mcap) }}</p>
-          <p>${{ formatShortNumber(agent.liquidity) }}</p>
-          <p>{{ agent.holders }}</p>
+          <p v-for="(value, index) in statsData.values" :key="`stat-value-${index}`">
+            {{ value }}
+          </p>
         </div>
       </div>
       <div class="changes">
-        <div>
-          <p :style="{ color: changes.change5m.color }">{{ changes.change5m.formatted }}</p>
-          <p>5m</p>
-        </div>
-        <div>
-          <p :style="{ color: changes.change1h.color }">{{ changes.change1h.formatted }}</p>
-          <p>1h</p>
-        </div>
-        <div>
-          <p :style="{ color: changes.change24h.color }">{{ changes.change24h.formatted }}</p>
-          <p>24h</p>
-        </div>
-        <div>
-          <p :style="{ color: changes.change7d.color }">{{ changes.change7d.formatted }}</p>
-          <p>7d</p>
+        <div v-for="(item, index) in changesData" :key="index">
+          <p :style="{ color: item.color }">{{ item.formatted }}</p>
+          <p>{{ item.label }}</p>
         </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -79,6 +71,35 @@ import { formatShortNumber, formatContract } from '~/utils/formatters'
 import type { Agent } from '~/types';
 
 const props = defineProps<{ agent: Agent }>()
+
+const statsData = computed(() => ({
+  titles: ['MKAT CAP', 'LIQUIDITY', 'HOLDERS'],
+  values: [
+    `$${formatShortNumber(props.agent.mcap)}`,
+    `$${formatShortNumber(props.agent.liquidity)}`,
+    `${props.agent.holders}`
+  ]
+}));
+
+const pricesData = computed(() => ({
+  titles: [
+    '$ PRICE',
+    'PRICE',
+    'AGE'
+  ],
+  values: [
+    `$${props.agent.price}`,
+    `$${props.agent.price}`,
+    `${props.agent.createdAt.toUpperCase()} AGO`
+  ]
+}));
+
+const changesData = computed(() => [
+  { label: '5m', ...formatChange(props.agent.change5m) },
+  { label: '1h', ...formatChange(props.agent.change1h) },
+  { label: '24h', ...formatChange(props.agent.change24h) },
+  { label: '7d', ...formatChange(props.agent.change7d) },
+]);
 
 function formatChange(value: number): { formatted: string; color: string } {
   const absValue = Math.abs(value);
@@ -207,9 +228,19 @@ const changes = computed(() => ({
       .titles,
       .values {
         display: contents;
+
+        img {
+          width: 13px;
+          height: 13px;
+        }
       }
 
       .titles {
+        .img-solana {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
         p {
           opacity: 0.5;
         }

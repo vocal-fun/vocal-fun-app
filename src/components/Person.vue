@@ -50,7 +50,6 @@ const openModal = (state: OpenModalState = 'default') => {
 
 const handleBuy = () => {
   console.log("Buy button clicked!");
-  // Add your logic here, e.g., open a modal, send a request, etc.
 };
 
 </script>

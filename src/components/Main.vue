@@ -217,7 +217,6 @@ onBeforeMount(async () => {
 <style scoped lang="scss">
 section.main {
   margin: 2.3rem 5.5rem 0 5.5rem;
-
   .content-header {
     display: flex;
     flex-direction: row;
@@ -241,8 +240,6 @@ section.main {
         color: #FFFFFF;
       }
     }
-
-
   }
 
   .table-agents {
