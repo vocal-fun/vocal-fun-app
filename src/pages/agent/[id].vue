@@ -1,6 +1,6 @@
 <template>
   <div class="agent-info" v-if="agent">
-    <Coininfo  :agent="agent" />
+    <Coininfo :agent="agent" />
     <p>graphic</p>
     <p>buy</p>
   </div>
@@ -32,7 +32,14 @@ const defaultDetails = {
   holders: 0
 };
 
-
+onBeforeMount(async () => {
+  await agentsStore.getAgents()
+  const { id } = route.params;
+  const found = agentsStore.agents.find(agent => agent.id === id);
+  if (found) {
+    agent.value = { ...defaultDetails, ...found } as Agent;
+  }
+})
 
 onMounted(async () => {
   const { id } = route.params;
@@ -48,15 +55,24 @@ onMounted(async () => {
 .agent-info {
   display: flex;
   gap: 1rem;
-}
 
-.agent-info > *:nth-child(1),
-.agent-info > *:nth-child(3) { 
-  flex: 1; 
-}
+  &>* {
+    width: 100%;
+  }
 
-.agent-info > *:nth-child(2) {
-  flex: 2;
-}
+  &> :nth-child(1) {
+    max-width: 320px;
+    flex: 1;
+  }
 
+  &> :nth-child(2) {
+    max-width: 900px;
+    flex: 2;
+  }
+
+  &> :nth-child(3) {
+    max-width: 400px;
+    flex: 1;
+  }
+}
 </style>
