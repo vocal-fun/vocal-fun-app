@@ -1,5 +1,5 @@
 <template>
-  <div class="person shake-little" :class="{ disabled: isDisabled }" @click="openModal('default')">
+  <div class="person shake-little" :class="{ disabled: isDisabled }" @click="goToAgentPage">
     <div class="info">
       <div>
         <p>{{ name }}</p>
@@ -27,16 +27,20 @@ import { audioService } from '~/services/audio';
 import type { Agent, OpenModalState } from '~/types';
 import { formatShortNumber } from '~/utils/formatters'
 
-type PersonProps = Pick<Agent, 'name' | 'createdAt' | 'image' | 'rate' | 'tokenName' | 'mcap'> & { disabled: boolean };
+type PersonProps = Pick<Agent,'id' | 'name' | 'createdAt' | 'image' | 'rate' | 'tokenName' | 'mcap'> & { disabled: boolean };
 
 const props = defineProps<PersonProps>();
 const isDisabled = computed(() => props.disabled || !props.name);
-
+const router = useRouter()
 const emit = defineEmits<{
   'open-modal': [state: OpenModalState],
 }>();
 
 const playClickSound = () => audioService.click();
+function goToAgentPage() {
+  if (isDisabled.value) return
+  router.push(`/agent/${props.id}`)
+}
 
 const openModal = (state: OpenModalState = 'default') => {
   if (props.disabled) return;

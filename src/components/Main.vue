@@ -39,7 +39,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="person in filteredAgents" :key="person.id">
+            <tr v-for="person in filteredAgents" :key="person.id" @click="goToAgentPage(person)">
               <td class="table-avatar-column">
                 <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
                   placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
@@ -98,7 +98,7 @@ const agentsStore = useAgentsStore()
 const authStore = useAuthStore()
 const { handleConnectClick } = useWalletConnect()
 const route = useRoute()
-
+const router = useRouter()
 const user = computed(() => authStore.user)
 const modalLoading = ref(false)
 const isModalOpen = ref(false)
@@ -120,7 +120,10 @@ const columns = [
   { key: 'holders', label: 'Holders' }
 ]
 
-const agents = computed(() => agentsStore.agents)
+
+function goToAgentPage(person: Agent) {
+  router.push(`/agent/${person.id}`)
+}
 
 function setSort(field: string) {
   if (sortBy.value === field) {
@@ -327,6 +330,7 @@ section.main {
         border-bottom: 1px solid #333;
 
         &:hover {
+          cursor: pointer;
           background: #2b2b3b;
         }
 
