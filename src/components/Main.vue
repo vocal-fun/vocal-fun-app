@@ -15,7 +15,8 @@
       <div v-if="viewMode === 'grid'" class="agents-grid">
         <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
           :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap"
-          :createdAt="person.createdAt" :disabled="modalLoading" @open-modal="openModal(person, $event)" />
+          :createdAt="person.createdAt" :created-by="person.createdBy" :disabled="modalLoading"
+          @open-modal="openModal(person, $event)" />
       </div>
 
       <div v-else class="table-container">

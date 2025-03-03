@@ -19,11 +19,16 @@ export type Agent = {
   image: string;
   rate: number;
   createdAt: string;
+  createdBy: string;
   route: string;
   tokenName: string;
   mcap: number; 
   price: number;
+  contract: string;
+  liquidity: number;
   volume24h: number;
+  change5m: number;
+  change1h: number;
   change24h: number;
   change7d: number;
   holders: number;

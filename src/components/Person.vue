@@ -6,7 +6,7 @@
         <p>{{ tokenName }}</p>
       </div>
       <p><span class="dim">mcap </span>${{ formatShortNumber(mcap) }} </p>
-      <p class="dim">{{ createdAt }}</p>
+      <p class="dim">{{ createdAt }} ago by <span>{{ createdBy }}</span></p>
     </div>
 
     <div class="avatar-block">
@@ -27,7 +27,7 @@ import { audioService } from '~/services/audio';
 import type { Agent, OpenModalState } from '~/types';
 import { formatShortNumber } from '~/utils/formatters'
 
-type PersonProps = Pick<Agent,'id' | 'name' | 'createdAt' | 'image' | 'rate' | 'tokenName' | 'mcap'> & { disabled: boolean };
+type PersonProps = Pick<Agent, 'id' | 'name' | 'createdAt' | 'createdBy' | 'image' | 'rate' | 'tokenName' | 'mcap'> & { disabled: boolean };
 
 const props = defineProps<PersonProps>();
 const isDisabled = computed(() => props.disabled || !props.name);

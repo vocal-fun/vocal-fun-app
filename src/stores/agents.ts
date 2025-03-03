@@ -7,14 +7,19 @@ export const useAgentsStore = defineStore('agents', () => {
     Array.from({ length: 33 }, (_, index) => ({
       id: index.toString(),
       name: ``,
-      rate: 0,
       image: '',
-      createdAt: '3days ago by jitaru',
+      rate: 0,
+      createdAt: '3days',
+      createdBy: 'Jitaru',
       route: '',
       tokenName: 'token1',
-      price: Number((Math.random() * 100).toFixed(2)),
       mcap: Number((Math.random() * 10000).toFixed(2)),
+      price: Number((Math.random() * 100).toFixed(2)),
+      contract: '0x1cd9a56c8c2ea913c70319a44da75e99255aa46f',
+      liquidity: Number((Math.random() * 10000).toFixed(2)),
       volume24h: Number((Math.random() * 500).toFixed(2)),
+      change5m: Number((Math.random() * 10).toFixed(2)),
+      change1h: Number((Math.random() * 10).toFixed(2)),
       change24h: Number((Math.random() * 10).toFixed(2)),
       change7d: Number((Math.random() * 20).toFixed(2)),
       holders: Math.floor(Math.random() * 1000)
@@ -32,14 +37,19 @@ export const useAgentsStore = defineStore('agents', () => {
         return {
           id: _id,
           name,
-          rate,
           image,
-          createdAt: '3days ago by jitaru',
-          tokenName: 'token1',
+          rate,
+          createdAt: '3days',
+          createdBy: 'Jitaru',
           route: name.toLowerCase().replace(/\s/g, '-'),
-          price: Number((Math.random() * 100).toFixed(2)),
+          tokenName: 'token1',
           mcap: Number((Math.random() * 10000).toFixed(2)),
+          price: Number((Math.random() * 100).toFixed(2)),
+          contract: '0x1cd9a56c8c2ea913c70319a44da75e99255aa46f',
+          liquidity: Number((Math.random() * 10000).toFixed(2)),
           volume24h: Number((Math.random() * 500).toFixed(2)),
+          change5m: Number((Math.random() * 10).toFixed(2)),
+          change1h: Number((Math.random() * 10).toFixed(2)),
           change24h: Number((Math.random() * 10).toFixed(2)),
           change7d: Number((Math.random() * 20).toFixed(2)),
           holders: Math.floor(Math.random() * 1000)
@@ -59,7 +69,7 @@ export const useAgentsStore = defineStore('agents', () => {
       try {
         const data: PreviewDto = JSON.parse(previewCookie.value);
         if (data.audio) return data;
-      } catch (error) {}
+      } catch (error) { }
     }
     return null;
   }
@@ -67,7 +77,7 @@ export const useAgentsStore = defineStore('agents', () => {
   function writePreviewCache(agentId: string, data: PreviewDto): void {
     try {
       useLocalStorage(`preview-${agentId}`, JSON.stringify(data)); // Unlimited duration
-    } catch (error) {} // Might be full
+    } catch (error) { } // Might be full
   }
 
   /**

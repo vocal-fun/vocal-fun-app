@@ -1,6 +1,5 @@
 <template>
   <div class="agent-details-card">
-
     <div class="header-info">
       <div class="header">
         <NuxtImg class="avatar-img" :src="agent.image" alt="Agent Avatar" width="90" height="90" />
@@ -11,35 +10,32 @@
       </div>
       <div class="contract-info">
         <div class="info-row">
-          <p class="label">
-            CONTRACT</p>
-          <p class="value"> 0x1232 </p>
+          <p class="label">CONTRACT</p>
+          <p class="value">{{ formatContract(agent.contract) }}</p>
         </div>
         <div class="info-row">
           <p class="label">PRICE / MIN</p>
-          <p class="value">1 VOCAL</p>
+          <p class="value">{{ agent.rate }} VOCAL</p>
         </div>
       </div>
     </div>
 
-
     <div class="actions">
-      <button class="preview">
-        PREVIEW</button>
+      <button class="preview">PREVIEW</button>
       <button class="call">CALL</button>
     </div>
 
     <div class="coin-info">
       <div class="prices">
         <div class="titles">
-          <p><span>$</span>PRICE</p>
+          <p><span>$ </span>PRICE</p>
           <p>PRICE</p>
           <p>AGE</p>
         </div>
         <div class="values">
-          <p>$0.00004</p>
-          <p>$0.00065</p>
-          <p>40M ago</p>
+          <p>${{ agent.price }}</p>
+          <p>${{ agent.price }}</p>
+          <p>{{ agent.createdAt.toUpperCase() }} AGO</p>
         </div>
       </div>
       <div class="stats">
@@ -49,26 +45,26 @@
           <p>HOLDERS</p>
         </div>
         <div class="values">
-          <p>$185K</p>
-          <p>$20K</p>
-          <p>1.223</p>
+          <p>${{ formatShortNumber(agent.mcap) }}</p>
+          <p>${{ formatShortNumber(agent.liquidity) }}</p>
+          <p>{{ agent.holders }}</p>
         </div>
       </div>
       <div class="changes">
         <div>
-          <p>-10.49%</p>
+          <p :style="{ color: changes.change5m.color }">{{ changes.change5m.formatted }}</p>
           <p>5m</p>
         </div>
         <div>
-          <p>+5.39%</p>
+          <p :style="{ color: changes.change1h.color }">{{ changes.change1h.formatted }}</p>
           <p>1h</p>
         </div>
         <div>
-          <p>+146.39%</p>
+          <p :style="{ color: changes.change24h.color }">{{ changes.change24h.formatted }}</p>
           <p>24h</p>
         </div>
         <div>
-          <p>2,483%</p>
+          <p :style="{ color: changes.change7d.color }">{{ changes.change7d.formatted }}</p>
           <p>7d</p>
         </div>
       </div>
@@ -77,11 +73,28 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineProps, computed } from 'vue'
 import { NuxtImg } from '#components'
+import { formatShortNumber, formatContract } from '~/utils/formatters'
 import type { Agent } from '~/types';
 
-defineProps<{ agent: Agent }>()
+const props = defineProps<{ agent: Agent }>()
+
+function formatChange(value: number): { formatted: string; color: string } {
+  const absValue = Math.abs(value);
+  if (value >= 0) {
+    return { formatted: `+${absValue}%`, color: '#00FA00' };
+  } else {
+    return { formatted: `-${absValue}%`, color: '#FF886A' };
+  }
+}
+
+const changes = computed(() => ({
+  change5m: formatChange(props.agent.change5m),
+  change1h: formatChange(props.agent.change1h),
+  change24h: formatChange(props.agent.change24h),
+  change7d: formatChange(props.agent.change7d),
+}));
 </script>
 
 <style scoped lang="scss">
@@ -130,7 +143,6 @@ defineProps<{ agent: Agent }>()
       display: flex;
       flex-direction: column;
       margin-top: 12px;
-
       gap: 0.8rem;
 
       .info-row {
@@ -141,10 +153,18 @@ defineProps<{ agent: Agent }>()
           padding-bottom: 14px;
           border-bottom: 1px solid #37D339;
         }
+
+        .value {
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+
+          }
+        }
       }
     }
   }
-
 
   .actions {
     display: flex;
@@ -168,7 +188,6 @@ defineProps<{ agent: Agent }>()
       }
     }
   }
-
 
   .coin-info {
     margin-top: 20px;
@@ -202,7 +221,6 @@ defineProps<{ agent: Agent }>()
       flex-direction: row;
       border-top: 1px solid #59596D;
       justify-content: space-between;
-
       color: #FFFFFF;
       opacity: 0.5;
       font-size: 11px;
@@ -213,6 +231,7 @@ defineProps<{ agent: Agent }>()
         gap: 8px;
         padding: 14px;
         align-items: center;
+
         &:not(:last-child) {
           border-right: 1px solid #59596D;
         }

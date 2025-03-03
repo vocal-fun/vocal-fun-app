@@ -9,3 +9,8 @@ export function formatShortNumber(num: number): string {
     return num.toString();
   }
 }
+
+export function formatContract(contract: string): string {
+  if (!contract || contract.length < 10) return contract; // Return as is if too short
+  return `${contract.slice(0, 4)}...${contract.slice(-5)}`;
+}

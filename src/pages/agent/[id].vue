@@ -19,17 +19,24 @@ const agentsStore = useAgentsStore();
 const agent = ref<Agent | null>(null);
 
 const defaultDetails = {
-  contract: 'N/A',
-  pricePerMin: 0,
-  priceUsd: 0,
-  priceTez: 0,
-  age: 'Unknown',
-  liquidity: '$0',
+  id: '',
+  name: '',
+  image: '',
+  rate: 0,
+  createdAt: '',
+  createdBy: '',
+  route: '',
+  tokenName: '',
+  mcap: 0,
+  price: 0,
+  contract: '',
+  liquidity: 0,
+  volume24h: 0,
   change5m: 0,
   change1h: 0,
   change24h: 0,
   change7d: 0,
-  holders: 0
+  holders: 0,
 };
 
 onBeforeMount(async () => {
@@ -55,6 +62,7 @@ onMounted(async () => {
 .agent-info {
   display: flex;
   gap: 1rem;
+  
 
   &>* {
     width: 100%;
