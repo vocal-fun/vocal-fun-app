@@ -1,7 +1,7 @@
 <template>
   <div class="agent-info" v-if="agent">
     <Coininfo :agent="agent" />
-    <p>graphic</p>
+    <Graphic token="BONK"/>
     <p>buy</p>
   </div>
   <p v-else>Agent not found or still loading...</p>
@@ -12,6 +12,7 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAgentsStore } from '~/stores/agents';
 import Coininfo from '~/components/Coininfo.vue';
+import Graphic from '~/components/Graphic.vue';
 import type { Agent } from '~/types';
 
 const route = useRoute();
@@ -61,9 +62,6 @@ onMounted(async () => {
 <style scoped lang="scss">
 .agent-info {
   display: flex;
-  gap: 1rem;
-  
-
   &>* {
     width: 100%;
   }
