@@ -72,3 +72,8 @@ export type BuyOptionDto = {
 };
 
 export type OpenModalState = 'default' | 'preview' | 'call';
+
+export enum TypeGridTable  {
+  GRID = 'grid',
+  TABLE = 'table'
+}

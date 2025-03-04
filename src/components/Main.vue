@@ -10,9 +10,9 @@
 
     <div class="table-agents">
       <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
-        v-model:viewMode="viewMode" :showSort="viewMode === 'grid'" @toggle-watchlist="toggleWatchlist" />
+        v-model:viewMode="viewMode" :showSort="viewMode === TypeGridTable.GRID" @toggle-watchlist="toggleWatchlist" />
 
-      <div v-if="viewMode === 'grid'" class="agents-grid">
+      <div v-if="viewMode === TypeGridTable.GRID" class="agents-grid">
         <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
           :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap"
           :createdAt="person.createdAt" :created-by="person.createdBy" :disabled="modalLoading"
@@ -92,7 +92,7 @@ import Person from '~/components/Person.vue'
 import Modal from '~/components/Modal.vue'
 import CallModalContent from '~/components/CallModalContent.vue'
 import Toolbar from '~/components/Toolbar.vue'
-import type { Agent, OpenModalState } from '~/types'
+import { TypeGridTable, type Agent, type OpenModalState } from '~/types'
 
 const modalContent = useTemplateRef('modalContent')
 const agentsStore = useAgentsStore()
@@ -104,11 +104,9 @@ const user = computed(() => authStore.user)
 const modalLoading = ref(false)
 const isModalOpen = ref(false)
 const selectedPerson = ref<Agent | undefined>(undefined)
-
-
 const searchQuery = ref('')
 const showWatchlist = ref(false)
-const viewMode = ref<'grid' | 'table'>('grid')
+const viewMode = ref<TypeGridTable.GRID | TypeGridTable.TABLE>(TypeGridTable.GRID)
 const sortBy = ref('mcap')
 const sortDirection = ref<'asc' | 'desc'>('desc')
 

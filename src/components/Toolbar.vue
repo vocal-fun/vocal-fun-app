@@ -1,16 +1,16 @@
 <template>
   <div class="toolbar">
     <div class="view-toggle">
-      <button :class="{ active: viewMode === 'grid' }" @click="$emit('update:viewMode', 'grid')">
+      <button :class="{ active: viewMode === TypeGridTable.GRID }" @click="$emit('update:viewMode', TypeGridTable.GRID)">
         <NuxtImg class="grid" src="/img/grid.png" alt="Grid button" format="webp" sizes="48px" loading="lazy" />
       </button>
-      <button :class="{ active: viewMode === 'table' }" @click="$emit('update:viewMode', 'table')">
+      <button :class="{ active: viewMode === TypeGridTable.TABLE }" @click="$emit('update:viewMode', TypeGridTable.TABLE)">
         <NuxtImg class="table" src="/img/table.png" alt="Table button" format="webp" sizes="48px" loading="lazy" />
       </button>
     </div>
 
     <div class="divider" />
-    <div v-if="viewMode === 'grid'" class="sort">
+    <div v-if="viewMode === TypeGridTable.GRID" class="sort">
       <label>Sort by:</label>
       <div class="dropdown">
         <button class="dropdown-trigger" @click="toggleDropdown">
@@ -27,7 +27,7 @@
     </div>
 
     <p class="watchlist">Watchlist</p>
-    <p v-if="viewMode === 'table'" class="clips">My clips</p>
+    <p v-if="viewMode === TypeGridTable.TABLE" class="clips">My clips</p>
 
     <div class="search">
       <NuxtImg class="icon" src="/img/search.png" alt="Search Icon" format="webp" sizes="16px" loading="lazy" />
@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-
+import { TypeGridTable } from '~/types'
 const props = defineProps({
   searchQuery: {
     type: String,

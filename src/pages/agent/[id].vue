@@ -1,7 +1,7 @@
 <template>
   <div class="agent-info" v-if="agent">
     <Coininfo :agent="agent" />
-    <Trades token="BONK" />
+    <Trades token="BONK" :holders="agent.holders"/>
     <p>buy</p>
   </div>
   <p v-else>Agent not found or still loading...</p>
@@ -76,6 +76,7 @@ onMounted(async () => {
   &> :nth-child(2) {
     max-width: 900px;
     flex: 2;
+    border-inline: 1px solid #59596D;
   }
 
   &> :nth-child(3) {

@@ -1,9 +1,17 @@
 <template>
-	<div class="trades">
+	<div>
 		<Graphic :token="token" />
-		<div class="list">
-			<p>Holders</p>
-			<div class="transactions-table-container">
+		<div>
+			<div class="holders">
+				<p :class="{ selected: selectedTab === TypeOfTable.HOLDERS }" @click="selectedTab = TypeOfTable.HOLDERS">
+					Holders ({{ holders }})
+				</p>
+				<p :class="{ selected: selectedTab === TypeOfTable.TRADES }" @click="selectedTab = TypeOfTable.TRADES">
+					All trades
+				</p>
+			</div>
+
+			<div v-if="selectedTab === TypeOfTable.TRADES" class="transactions-table-container">
 				<table class="transactions-table">
 					<thead>
 						<tr>
@@ -14,21 +22,26 @@
 					</thead>
 					<tbody>
 						<tr v-for="(tx, index) in transactions" :key="index">
-							<td v-for="header in tableHeaders" :key="header.key">
-								{{ header.key === 'account' || header.key === 'transactionHash' ? formatContract(tx[header.key]) :
-									tx[header.key] }}
+							<td v-for="header in tableHeaders" :key="header.key"
+								:class="header.key === 'type' && tx[header.key] === TrxType.SELL ? 'sell-trx' : ''">
+								{{ header.key === 'account' || header.key === 'transactionHash'
+									? formatContract(tx[header.key])
+									: tx[header.key] }}
 							</td>
 						</tr>
 					</tbody>
-
 				</table>
+			</div>
+			<div v-else>
+				<p>list of holders</p>
 			</div>
 		</div>
 	</div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, defineProps } from 'vue'
+import { TrxType, TypeOfTable, type Transaction } from '~/types/transactions'
 import Graphic from './Graphic.vue'
 
 const props = defineProps({
@@ -36,8 +49,13 @@ const props = defineProps({
 		type: String,
 		required: true,
 	},
+	holders: {
+		type: Number,
+		required: true,
+	},
 })
 
+const selectedTab = ref<TypeOfTable.HOLDERS | TypeOfTable.TRADES>(TypeOfTable.TRADES)
 
 const tableHeaders = ref([
 	{ key: 'account', label: 'Account' },
@@ -48,9 +66,9 @@ const tableHeaders = ref([
 	{ key: 'transactionHash', label: 'Transaction #' },
 ])
 
-const baseTransaction = {
+const baseTransaction: Transaction = {
 	account: '0x1cd9a56c8c2ea913c70319a44da75e99255aa46f',
-	type: 'Sell',
+	type: TrxType.SELL,
 	sol: 0.841,
 	tokenAmount: 4242,
 	date: '10s ago',
@@ -59,19 +77,36 @@ const baseTransaction = {
 
 const transactions = ref(Array(6).fill(baseTransaction))
 
+const formatContract = (address: string) => {
+	return address.slice(0, 4) + '...' + address.slice(-4)
+}
 
 onMounted(() => {
-	// Here will get trxs from the api
+	// Here will get transactions from the API
 })
 </script>
 
 <style scoped lang="scss">
-.trades {
-	/* container styling */
-}
+.holders {
+	display: flex;
+	flex-direction: row;
+	gap: 24px;
+	padding: 20px 32px;
+	border-bottom: 1px solid #59596D;
+	color: #00FA00;
 
-.list {
-	margin-top: 1rem;
+	p {
+		opacity: 0.5;
+
+		&:hover {
+			opacity: 0.7;
+			cursor: pointer;
+		}
+
+		&.selected {
+			opacity: 1;
+		}
+	}
 }
 
 .transactions-table-container {
@@ -90,13 +125,8 @@ onMounted(() => {
 		padding: 20px 0px;
 
 		&:first-child {
-			padding-left: 30px;
+			padding-left: 32px;
 			text-align: left;
-
-			&:hover {
-				text-decoration: underline;
-			}
-
 		}
 
 		&:nth-child(2) {
@@ -117,6 +147,10 @@ onMounted(() => {
 		}
 	}
 
+	.sell-trx {
+		color: #FA6400;
+	}
+
 	td {
 
 		&:first-child,
@@ -125,7 +159,6 @@ onMounted(() => {
 				cursor: pointer;
 				text-decoration: underline;
 			}
-
 		}
 	}
 
