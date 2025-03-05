@@ -1,6 +1,6 @@
 <template>
   <div class="agent-info" v-if="agent">
-    <Coininfo :agent="agent" />
+    <AgentDetailsCard :agent="agent" />
     <Trades token="BONK" :holders="agent.holders" />
     <BuySell />
   </div>
@@ -11,9 +11,9 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAgentsStore } from '~/stores/agents';
-import Coininfo from '~/components/Coininfo.vue';
-import Trades from '~/components/Trades.vue';
-import BuySell from '~/components/BuySell.vue';
+import AgentDetailsCard from '~/components/AgentInfo/AgentDetailsCard/AgentDetailsCard.vue';
+import Trades from '~/components/AgentInfo/Trades.vue';
+import BuySell from '~/components/AgentInfo/BuySell.vue';
 import type { Agent } from '~/types';
 
 const route = useRoute();

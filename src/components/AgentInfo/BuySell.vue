@@ -33,7 +33,6 @@
 			</button>
 		</div>
 
-		<!-- Slippage -->
 		<div class="slippage">
 			<div @click="toggleSlippageOptions">
 				<NuxtImg class="slippage-img" src="/img/slippage.png" alt="Slippage Settings" format="webp" loading="lazy" />
@@ -53,7 +52,6 @@
 			</div>
 		</div>
 
-		<!-- Curve -->
 		<div class="curve">
 			<div class="title">
 				<p>BONDING CURVE</p>
