@@ -1,8 +1,8 @@
 <template>
   <div class="agent-info" v-if="agent">
     <Coininfo :agent="agent" />
-    <Trades token="BONK" :holders="agent.holders"/>
-    <p>buy</p>
+    <Trades token="BONK" :holders="agent.holders" />
+    <BuySell />
   </div>
   <p v-else>Agent not found or still loading...</p>
 </template>
@@ -13,6 +13,7 @@ import { useRoute } from 'vue-router';
 import { useAgentsStore } from '~/stores/agents';
 import Coininfo from '~/components/Coininfo.vue';
 import Trades from '~/components/Trades.vue';
+import BuySell from '~/components/BuySell.vue';
 import type { Agent } from '~/types';
 
 const route = useRoute();
@@ -69,19 +70,35 @@ onMounted(async () => {
 
   &> :nth-child(1) {
     max-width: 320px;
-    flex: 1;
     background-color: #212133;
   }
 
   &> :nth-child(2) {
-    max-width: 900px;
-    flex: 2;
     border-inline: 1px solid #59596D;
   }
 
   &> :nth-child(3) {
-    max-width: 400px;
-    flex: 1;
+    max-width: 400px
   }
+
+  @media (max-width: 1250px) {
+    &> :nth-child(1) {
+      max-width: 250px;
+      background-color: #212133;
+    }
+
+    &> :nth-child(3) {
+      max-width: 300px;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    flex-direction: column;
+
+    &> :nth-child(1) {
+      min-width: 100%
+    }
+  }
+
 }
 </style>

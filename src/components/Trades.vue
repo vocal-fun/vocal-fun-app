@@ -112,7 +112,6 @@ onMounted(() => {
 .transactions-table-container {
 	max-height: 240px;
 	overflow-y: auto;
-	scrollbar-width: 0px;
 }
 
 .transactions-table {
@@ -152,6 +151,8 @@ onMounted(() => {
 	}
 
 	td {
+		background-color: black;
+		color: #00FA00;
 
 		&:first-child,
 		&:last-child {
@@ -164,11 +165,6 @@ onMounted(() => {
 
 	th {
 		color: #8989AB;
-	}
-
-	td {
-		background-color: black;
-		color: #00FA00;
 	}
 
 	tr {

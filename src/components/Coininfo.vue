@@ -248,6 +248,7 @@ function formatChange(value: number): { formatted: string; color: string } {
       color: white;
       opacity: 0.5;
       font-size: 11px;
+      flex-wrap: wrap;
 
       div {
         display: flex;
