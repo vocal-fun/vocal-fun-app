@@ -33,7 +33,6 @@
 		<div class="slippage">
 			<div @click="toggleSlippageOptions">
 				<NuxtImg class="slippage-img" src="/img/slippage.png" alt="Slippage Settings" format="webp" loading="lazy" />
-				<!-- This <p> now conditionally displays the selected slippage -->
 				<p>{{ selectedSlippage !== null ? selectedSlippage + '%' : 'SLIPPAGE SETTINGS' }}</p>
 				<p class="slippage-arrow">></p>
 			</div>
@@ -53,17 +52,21 @@
 		<div class="curve">
 			<div class="title">
 				<p>BONDING CURVE</p>
-				<p>4%</p>
+				<p>{{ progressPercentage }}%</p>
 			</div>
-			<div class="progress">
-				<NuxtImg class="plane" src="/img/plane.png" alt="Plane Progress" />
+			<div class="progress-bar">
+				<div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
+				<NuxtImg class="plane" src="/img/plane.png" alt="Plane Progress"
+					:style="{ left: `calc(${progressPercentage}% - 15px)` }" />
 			</div>
-			<div class="description">
-				<p>
-					After graduating at $69,000 market cap, the token will take off to aerodrome
-				</p>
-				<NuxtImg class="aerodrome" src="/img/aerodrome.png" alt="Aerodrome" />
-			</div>
+			<p class="description">
+				After graduating at <span>$69,000 market cap,</span><br />
+				the token will take off to
+				<span class="inline-aero">
+					aerodrome
+					<NuxtImg class="aerodrome" src="/img/aerodrome.png" alt="Aerodrome" loading="lazy" />
+				</span>
+			</p>
 		</div>
 	</div>
 </template>
@@ -81,6 +84,7 @@ const selectAmount = (amount: string) => {
 // Slippage dropdown state and options
 const showSlippageOptions = ref(false)
 const slippageOptions = ref([0.1, 0.2, 0.5, 1, 2, 5])
+const progressPercentage = ref(4)
 const selectedSlippage = ref<number | null>(null)
 const customSlippage = ref<number | null>(null)
 
@@ -355,5 +359,74 @@ const setCustomSlippage = () => {
 			}
 		}
 	}
+
+	.curve {
+		display: flex;
+		flex-direction: column;
+		color: white;
+		margin-top: 24px;
+		margin-bottom: 22px;
+		border-bottom: 1px solid #59596D;
+
+		.title {
+			display: flex;
+			justify-content: space-between;
+
+			p {
+				&:last-child {
+					color: #00FA00;
+				}
+			}
+		}
+
+		.progress-bar {
+			position: relative;
+			width: 100%;
+			height: 43px;
+			background-color: #59596D80;
+			overflow: hidden;
+			margin-top: 10px;
+			margin-bottom: 20px;
+		}
+
+		.progress-fill {
+			position: absolute;
+			height: 100%;
+			background-color: #00FA00;
+			transition: width 0.5s ease-in-out;
+		}
+
+		.plane {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 45px;
+			height: 32px;
+			margin-left: 10px;
+		}
+
+		.description {
+			color: rgba(255, 255, 255, 0.5);
+			padding-bottom: 18px;
+
+			span {
+				color: white;
+			}
+
+			.inline-aero {
+				white-space: nowrap;
+			}
+
+			.aerodrome {
+				display: inline-block;
+				width: 24px;
+				height: 24px;
+				vertical-align: middle;
+				margin-left: 6px;
+			}
+		}
+	}
+
+
 }
 </style>
