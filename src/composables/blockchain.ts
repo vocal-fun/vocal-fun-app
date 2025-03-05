@@ -37,6 +37,12 @@ export function useBlockchain() {
     return signer;
   }
 
+  const getNativeBalance = async (address: string): Promise<bigint> => {
+    const provider = getProvider();
+    // getBalance returns a BigInt
+    return provider.getBalance(address);
+  };
+
   const signMessage = async (message: string): Promise<string> => {
     try {
       const provider = getProvider();
@@ -71,5 +77,6 @@ export function useBlockchain() {
     getProvider,
     signMessage,
     transfer,
+    getNativeBalance,
   };
 }

@@ -11,8 +11,8 @@
 		<div class="balance-select">
 			<div class="balance-user">
 				<div class="amount">
-					<input type="number" placeholder="0.00" />
-					<p>Balance 0.0053 ETH</p>
+					<input type="number" v-model="inputValue" placeholder="0.00" />
+					<p>Balance {{ userBalance }} ETH</p>
 				</div>
 				<div class="token">
 					<p>ETH</p>
@@ -28,8 +28,12 @@
 		</div>
 		<div class="action">
 			<EQ class="equalizer" />
-			<button>BUY</button>
+			<button @click="selectedTab === 'BUY' ? buy() : sellFunction()">
+				{{ selectedTab === 'BUY' ? 'BUY' : 'SELL' }}
+			</button>
 		</div>
+
+		<!-- Slippage -->
 		<div class="slippage">
 			<div @click="toggleSlippageOptions">
 				<NuxtImg class="slippage-img" src="/img/slippage.png" alt="Slippage Settings" format="webp" loading="lazy" />
@@ -44,11 +48,12 @@
 				</ul>
 				<div class="custom-slippage">
 					<input type="number" v-model.number="customSlippage" placeholder="Custom" @input="validateCustomSlippage" />
-
 					<button @click="setCustomSlippage">Set</button>
 				</div>
 			</div>
 		</div>
+
+		<!-- Curve -->
 		<div class="curve">
 			<div class="title">
 				<p>BONDING CURVE</p>
@@ -72,49 +77,90 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { ethers } from 'ethers'
+import { useBlockchain } from '~/composables/blockchain'
+import { useWalletConnect } from '~/composables/useWalletConnect'
 
 const selectedTab = ref('BUY')
+const { getNativeBalance } = useBlockchain()
+const { accountAddress, isConnected } = useWalletConnect()
 const amounts = ref(['0.01', '0.02', '0.1', '0.2', 'MAX'])
+const inputValue = ref('0.0')
+const userBalance = ref('0.0')
 
-const selectAmount = (amount: string) => {
-	console.log("Selected amount:", amount)
+async function fetchBalance() {
+	try {
+		if (!isConnected.value || !accountAddress.value) {
+			userBalance.value = '0.0'
+			return
+		}
+		const balanceBigInt = await getNativeBalance(accountAddress.value)
+		userBalance.value = ethers.formatEther(balanceBigInt)
+	} catch (error) {
+		console.error('Error fetching native balance:', error)
+	}
 }
 
-// Slippage dropdown state and options
+onMounted(() => {
+	fetchBalance()
+})
+
+watch([isConnected, accountAddress], () => {
+	fetchBalance()
+})
+
+function selectAmount(amount: string) {
+	const balanceNum = parseFloat(userBalance.value)
+
+	if (amount === 'MAX') {
+		inputValue.value = userBalance.value
+		return
+	}
+
+	const selectedNum = parseFloat(amount)
+	if (selectedNum > balanceNum) {
+		inputValue.value = userBalance.value
+	} else {
+		inputValue.value = amount
+	}
+}
+
+function buy() {
+	console.log('User wants to buy:', inputValue.value, 'ETH')
+}
+function sellFunction() {
+	console.log('User wants to sell:', inputValue.value, 'ETH')
+}
+
 const showSlippageOptions = ref(false)
 const slippageOptions = ref([0.1, 0.2, 0.5, 1, 2, 5])
 const progressPercentage = ref(4)
 const selectedSlippage = ref<number | null>(null)
 const customSlippage = ref<number | null>(null)
 
-const toggleSlippageOptions = () => {
+function toggleSlippageOptions() {
 	showSlippageOptions.value = !showSlippageOptions.value
 }
 
-const validateCustomSlippage = () => {
+function validateCustomSlippage() {
 	if (customSlippage.value !== null) {
-		if (customSlippage.value < 0) {
-			customSlippage.value = 0;
-		}
-		if (customSlippage.value > 50) {
-			customSlippage.value = 50;
-		}
+		if (customSlippage.value < 0) customSlippage.value = 0
+		if (customSlippage.value > 50) customSlippage.value = 50
 	}
-};
-
-
-const selectSlippage = (option: number) => {
-	selectedSlippage.value = option
-	showSlippageOptions.value = false
-	console.log("Selected slippage:", option)
 }
 
-const setCustomSlippage = () => {
+function selectSlippage(option: number) {
+	selectedSlippage.value = option
+	showSlippageOptions.value = false
+	console.log('Selected slippage:', option)
+}
+
+function setCustomSlippage() {
 	if (customSlippage.value !== null) {
 		selectedSlippage.value = customSlippage.value
 		showSlippageOptions.value = false
-		console.log("Selected custom slippage:", customSlippage.value)
+		console.log('Selected custom slippage:', customSlippage.value)
 	}
 }
 </script>

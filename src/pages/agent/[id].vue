@@ -95,7 +95,8 @@ onMounted(async () => {
   @media (max-width: 1100px) {
     flex-direction: column;
 
-    &> :nth-child(1) {
+    &> :nth-child(1),
+    &> :nth-child(3) {
       min-width: 100%
     }
   }
