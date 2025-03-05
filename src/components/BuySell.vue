@@ -31,9 +31,24 @@
 			<button>BUY</button>
 		</div>
 		<div class="slippage">
-			<NuxtImg class="slippage" src="/img/slippage.png" alt="Slippage Settings" format="webp" loading="lazy" />
-			<p>SLIPPAGE SETTINGS</p>
-			<NuxtImg class="arrow-down" src="/img/arrow-up.png" alt="Down arrow" />
+			<div @click="toggleSlippageOptions">
+				<NuxtImg class="slippage-img" src="/img/slippage.png" alt="Slippage Settings" format="webp" loading="lazy" />
+				<!-- This <p> now conditionally displays the selected slippage -->
+				<p>{{ selectedSlippage !== null ? selectedSlippage + '%' : 'SLIPPAGE SETTINGS' }}</p>
+				<p class="slippage-arrow">></p>
+			</div>
+			<div v-if="showSlippageOptions" class="slippage-options" @click.stop>
+				<ul>
+					<li v-for="option in slippageOptions" :key="option" @click.stop="selectSlippage(option)">
+						{{ option }}%
+					</li>
+				</ul>
+				<div class="custom-slippage">
+					<input type="number" v-model.number="customSlippage" placeholder="Custom" @input="validateCustomSlippage" />
+
+					<button @click="setCustomSlippage">Set</button>
+				</div>
+			</div>
 		</div>
 		<div class="curve">
 			<div class="title">
@@ -60,8 +75,43 @@ const selectedTab = ref('BUY')
 const amounts = ref(['0.01', '0.02', '0.1', '0.2', 'MAX'])
 
 const selectAmount = (amount: string) => {
-	// Handle the click action (e.g., updating a value or logging the selection)
 	console.log("Selected amount:", amount)
+}
+
+// Slippage dropdown state and options
+const showSlippageOptions = ref(false)
+const slippageOptions = ref([0.1, 0.2, 0.5, 1, 2, 5])
+const selectedSlippage = ref<number | null>(null)
+const customSlippage = ref<number | null>(null)
+
+const toggleSlippageOptions = () => {
+	showSlippageOptions.value = !showSlippageOptions.value
+}
+
+const validateCustomSlippage = () => {
+	if (customSlippage.value !== null) {
+		if (customSlippage.value < 0) {
+			customSlippage.value = 0;
+		}
+		if (customSlippage.value > 50) {
+			customSlippage.value = 50;
+		}
+	}
+};
+
+
+const selectSlippage = (option: number) => {
+	selectedSlippage.value = option
+	showSlippageOptions.value = false
+	console.log("Selected slippage:", option)
+}
+
+const setCustomSlippage = () => {
+	if (customSlippage.value !== null) {
+		selectedSlippage.value = customSlippage.value
+		showSlippageOptions.value = false
+		console.log("Selected custom slippage:", customSlippage.value)
+	}
 }
 </script>
 
@@ -97,7 +147,6 @@ const selectAmount = (amount: string) => {
 			}
 
 			&:not(.active):hover {
-				cursor: pointer;
 				background: #2c2c3d;
 			}
 		}
@@ -170,10 +219,12 @@ const selectAmount = (amount: string) => {
 			display: flex;
 			gap: 8px;
 			margin-top: 12px;
+
 			@media (max-width: 1250px) {
 				flex-wrap: wrap;
 			}
-			.select-amount-btn {
+
+			&-btn {
 				display: flex;
 				align-items: center;
 				font-size: 12px;
@@ -186,7 +237,6 @@ const selectAmount = (amount: string) => {
 				transition: background-color 0.3s;
 
 				&:hover {
-					cursor: pointer;
 					background-color: rgba(89, 89, 109, 0.2);
 				}
 
@@ -202,11 +252,107 @@ const selectAmount = (amount: string) => {
 		display: flex;
 		flex-direction: column;
 		flex-wrap: wrap;
+		margin-bottom: 20px;
 
 		.equalizer {
 			width: 100%;
 			overflow: hidden;
 			height: 40px;
+		}
+
+		button {
+			padding: 24px;
+			width: 100%;
+			color: #121212;
+			background-color: #00FA00;
+			text-align: center;
+
+			&:hover {
+				background-color: #37D339;
+			}
+		}
+	}
+
+	.slippage {
+		position: relative;
+		padding-bottom: 24px;
+		border-bottom: 1px solid #59596D;
+
+		div {
+			background: #59596D26;
+			border: 1px solid #59596D;
+			padding: 18px;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			color: white;
+			cursor: pointer;
+			transition: background 0.3s;
+
+			&:hover {
+				background: #73737326;
+			}
+
+			.slippage-img {
+				margin-right: 16px;
+				width: 24px;
+				height: 24px;
+			}
+
+			.slippage-arrow {
+				opacity: 0.5;
+				display: inline-block;
+				transform: rotate(90deg);
+				margin-left: auto;
+			}
+		}
+
+		.slippage-options {
+			padding: 10px;
+			margin-top: 5px;
+			display: flex;
+			flex-direction: column;
+
+			ul {
+				list-style: none;
+				padding: 0;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				width: 100%;
+
+				li {
+					padding: 4px;
+					border: 1px solid #59596D;
+					cursor: pointer;
+
+					&:hover {
+						background-color: rgba(89, 89, 109, 0.2);
+					}
+				}
+			}
+
+			.custom-slippage {
+				background-color: transparent;
+				border: unset;
+
+				input {
+					background-color: transparent;
+
+					&::-webkit-inner-spin-button {
+						-webkit-appearance: none;
+					}
+
+					border: 1px solid #59596D;
+					padding: 4px;
+					margin-right: 8px;
+					color: white;
+
+					&:focus-visible {
+						outline: unset;
+					}
+				}
+			}
 		}
 	}
 }
