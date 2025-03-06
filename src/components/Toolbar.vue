@@ -1,10 +1,12 @@
 <template>
   <div class="toolbar">
     <div class="view-toggle">
-      <button :class="{ active: viewMode === TypeGridTable.GRID }" @click="$emit('update:viewMode', TypeGridTable.GRID)">
+      <button :class="{ active: viewMode === TypeGridTable.GRID }"
+        @click="$emit('update:viewMode', TypeGridTable.GRID)">
         <NuxtImg class="grid" src="/img/grid.png" alt="Grid button" format="webp" sizes="48px" loading="lazy" />
       </button>
-      <button :class="{ active: viewMode === TypeGridTable.TABLE }" @click="$emit('update:viewMode', TypeGridTable.TABLE)">
+      <button :class="{ active: viewMode === TypeGridTable.TABLE }"
+        @click="$emit('update:viewMode', TypeGridTable.TABLE)">
         <NuxtImg class="table" src="/img/table.png" alt="Table button" format="webp" sizes="48px" loading="lazy" />
       </button>
     </div>
@@ -27,16 +29,10 @@
     </div>
 
     <p class="watchlist">Watchlist</p>
-    <p v-if="viewMode === TypeGridTable.TABLE" class="clips">My clips</p>
-
     <div class="search">
       <NuxtImg class="icon" src="/img/search.png" alt="Search Icon" format="webp" sizes="16px" loading="lazy" />
-<input
-  type="text"
-  :value="searchQuery"
-  @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)"
-  placeholder="Search"
-/>
+      <input type="text" :value="searchQuery"
+        @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)" placeholder="Search" />
 
     </div>
   </div>
@@ -140,6 +136,7 @@ const currentLabel = computed(() => {
     transition: opacity 0.2s ease-in-out;
     opacity: 0.5;
   }
+
   .active .grid,
   .active .table {
     opacity: 1;
@@ -153,8 +150,7 @@ const currentLabel = computed(() => {
   gap: 0.5rem;
 }
 
-.watchlist,
-.clips {
+.watchlist {
   opacity: 0.5;
 }
 
@@ -165,6 +161,7 @@ const currentLabel = computed(() => {
   margin-left: auto;
   border: 2px solid #59596D;
   max-width: 240px;
+
   input {
     background-color: transparent;
     box-sizing: border-box;
@@ -246,11 +243,20 @@ const currentLabel = computed(() => {
   font-weight: bold;
 }
 
-@media (max-width: 900px) {
+
+@media (max-width: 1048px) {
+  .divider {
+    display: none;
+  }
+
   .toolbar {
-    padding: 8px 12px;
+    padding: 20px 24px;
     gap: 1rem;
   }
+  .watchlist {
+    margin-left: auto;
+  }
+
   .view-toggle {
     button {
       .grid,
@@ -260,6 +266,7 @@ const currentLabel = computed(() => {
       }
     }
   }
+
   .search {
     max-width: unset;
     width: 100%;
@@ -271,15 +278,16 @@ const currentLabel = computed(() => {
     flex-direction: column;
     align-items: stretch;
   }
+
   .view-toggle,
   .sort,
   .search,
-  .watchlist,
-  .clips {
+  .watchlist {
     width: 100%;
     text-align: left;
     margin-bottom: 0.5rem;
   }
+
   .divider {
     display: none;
   }

@@ -41,7 +41,7 @@
 
           <tbody>
             <tr v-for="person in filteredAgents" :key="person.id" @click="goToAgentPage(person)">
-              <td class="table-avatar-column">
+              <td class="table-avatar-column" data-label="Vocal agent">
                 <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
                   placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
                   :alt="person.name" />
@@ -50,23 +50,25 @@
                   <p class="token-name">${{ person.tokenName }}</p>
                 </div>
               </td>
-              <td>${{ person.price }}</td>
-              <td>${{ formatShortNumber(person.mcap) }}</td>
-              <td>${{ person.volume24h }}</td>
-              <td :class="{ negative: person.change24h < 0 }">
+              <td data-label="Price">${{ person.price }}</td>
+              <td data-label="Mcap">${{ formatShortNumber(person.mcap) }}</td>
+              <td data-label="24h vol.">${{ person.volume24h }}</td>
+              <td data-label="24h %" :class="{ negative: person.change24h < 0 }">
                 {{ person.change24h > 0 ? `+${person.change24h}` : person.change24h }}%
               </td>
-              <td :class="{ negative: person.change7d < 0 }">
+              <td data-label="7d %" :class="{ negative: person.change7d < 0 }">
                 {{ person.change7d > 0 ? `+${person.change7d}` : person.change7d }}%
               </td>
-              <td>{{ person.holders }}</td>
-              <td class="actions-buttons">
-                <button @click="openModal(person, 'preview')" class="preview-btn">Preview</button>
-                <button @click="openModal(person, 'call')" class="call-btn">Call</button>
+              <td data-label="Holders">{{ person.holders }}</td>
+              <td data-label="Actions" class="actions-buttons">
+                <button @click.stop="openModal(person, 'preview')" class="preview-btn">Preview</button>
+                <button @click.stop="openModal(person, 'call')" class="call-btn">Call</button>
                 <button class="buy-btn">Buy</button>
               </td>
             </tr>
           </tbody>
+
+
         </table>
       </div>
     </div>
@@ -215,6 +217,7 @@ onBeforeMount(async () => {
 <style scoped lang="scss">
 section.main {
   margin: 2.3rem 5.5rem 0 5.5rem;
+
   .content-header {
     display: flex;
     flex-direction: row;
@@ -271,7 +274,7 @@ section.main {
 
   .agents-table {
     width: 100%;
-    min-width: 1200px;
+    min-width: 1000px;
     border-collapse: collapse;
     background: #161622;
     border-top: 2px solid #59596d;
@@ -331,7 +334,7 @@ section.main {
         }
 
         td {
-          padding: 0.75rem 1rem;
+          padding: 4px 8px;
         }
       }
     }
@@ -410,38 +413,103 @@ section.main {
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   section.main {
-    margin: 0.75rem 1.25px 1.25px 1.25px;
+    margin: 2rem;
 
-    .content-header {
-      flex-direction: column;
-      align-items: center;
+    .agents-table {
+      min-width: 900px;
+    }
+  }
+}
+
+@media (max-width: 1048px) {
+  section.main .agents-table {
+    min-width: unset;
+    border-top: unset;
+  }
+
+  .table-container {
+    background-color: black;
+  }
+
+  .agents-table {
+    display: block;
+    border-collapse: separate;
+
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: block;
+    }
+
+    tr {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-areas:
+        "col1 col1 col1 col1"
+        "col2 col3 col4 col4"
+        "col5 col6 col7 col7"
+        "col8 col8 col8 col8";
+      padding: 1rem;
       gap: 1rem;
+      background: black;
+    }
 
-      h2 {
-        text-align: center;
-      }
+    td {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 0.5rem;
+      border: unset;
+    }
 
-      .equalizer {
+    td[data-label]:not(:nth-child(1)):not(:nth-child(8))::before {
+      content: attr(data-label);
+      display: block;
+      font-weight: bold;
+      color: #8989AB;
+      margin-bottom: 4px;
+    }
+
+    td:nth-child(1) {
+      grid-area: col1;
+    }
+
+    td:nth-child(8) {
+      grid-area: col8;
+      flex-direction: row;
+
+      button {
         width: 100%;
-        display: flex;
-        justify-content: center;
       }
     }
   }
 }
 
+@media (max-width: 768px) {
+  section.main {
+    margin: 0;
+  }
+}
 
 @media (max-width: 500px) {
   section.main {
     .equalizer {
       height: 80px;
+      width: unset;
     }
 
-    .agents-grid,
-    .table-container {
+    .agents-grid {
       padding: 0.75rem;
+    }
+
+    .content-header {
+      flex-direction: column;
+      text-align: center;
     }
   }
 }

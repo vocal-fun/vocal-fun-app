@@ -30,6 +30,7 @@ defineProps<{ selectedTab: string }>()
 
 		&.active {
 			background: linear-gradient(348.34deg, #00fa00 -14.85%, rgba(0, 250, 0, 0) 93.01%);
+			border-bottom: 1px solid #00FA00;
 		}
 
 		&:not(.active):hover {

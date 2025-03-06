@@ -7,7 +7,6 @@
 				<p class="token">${{ agent.tokenName }}</p>
 			</div>
 		</div>
-
 		<div class="contract-info">
 			<div class="info-row">
 				<p class="label">CONTRACT</p>
@@ -18,9 +17,7 @@
 				<p class="value">{{ agent.rate }} VOCAL</p>
 			</div>
 		</div>
-
 		<div class="actions">
-
 			<button @click="openModal('preview')" class="preview">PREVIEW</button>
 			<button @click="openModal('call')" class="call">CALL</button>
 		</div>
