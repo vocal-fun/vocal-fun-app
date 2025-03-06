@@ -1,0 +1,171 @@
+<template>
+	<div class="slippage">
+		<div @click="toggleOptions">
+			<NuxtImg class="slippage-img" src="/img/slippage.png" alt="Slippage Settings" format="webp" loading="lazy" />
+			<p>{{ selectedSlippage !== null ? selectedSlippage + '%' : 'SLIPPAGE SETTINGS' }}</p>
+			<p class="slippage-arrow">></p>
+		</div>
+		<div v-if="showOptions" class="slippage-options" @click.stop>
+			<ul>
+				<li v-for="option in slippageOptions" :key="option" @click.stop="selectOption(option)">
+					{{ option }}%
+				</li>
+			</ul>
+			<div class="custom-slippage">
+				<input type="number" v-model.number="customValue" placeholder="Custom" @input="validateCustom" />
+				<button @click="setCustom">Set</button>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const showOptions = ref(false)
+const slippageOptions = ref([0.1, 0.2, 0.5, 1, 2, 5])
+const selectedSlippage = ref<number | null>(null)
+const customValue = ref<number | null>(null)
+
+function toggleOptions() {
+	showOptions.value = !showOptions.value
+}
+
+function selectOption(option: number) {
+	selectedSlippage.value = option
+	showOptions.value = false
+	console.log('Selected slippage:', option)
+}
+
+function validateCustom() {
+	if (customValue.value !== null) {
+		if (customValue.value < 0) customValue.value = 0
+		if (customValue.value > 50) customValue.value = 50
+	}
+}
+
+function setCustom() {
+	if (customValue.value !== null) {
+		selectedSlippage.value = customValue.value
+		showOptions.value = false
+		console.log('Selected custom slippage:', customValue.value)
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.slippage {
+	position: relative;
+	border-bottom: 1px solid #59596d;
+
+	div {
+		background: #59596d26;
+		border: 1px solid #59596d;
+		padding: 18px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		color: white;
+		cursor: pointer;
+		transition: background 0.3s;
+
+		&:hover {
+			background: #73737326;
+		}
+
+		.slippage-img {
+			margin-right: 16px;
+			width: 24px;
+			height: 24px;
+		}
+
+		.slippage-arrow {
+			opacity: 0.5;
+			display: inline-block;
+			transform: rotate(90deg);
+			margin-left: auto;
+		}
+	}
+
+	.slippage-options {
+		padding: 10px;
+		margin-top: 5px;
+		display: flex;
+		flex-direction: column;
+
+		ul {
+			list-style: none;
+			padding: 0;
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			width: 100%;
+
+			li {
+				padding: 4px;
+				border: 1px solid #59596d;
+				cursor: pointer;
+
+				&:hover {
+					background-color: rgba(89, 89, 109, 0.2);
+				}
+			}
+		}
+
+		.custom-slippage {
+			background-color: transparent;
+			border: unset;
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+
+			input {
+				background-color: transparent;
+				border: 1px solid #59596d;
+				padding: 4px;
+				color: white;
+
+				&::-webkit-inner-spin-button {
+					-webkit-appearance: none;
+				}
+
+				&:focus-visible {
+					outline: unset;
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: 1100px) {
+	.slippage {
+		.slippage-options {
+			ul {
+				li {
+					padding: 12px;
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	.slippage {
+		.slippage-options {
+			ul {
+				flex-wrap: wrap;
+				li {
+					padding: 4px;
+				}
+			}
+
+			.custom-slippage {
+				input {
+					width: 100%;
+				}
+			}
+		}
+	}
+
+}
+</style>

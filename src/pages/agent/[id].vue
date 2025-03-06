@@ -13,7 +13,7 @@ import { useRoute } from 'vue-router';
 import { useAgentsStore } from '~/stores/agents';
 import AgentDetailsCard from '~/components/AgentInfo/AgentDetailsCard/AgentDetailsCard.vue';
 import Trades from '~/components/AgentInfo/Trades.vue';
-import BuySell from '~/components/AgentInfo/BuySell.vue';
+import BuySell from '~/components/AgentInfo/BuySell/BuySell.vue';
 import type { Agent } from '~/types';
 
 const route = useRoute();
