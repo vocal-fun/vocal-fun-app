@@ -7,6 +7,7 @@
 				<p class="token">${{ agent.tokenName }}</p>
 			</div>
 		</div>
+
 		<div class="contract-info">
 			<div class="info-row">
 				<p class="label">CONTRACT</p>
@@ -17,42 +18,73 @@
 				<p class="value">{{ agent.rate }} VOCAL</p>
 			</div>
 		</div>
+
 		<div class="actions">
-			<!-- <button @click="openModal(agent, 'preview')" class="preview">PREVIEW</button>
-			<button @click="openModal(agent, 'call')" class="call">CALL</button> -->
-			<button class="preview">PREVIEW</button>
-			<button class="call">CALL</button>
+
+			<button @click="openModal('preview')" class="preview">PREVIEW</button>
+			<button @click="openModal('call')" class="call">CALL</button>
 		</div>
 	</div>
+
+	<Modal :isOpen="isModalOpen" @close="closeModal">
+		<ClientOnly>
+			<CallModalContent ref="modalContent" :person="agent" :modalType="modalType" @close="closeModal" />
+		</ClientOnly>
+	</Modal>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineProps, ref, computed } from 'vue'
+import { useAuthStore } from '~/stores/auth'
 import { NuxtImg } from '#components'
 import { formatContract } from '~/utils/formatters'
 import type { Agent } from '~/types'
+import Modal from '~/components/Modal.vue'
+import CallModalContent from '~/components/CallModalContent.vue'
+import { useWalletConnect } from '~/composables/useWalletConnect'
 
-const props = defineProps<{ agent: Agent }>()
+defineProps<{ agent: Agent }>()
+const isModalOpen = ref(false)
+const modalType = ref<'preview' | 'call' | 'default'>('default')
+const modalLoading = ref(false)
+const modalContent = ref<InstanceType<typeof CallModalContent> | null>(null)
+const authStore = useAuthStore()
+const user = computed(() => authStore.user)
+const { handleConnectClick } = useWalletConnect()
+
+async function openModal(type: 'preview' | 'call' | 'default') {
+	if (type === 'call' && !user.value) {
+		handleConnectClick()
+		return
+	}
+	modalLoading.value = true
+	modalType.value = type
+	isModalOpen.value = true
+	await modalContent.value?.onOpen(type)
+	modalLoading.value = false
+}
+
+function closeModal() {
+	isModalOpen.value = false
+	modalContent.value?.onClose?.()
+}
 </script>
 
 <style scoped lang="scss">
 .header-info {
 	background: linear-gradient(180deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
-
 	.header {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
 		padding: 24px 18px 22px;
 		border-bottom: 1px solid #37D339;
-
 		.avatar-img {
 			border-radius: 50%;
 			object-fit: cover;
 			width: 74px;
 			height: 74px;
 		}
-
 		.header-text {
 			display: flex;
 			flex-direction: column;
@@ -73,30 +105,24 @@ const props = defineProps<{ agent: Agent }>()
 		flex-direction: column;
 		margin-top: 12px;
 		gap: 0.8rem;
-
 		.info-row {
 			display: flex;
 			justify-content: space-between;
-
 			&:first-child {
 				padding: 0px 14px 16px 14px;
 				border-bottom: 1px solid #37D339;
 			}
-
 			&:last-child {
 				padding: 0px 14px 0px 14px;
 			}
-
 			.value {
 				cursor: pointer;
-
 				&:hover {
 					text-decoration: underline;
 				}
 			}
 		}
 	}
-
 	.actions {
 		display: flex;
 		flex-direction: row;
@@ -116,7 +142,7 @@ const props = defineProps<{ agent: Agent }>()
 				color: #121212;
 			}
 
-			&:first-child {
+			&.preview {
 				border-right: 1px solid #00FA00;
 			}
 		}
