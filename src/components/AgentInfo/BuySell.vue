@@ -180,10 +180,6 @@ function setCustomSlippage() {
 
 	>*:not(:first-child) {
 		padding: 0px 24px;
-
-		@media (max-width: 1250px) {
-			padding: 0 12px;
-		}
 	}
 
 	.buttons {
@@ -224,10 +220,6 @@ function setCustomSlippage() {
 			background-color: #59596D26;
 			border: 1px solid #59596D;
 
-			@media (max-width: 1100px) {
-				padding: 10px;
-			}
-
 			.amount {
 				display: flex;
 				flex-direction: column;
@@ -237,10 +229,6 @@ function setCustomSlippage() {
 				font-size: 10px;
 				border-right: 1px solid #59596D;
 				max-width: 220px;
-
-				@media (max-width: 1250px) {
-					max-width: 135px;
-				}
 
 				input {
 					background-color: transparent;
@@ -270,10 +258,6 @@ function setCustomSlippage() {
 				align-items: center;
 				margin-left: 22px;
 
-				@media (max-width: 1100px) {
-					margin-left: auto;
-				}
-
 				.eth {
 					width: 24px;
 					height: 24px;
@@ -285,18 +269,6 @@ function setCustomSlippage() {
 			display: flex;
 			gap: 8px;
 			margin-top: 12px;
-
-			@media (max-width: 1250px) {
-				flex-wrap: wrap;
-			}
-
-			@media (max-width: 1100px) {
-				flex-wrap: unset;
-			}
-
-			@media (max-width: 480px) {
-				flex-wrap: wrap;
-			}
 
 			&-btn {
 				display: flex;
@@ -318,10 +290,6 @@ function setCustomSlippage() {
 					width: 12px;
 					height: 12px;
 				}
-
-				@media (max-width: 1100px) {
-					width: 100%;
-				}
 			}
 		}
 	}
@@ -340,11 +308,6 @@ function setCustomSlippage() {
 
 		button {
 			padding: 24px;
-
-			@media (max-width: 1100px) {
-				padding: 12px;
-			}
-
 			width: 100%;
 			color: #121212;
 			background-color: #00FA00;
@@ -404,10 +367,6 @@ function setCustomSlippage() {
 				justify-content: space-between;
 				width: 100%;
 
-				@media (max-width: 480px) {
-					flex-wrap: wrap;
-				}
-
 				li {
 					padding: 4px;
 					border: 1px solid #59596D;
@@ -428,21 +387,16 @@ function setCustomSlippage() {
 
 				input {
 					background-color: transparent;
+					border: 1px solid #59596D;
+					padding: 4px;
+					color: white;
 
 					&::-webkit-inner-spin-button {
 						-webkit-appearance: none;
 					}
 
-					border: 1px solid #59596D;
-					padding: 4px;
-					color: white;
-
 					&:focus-visible {
 						outline: unset;
-					}
-
-					@media (max-width: 480px) {
-						width: 100%;
 					}
 				}
 			}
@@ -512,6 +466,75 @@ function setCustomSlippage() {
 				height: 24px;
 				vertical-align: middle;
 				margin-left: 6px;
+			}
+		}
+	}
+}
+
+@media (max-width: 1250px) {
+	.buy-sell-tabs {
+		>*:not(:first-child) {
+			padding: 0 12px;
+		}
+
+		.balance-select {
+			.balance-user {
+				.amount {
+					max-width: 135px;
+				}
+			}
+		}
+
+		.select-amount {
+			flex-wrap: wrap;
+		}
+	}
+}
+
+@media (max-width: 1100px) {
+	.buy-sell-tabs {
+		.balance-select {
+			.balance-user {
+				padding: 10px;
+			}
+
+			.token {
+				margin-left: auto;
+			}
+		}
+
+		.select-amount {
+			flex-wrap: unset;
+			&-btn {
+				width: 100%;
+			}
+		}
+
+		.action {
+			button {
+				padding: 12px;
+			}
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	.buy-sell-tabs {
+		.select-amount {
+			flex-wrap: wrap;
+		}
+
+		.slippage {
+			.slippage-options {
+				ul {
+					flex-wrap: wrap;
+				}
+
+				.custom-slippage {
+					input {
+						width: 100%;
+					}
+				}
 			}
 		}
 	}
