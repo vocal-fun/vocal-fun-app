@@ -27,7 +27,7 @@
 			</div>
 		</div>
 		<div class="action">
-			<EQ class="equalizer" />
+			<EQ class="equalizer" :repeatTimes="3" />
 			<button @click="selectedTab === 'BUY' ? buy() : sellFunction()">
 				{{ selectedTab === 'BUY' ? 'BUY' : 'SELL' }}
 			</button>
@@ -86,6 +86,16 @@ const { accountAddress, isConnected } = useWalletConnect()
 const amounts = ref(['0.01', '0.02', '0.1', '0.2', 'MAX'])
 const inputValue = ref('0.0')
 const userBalance = ref('0.0')
+// const shouldRepeatTimes = ref(1) // default 1
+
+// function checkScreenWidth() {
+// 	if (window.innerWidth < 1100) {
+// 		shouldRepeatTimes.value = 3
+// 	} else {
+// 		// default is 1 or no prop
+// 		shouldRepeatTimes.value = 1
+// 	}
+// }
 
 async function fetchBalance() {
 	try {
@@ -214,6 +224,10 @@ function setCustomSlippage() {
 			background-color: #59596D26;
 			border: 1px solid #59596D;
 
+			@media (max-width: 1100px) {
+				padding: 10px;
+			}
+
 			.amount {
 				display: flex;
 				flex-direction: column;
@@ -256,6 +270,10 @@ function setCustomSlippage() {
 				align-items: center;
 				margin-left: 22px;
 
+				@media (max-width: 1100px) {
+					margin-left: auto;
+				}
+
 				.eth {
 					width: 24px;
 					height: 24px;
@@ -269,6 +287,14 @@ function setCustomSlippage() {
 			margin-top: 12px;
 
 			@media (max-width: 1250px) {
+				flex-wrap: wrap;
+			}
+
+			@media (max-width: 1100px) {
+				flex-wrap: unset;
+			}
+
+			@media (max-width: 480px) {
 				flex-wrap: wrap;
 			}
 
@@ -292,6 +318,10 @@ function setCustomSlippage() {
 					width: 12px;
 					height: 12px;
 				}
+
+				@media (max-width: 1100px) {
+					width: 100%;
+				}
 			}
 		}
 	}
@@ -302,14 +332,19 @@ function setCustomSlippage() {
 		flex-wrap: wrap;
 		margin-bottom: 20px;
 
-		.equalizer {
+		& :deep(.equalizer) {
 			width: 100%;
-			overflow: hidden;
 			height: 40px;
+			overflow: hidden;
 		}
 
 		button {
 			padding: 24px;
+
+			@media (max-width: 1100px) {
+				padding: 12px;
+			}
+
 			width: 100%;
 			color: #121212;
 			background-color: #00FA00;
@@ -369,6 +404,10 @@ function setCustomSlippage() {
 				justify-content: space-between;
 				width: 100%;
 
+				@media (max-width: 480px) {
+					flex-wrap: wrap;
+				}
+
 				li {
 					padding: 4px;
 					border: 1px solid #59596D;
@@ -383,6 +422,9 @@ function setCustomSlippage() {
 			.custom-slippage {
 				background-color: transparent;
 				border: unset;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
 
 				input {
 					background-color: transparent;
@@ -393,11 +435,14 @@ function setCustomSlippage() {
 
 					border: 1px solid #59596D;
 					padding: 4px;
-					margin-right: 8px;
 					color: white;
 
 					&:focus-visible {
 						outline: unset;
+					}
+
+					@media (max-width: 480px) {
+						width: 100%;
 					}
 				}
 			}
@@ -470,7 +515,5 @@ function setCustomSlippage() {
 			}
 		}
 	}
-
-
 }
 </style>

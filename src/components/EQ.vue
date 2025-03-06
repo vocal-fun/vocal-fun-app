@@ -1,24 +1,21 @@
 <template>
   <div class="equalizer">
-    <div v-for="(item, index) in eqData" :key="index" :class="['row', 'row-' + ((index % 7) +1)]">
+    <div v-for="(item, index) in repeatedEqData" :key="index" :class="['row', 'row-' + ((index % 7) + 1)]">
       <div class="end-bar"></div>
-      <div
-        v-for="blockItemNumber in reversedNumbers(item.quantity)"
-        :key="'tone-' + blockItemNumber"
-        :class="['block', 'tone-' + blockItemNumber]"
-      >
-      </div>
+      <div v-for="blockItemNumber in reversedNumbers(item.quantity)" :key="'tone-' + blockItemNumber"
+        :class="['block', 'tone-' + blockItemNumber]" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed, defineProps } from 'vue'
 
-const reversedNumbers = (num: number) => {
-  return Array.from({ length: num }, (_, i) => num - i);
-}
+const props = defineProps<{
+  repeatTimes?: number
+}>()
 
-const eqData = [
+const baseEqData = [
   { quantity: 4, delay: 1 },
   { quantity: 6, delay: 1 },
   { quantity: 7, delay: 1 },
@@ -38,8 +35,21 @@ const eqData = [
   { quantity: 4, delay: 1 },
   { quantity: 6, delay: 1 },
   { quantity: 7, delay: 1 },
-  { quantity: 6, delay: 1 }
+  { quantity: 6, delay: 1 },
 ]
+
+const repeatedEqData = computed(() => {
+  const times = props.repeatTimes ?? 1
+  const out = []
+  for (let i = 0; i < times; i++) {
+    out.push(...baseEqData)
+  }
+  return out
+})
+
+function reversedNumbers(num: number) {
+  return Array.from({ length: num }, (_, i) => num - i)
+}
 </script>
 
 <style scoped lang="scss">
@@ -49,9 +59,11 @@ const eqData = [
   0% {
     margin-bottom: math.random(20)+px;
   }
+
   50% {
     margin-bottom: math.random(20)+px;
   }
+
   100% {
     margin-bottom: math.random(20)+px;
   }
@@ -61,6 +73,7 @@ const eqData = [
   0% {
     height: 10px;
   }
+
   50% {
     height: 25px;
   }
@@ -129,6 +142,7 @@ const eqData = [
   }
 }
 
+/* color tones */
 .tone-1 {
   background: #197e0c;
 }
@@ -159,7 +173,7 @@ const eqData = [
 
 .end-bar {
   background: #99989d;
-  margin-bottom: .625rem;
+  margin-bottom: 0.625rem;
   height: 7px;
   width: 12px;
   will-change: margin-bottom;
@@ -178,5 +192,4 @@ const eqData = [
     display: none;
   }
 }
-
 </style>

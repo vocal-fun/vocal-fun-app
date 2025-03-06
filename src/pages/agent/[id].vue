@@ -99,6 +99,10 @@ onMounted(async () => {
     &> :nth-child(3) {
       min-width: 100%
     }
+
+    &> :nth-child(3) {
+      border-top: 1px solid #59596D
+    }
   }
 
 }
