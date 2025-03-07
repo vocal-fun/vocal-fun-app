@@ -78,36 +78,21 @@ import { meta } from '~~/meta';
 import { icons } from '~/consts';
 import { audioService } from '~/services/audio';
 import type { Agent, OpenModalState, Preview } from '~/types';
+import { defaultAgent } from '~/consts';
 
 type CallStatusType = 'calling' | 'idle' | 'on-call';
 
 const props = withDefaults(
   defineProps<{
     person?: Agent,
+    modalType?: string,
   }>(),
   {
-    person: () => ({
-      id: '',
-      name: '',
-      image: '',
-      rate: 0,
-      createdAt: '',
-      createdBy: '',
-      route: '',
-      tokenName: '',
-      mcap: 0,
-      price: 0,
-      contract: '',
-      liquidity: 0,
-      volume24h: 0,
-      change5m: 0,
-      change1h: 0,
-      change24h: 0,
-      change7d: 0,
-      holders: 0,
-    }),
+    person: () => ({ ...defaultAgent }),
+    modalType: 'default',
   }
 );
+
 
 const personSafe = computed(() => props.person || { name: '', image: '', rate: 1, createdAt: '', id: '', route: '' });
 const emit = defineEmits(['close']);

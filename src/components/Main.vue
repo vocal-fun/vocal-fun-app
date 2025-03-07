@@ -59,7 +59,7 @@
               <td data-label="7d %" :class="{ negative: person.change7d < 0 }">
                 {{ person.change7d > 0 ? `+${person.change7d}` : person.change7d }}%
               </td>
-              <td data-label="Holders">{{ person.holders }}</td>
+              <td data-label="Holders">{{ person.tokenHolders.holders.total }}</td>
               <td data-label="Actions" class="actions-buttons">
                 <button @click.stop="openModal(person, 'preview')" class="preview-btn">Preview</button>
                 <button @click.stop="openModal(person, 'call')" class="call-btn">Call</button>
@@ -136,6 +136,8 @@ function setSort(field: string) {
 }
 
 const filteredAgents = computed(() => {
+  // console.info('we are in filteredAgents')
+  console.info('agentsStore', agentsStore.agents)
   let results = [...agentsStore.agents]
 
   if (searchQuery.value) {
@@ -161,7 +163,7 @@ const filteredAgents = computed(() => {
       results.sort((a, b) => b.change7d - a.change7d)
       break
     case 'holders':
-      results.sort((a, b) => b.holders - a.holders)
+      results.sort((a, b) => b.tokenHolders.holders.total - a.tokenHolders.holders.total)
       break
   }
   if (sortDirection.value === 'asc') results.reverse()
@@ -199,6 +201,9 @@ function closeModal() {
 
 onBeforeMount(async () => {
   await agentsStore.getAgents()
+  // await agentsStore.getUserDetails('0x18e535Df172A16496DCBD0b39680018a4D5ad648')
+  // await agentsStore.getConfig() // TODO not work
+  // await agentsStore.getAgentDetails('679e1ec26707af8a10eeff1a')
 
   const agentRoute = route.params.slug?.[0] as string | undefined
   if (agentRoute) {

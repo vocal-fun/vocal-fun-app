@@ -1,3 +1,6 @@
+import type { Agent } from '~/types';
+
+
 export const icons = {
   play: 'M9.43993 4.13143C10.1867 4.51529 10.1867 5.48477 9.43992 5.86863L1.66142 9.86696C0.920935 10.2476 -3.72704e-08 9.76612 0 8.99836V1.00164C3.72705e-08 0.233881 0.920939 -0.247589 1.66143 0.133044L9.43993 4.13143Z',
   stop: 'M0.5 0.5H9.5V9.5H0.5V0.5Z',
@@ -32,3 +35,26 @@ export const Sound = {
 
 /** Agent Images base URL */
 export const BASE_IMAGE_URL = 'https://vocal-fun.s3.ap-south-1.amazonaws.com/agents/';
+
+export const defaultAgent: Agent = {
+  id: '',
+  name: '',
+  image: '',
+  rate: 0,
+  createdAt: '',
+  createdBy: '',
+  route: '',
+  tokenName: '',
+  mcap: 0,
+  price: 0,
+  contract: '',
+  liquidity: 0,
+  volume24h: 0,
+  change5m: 0,
+  change1h: 0,
+  change24h: 0,
+  change7d: 0,
+  comments: { comments: [] },
+  tokenHolders: { holders: { holders: [], total: 0 } },
+  trades: { trades: [] },
+};

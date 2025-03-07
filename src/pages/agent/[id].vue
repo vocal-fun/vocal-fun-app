@@ -1,7 +1,7 @@
 <template>
   <div class="agent-info" v-if="agent">
     <AgentDetailsCard :agent="agent" />
-    <Trades token="BONK" :holders="agent.holders" />
+    <Trades token="BONK" :holders="agent.tokenHolders.holders.total" />
     <BuySell />
   </div>
   <p v-else>Agent not found or still loading...</p>
@@ -15,38 +15,18 @@ import AgentDetailsCard from '~/components/AgentInfo/AgentDetailsCard/AgentDetai
 import Trades from '~/components/AgentInfo/Trades.vue';
 import BuySell from '~/components/AgentInfo/BuySell/BuySell.vue';
 import type { Agent } from '~/types';
+import { defaultAgent } from '~/consts';
 
 const route = useRoute();
 const agentsStore = useAgentsStore();
 const agent = ref<Agent | null>(null);
-
-const defaultDetails = {
-  id: '',
-  name: '',
-  image: '',
-  rate: 0,
-  createdAt: '',
-  createdBy: '',
-  route: '',
-  tokenName: '',
-  mcap: 0,
-  price: 0,
-  contract: '',
-  liquidity: 0,
-  volume24h: 0,
-  change5m: 0,
-  change1h: 0,
-  change24h: 0,
-  change7d: 0,
-  holders: 0,
-};
 
 onBeforeMount(async () => {
   await agentsStore.getAgents()
   const { id } = route.params;
   const found = agentsStore.agents.find(agent => agent.id === id);
   if (found) {
-    agent.value = { ...defaultDetails, ...found } as Agent;
+    agent.value = { ...defaultAgent, ...found } as Agent;
   }
 })
 
@@ -54,7 +34,7 @@ onMounted(async () => {
   const { id } = route.params;
   const found = agentsStore.agents.find(agent => agent.id === id);
   if (found) {
-    agent.value = { ...defaultDetails, ...found } as Agent;
+    agent.value = { ...defaultAgent, ...found } as Agent;
   }
 });
 </script>

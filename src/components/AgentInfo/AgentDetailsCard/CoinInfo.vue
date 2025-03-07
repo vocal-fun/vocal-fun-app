@@ -49,7 +49,7 @@ const statsData = computed(() => ({
 	values: [
 		`$${formatShortNumber(props.agent.mcap)}`,
 		`$${formatShortNumber(props.agent.liquidity)}`,
-		`${props.agent.holders}`
+		`${props.agent.tokenHolders.holders.total}`
 	]
 }))
 
