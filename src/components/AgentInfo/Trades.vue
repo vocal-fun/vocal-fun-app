@@ -57,14 +57,35 @@ const props = defineProps({
 
 const selectedTab = ref<TypeOfTable.HOLDERS | TypeOfTable.TRADES>(TypeOfTable.TRADES)
 
-const tableHeaders = ref([
-	{ key: 'account', label: 'Account' },
-	{ key: 'type', label: 'Type' },
-	{ key: 'sol', label: 'ETH' },
-	{ key: 'tokenAmount', label: `$${props.token}` },
-	{ key: 'date', label: 'Date' },
-	{ key: 'transactionHash', label: 'Transaction #' },
-])
+const isSmallScreen = ref(false)
+
+const updateScreenSize = () => {
+	isSmallScreen.value = window.innerWidth < 600
+}
+
+onUnmounted(() => {
+	window.removeEventListener('resize', updateScreenSize)
+})
+
+const tableHeaders = computed(() => {
+	if (isSmallScreen.value) {
+		// For small screens show only Date, Type, ETH (in that order)
+		return [
+			{ key: 'date', label: 'Date' },
+			{ key: 'type', label: 'Type' },
+			{ key: 'sol', label: 'ETH' },
+		]
+	} else {
+		return [
+			{ key: 'account', label: 'Account' },
+			{ key: 'type', label: 'Type' },
+			{ key: 'sol', label: 'ETH' },
+			{ key: 'tokenAmount', label: `$${props.token}` },
+			{ key: 'date', label: 'Date' },
+			{ key: 'transactionHash', label: 'Transaction #' },
+		]
+	}
+})
 
 const baseTransaction: Transaction = {
 	account: '0x1cd9a56c8c2ea913c70319a44da75e99255aa46f',
@@ -82,7 +103,8 @@ const formatContract = (address: string) => {
 }
 
 onMounted(() => {
-	// Here will get transactions from the API
+	updateScreenSize()
+	window.addEventListener('resize', updateScreenSize)
 })
 </script>
 
@@ -174,6 +196,15 @@ onMounted(() => {
 		&:last-child {
 			border-bottom: none;
 		}
+	}
+}
+
+@media (max-width: 600px) {
+
+	.transactions-table thead th:nth-child(1),
+	.transactions-table tbody td:nth-child(1) {
+		width: 30%;
+		text-align: left;
 	}
 }
 </style>
