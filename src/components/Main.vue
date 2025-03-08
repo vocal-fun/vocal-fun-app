@@ -135,8 +135,21 @@ function setSort(field: string) {
   }
 }
 
+async function create() {
+  // await agentsStore.addComment('67cb962e2fcbfdb6e517d632', 'just some comment')
+  // await agentsStore.createAgent({
+  //   name: 'agent-main',
+  //   symbol: 'agent-main',
+  //   description: 'agent-main',
+  //   systemPrompt: 'agent-main',
+  //   twitter: '',
+  //   website: '',
+  //   imagePath: '/img/grid.png',
+  //   voiceSamplePath: '/img/grid.png',
+  // });
+}
+
 const filteredAgents = computed(() => {
-  // console.info('we are in filteredAgents')
   console.info('agentsStore', agentsStore.agents)
   let results = [...agentsStore.agents]
 
@@ -339,6 +352,7 @@ section.main {
         }
 
         td {
+          margin-top: 10px;
           padding: 4px 8px;
         }
       }

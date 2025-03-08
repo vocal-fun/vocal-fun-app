@@ -186,14 +186,14 @@ export const useAuthStore = defineStore('auth', () => {
   async function getUser(): Promise<void> {
     try {
       loading.value = true;
-      const res = await $fetch<{ user: UserDto }>('/api/v1/user', {
+      const res = await $fetch<{ user: UserDto }>('https://api.vocal.fun/api/v1/user', {
         method: 'GET',
         headers: {
           Authorization: 'Bearer ' + token.value,
         },
       });
+      console.info('res from get user',res)
       user.value = res.user;
-      // Subscribe on user balance
       subscribeOnUserBalance();
     } catch (error) {
       user.value = null;

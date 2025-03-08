@@ -15,18 +15,19 @@ export const useAgentsStore = defineStore('agents', () => {
     try {
       loading.value = true;
       const res = await $fetch<AgentsResponse>('https://api.vocal.fun/api/v1/launchpad/agents');
-      agents.value = res.agents.map(({ _id, name, rate, imageUrl, createdAt }) => ({
+      console.info('res', res)
+      agents.value = res.agents.map(({ _id, name, symbol, marketCap, currentPrice, createdBy, tokenAddress, rate, imageUrl, createdAt }) => ({
         id: _id,
         name,
         image: imageUrl,
         rate: rate !== undefined ? rate : Number((Math.random() * 10).toFixed(2)),
         createdAt: createdAt || '3days',
-        createdBy: 'Jitaru',
+        createdBy: createdBy._id,
         route: name.toLowerCase().replace(/\s/g, '-'),
-        tokenName: 'token1',
-        mcap: Number((Math.random() * 10000).toFixed(2)),
-        price: Number((Math.random() * 100).toFixed(2)),
-        contract: '0x1cd9a56c8c2ea913c70319a44da75e99255aa46f',
+        tokenName: symbol,
+        mcap: Number(marketCap),
+        price: Number(currentPrice),
+        contract: tokenAddress,
         liquidity: Number((Math.random() * 10000).toFixed(2)),
         volume24h: Number((Math.random() * 500).toFixed(2)),
         change5m: Number((Math.random() * 10).toFixed(2)),
@@ -186,7 +187,80 @@ export const useAgentsStore = defineStore('agents', () => {
     }
   }
 
+  async function createAgent(params: {
+    name: string;
+    symbol: string;
+    description: string;
+    systemPrompt: string;
+    twitter?: string;
+    website?: string;
+    imagePath: string;
+    voiceSamplePath: string;
+  }): Promise<any> {
+    try {
+      loading.value = true;
+      const authStore = useAuthStore();
+      const formData = new FormData();
 
+      formData.append('name', params.name);
+      formData.append('symbol', params.symbol);
+      formData.append('description', params.description);
+      formData.append('systemPrompt', params.systemPrompt);
+      formData.append('twitter', params.twitter || '');
+      formData.append('website', params.website || '');
+
+      const imageResponse = await fetch(params.imagePath);
+      if (!imageResponse.ok) {
+        throw new Error(`Failed to fetch image from ${params.imagePath}`);
+      }
+      const imageBlob = await imageResponse.blob();
+      const imageFile = new File([imageBlob], 'image.png', { type: imageBlob.type });
+      formData.append('image', imageFile);
+
+      const voiceResponse = await fetch(params.voiceSamplePath);
+      if (!voiceResponse.ok) {
+        throw new Error(`Failed to fetch voice sample from ${params.voiceSamplePath}`);
+      }
+      const voiceBlob = await voiceResponse.blob();
+      const voiceFile = new File([voiceBlob], 'voiceSample.png', { type: voiceBlob.type });
+      formData.append('voiceSample', voiceFile);
+
+
+      const res = await $fetch('https://api.vocal.fun/api/v1/launchpad/create', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${authStore.token}`,
+        },
+      });
+      return res;
+    } catch (error) {
+      console.warn('[CREATE AGENT] Error creating agent:', error);
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function addComment(agentId: string, content: string): Promise<any> {
+    try {
+      loading.value = true;
+      const authStore = useAuthStore();
+      const res = await $fetch(`https://api.vocal.fun/api/v1/launchpad/comments/${agentId}`, {
+        method: 'POST',
+        body: { content },
+        headers: {
+          Authorization: `Bearer ${authStore.token}`,
+        }
+      });
+      return res;
+    } catch (error) {
+      console.warn(`[ADD COMMENT] Error adding comment for agent ${agentId}:`, error);
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  }
 
   return {
     loading,
@@ -197,6 +271,8 @@ export const useAgentsStore = defineStore('agents', () => {
     tokenHolders,
     userDetails,
     getAgents,
+    createAgent,
+    addComment,
     getAgentPreview,
     getConfig,
     getCommentsForAllAgents,
