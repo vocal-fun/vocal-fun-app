@@ -64,11 +64,10 @@
                 <button @click.stop="openModal(person, 'preview')" class="preview-btn">Preview</button>
                 <button @click.stop="openModal(person, 'call')" class="call-btn">Call</button>
                 <button class="buy-btn">Buy</button>
+                <!-- <button @click.stop="create" class="buy-btn">create</button> -->
               </td>
             </tr>
           </tbody>
-
-
         </table>
       </div>
     </div>
@@ -136,6 +135,8 @@ function setSort(field: string) {
 }
 
 async function create() {
+  const userId = authStore.user?._id
+  await agentsStore.getUserDetails(userId || '')
   // await agentsStore.addComment('67cb962e2fcbfdb6e517d632', 'just some comment')
   // await agentsStore.createAgent({
   //   name: 'agent-main',

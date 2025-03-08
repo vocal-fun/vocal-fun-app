@@ -262,6 +262,10 @@ export const useAgentsStore = defineStore('agents', () => {
     }
   }
 
+
+
+  // https://api.vocal.fun/api/v1/launchpad/user
+
   return {
     loading,
     agents,
