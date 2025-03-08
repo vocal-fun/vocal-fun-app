@@ -1,7 +1,7 @@
 <template>
   <div class="agent-info" v-if="agent">
     <AgentDetailsCard :agent="agent" />
-    <Trades token="BONK" :holders="agent.tokenHolders.holders.total" />
+    <Trades token="BONK" :holders="agent.tokenHolders" :tokenPrice="agent.price" />
     <BuySell />
   </div>
   <p v-else>Agent not found or still loading...</p>
@@ -20,6 +20,16 @@ import { defaultAgent } from '~/consts';
 const route = useRoute();
 const agentsStore = useAgentsStore();
 const agent = ref<Agent | null>(null);
+const dummyHolders = {
+  holders: {
+    holders: [
+      { user: { address: '0x123' }, balance: 100, percentage: 10 },
+      { user: { address: '0x456' }, balance: 200, percentage: 20 },
+    ],
+    total: 2,
+  },
+};
+
 
 onBeforeMount(async () => {
   await agentsStore.getAgents()
@@ -46,6 +56,7 @@ onMounted(async () => {
 
   &>* {
     width: 100%;
+    height: 100%;
   }
 
   &> :nth-child(1) {

@@ -32,7 +32,6 @@ defineProps<{ progressPercentage: number }>()
 	color: white;
 	margin-top: 24px;
 	margin-bottom: 22px;
-	border-bottom: 1px solid #59596d;
 
 	.title {
 		display: flex;
