@@ -11,14 +11,17 @@ export function formatShortNumber(num: number): string {
 }
 
 export function formatContract(contract: string): string {
-  if (!contract || contract.length < 10) return contract; // Return as is if too short
+  if (!contract || contract.length < 10) return contract; 
   return `${contract.slice(0, 4)}...${contract.slice(-5)}`;
 }
 
-export function timeAgo(timestamp: string): string {
-  const now = new Date();
-  const past = new Date(timestamp);
-  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+export function timeAgo(timestamp: string, nowMillis: number = Date.now()): string {
+  const past = new Date(timestamp).getTime();
+  let diffInSeconds = Math.floor((nowMillis - past) / 1000);
+
+  if (diffInSeconds < 1) {
+    diffInSeconds = 1; 
+  }
 
   if (diffInSeconds < 60) {
     const unit = diffInSeconds === 1 ? 'second' : 'seconds';
@@ -49,8 +52,9 @@ export function timeAgo(timestamp: string): string {
     return `${diffInWeeks} ${unit} ago`;
   }
 
-  // For simplicity, we approximate a month as 30 days.
+  // Approximate a month as 30 days
   const diffInMonths = Math.floor(diffInDays / 30);
   const unit = diffInMonths === 1 ? 'month' : 'months';
   return `${diffInMonths} ${unit} ago`;
 }
+

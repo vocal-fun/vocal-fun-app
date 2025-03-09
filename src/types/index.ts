@@ -53,6 +53,17 @@ export type CommentsResponse = {
   comments: Comment[];
 };
 
+export type CommentsApiResponse = {
+  comments: {
+    comments: Comment[];
+    total: number;
+  };
+  pagination: {
+    page: number;
+    limit: number;
+  };
+};
+
 export type TokenHolder = {
   user: {
     address: string;
@@ -161,3 +172,4 @@ export enum TypeGridTable  {
   GRID = 'grid',
   TABLE = 'table'
 }
+

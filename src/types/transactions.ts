@@ -4,10 +4,10 @@ export enum TrxType {
 }
 
 export enum TypeOfTable {
-	HOLDERS = 'holders',
-	TRADES = 'trades',
+  HOLDERS = 'HOLDERS',
+  TRADES = 'TRADES',
+  COMMENTS = 'Thread'
 }
-
 
 export type Transaction = {
 	account: string

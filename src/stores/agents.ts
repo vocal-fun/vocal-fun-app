@@ -1,5 +1,5 @@
 import { useLocalStorage } from '@vueuse/core';
-import type { AgentDto, Agent, PreviewDto, AgentsResponse, AgentTradesResponse, Trade, UserDetailsResponse } from '~/types';
+import type { AgentDto, Agent, PreviewDto, AgentsResponse, AgentTradesResponse, Trade, UserDetailsResponse, CommentsApiResponse } from '~/types';
 
 export const useAgentsStore = defineStore('agents', () => {
   const loading = ref(false);
@@ -119,13 +119,15 @@ export const useAgentsStore = defineStore('agents', () => {
 
   async function getAgentComments(agentId: string): Promise<void> {
     try {
-      const res = await $fetch(`https://api.vocal.fun/api/v1/launchpad/comments/${agentId}`);
-      agentComments.value[agentId] = res;
+      const res = await $fetch<CommentsApiResponse>(`https://api.vocal.fun/api/v1/launchpad/comments/${agentId}`);
+      // Now TypeScript knows res is of type CommentsApiResponse.
+      agentComments.value[agentId] = res.comments?.comments || [];
     } catch (error) {
       console.warn(`[AGENT COMMENTS] Error fetching comments for agent ${agentId}:`, error);
-      agentComments.value[agentId] = null;
+      agentComments.value[agentId] = [];
     }
   }
+
 
   async function getTokenHolders(agentId: string): Promise<void> {
     try {
@@ -279,6 +281,7 @@ export const useAgentsStore = defineStore('agents', () => {
     addComment,
     getAgentPreview,
     getConfig,
+    getAgentComments,
     getCommentsForAllAgents,
     getUserDetails,
     getTradesForAllAgents,

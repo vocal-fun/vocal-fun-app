@@ -9,6 +9,9 @@
 				<p :class="{ selected: selectedTab === TypeOfTable.TRADES }" @click="selectedTab = TypeOfTable.TRADES">
 					All trades
 				</p>
+				<p :class="{ selected: selectedTab === TypeOfTable.COMMENTS }" @click="selectedTab = TypeOfTable.COMMENTS">
+					Thread
+				</p>
 			</div>
 
 			<div v-if="selectedTab === TypeOfTable.TRADES" class="transactions-table-container">
@@ -33,6 +36,26 @@
 				</table>
 			</div>
 
+			<div v-else-if="selectedTab === TypeOfTable.COMMENTS" class="comments-container">
+				<div class="add-comment-section">
+					<input v-model="newComment" placeholder="Type your comment..." @keyup.enter="handleAddComment" />
+					<button @click="handleAddComment">Add comment</button>
+				</div>
+				<div v-for="(comment, index) in commentsList" :key="index" class="comment-row">
+					<div>
+						<p class="author">
+							{{ formatContract(comment?.createdBy?.address) || 'Unknown' }}
+						</p>
+						<span>:</span>
+						<p class="content">
+							{{ comment?.content || 'no content' }}
+						</p>
+					</div>
+					<p class="time">
+						{{ timeAgo(comment?.createdAt) }}
+					</p>
+				</div>
+			</div>
 			<div v-else class="holders-table-container">
 				<table class="holders-table">
 					<thead>
@@ -80,15 +103,88 @@ const props = defineProps({
 	}
 })
 
+onMounted(() => {
+	updateScreenSize()
+	window.addEventListener('resize', updateScreenSize)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('resize', updateScreenSize)
+})
+
+const newComment = ref('');
+const agentsStore = useAgentsStore()
 const contractAddress = props.agent.contract
-const selectedTab = ref<TypeOfTable.HOLDERS | TypeOfTable.TRADES>(TypeOfTable.TRADES)
+const selectedTab = ref<TypeOfTable>(TypeOfTable.TRADES)
 const isSmallScreen = ref(false)
 const updateScreenSize = () => {
 	isSmallScreen.value = window.innerWidth < 600
 }
 
-onUnmounted(() => {
-	window.removeEventListener('resize', updateScreenSize)
+const commentsList = computed(() => {
+	return Array.isArray(props.agent.comments) ? props.agent.comments : [];
+});
+
+async function addComment() {
+	console.info('props.agent.id', props.agent.id)
+	await agentsStore.addComment(props.agent.id, 'just some comment')
+}
+
+async function handleAddComment() {
+	if (!newComment.value.trim()) return;
+	try {
+		await agentsStore.addComment(props.agent.id, newComment.value);
+		await agentsStore.getAgentComments(props.agent.id);
+		props.agent.comments = agentsStore.agentComments[props.agent.id];
+		newComment.value = '';
+	} catch (err) {
+		console.warn('Error adding comment:', err);
+	}
+}
+
+const tradesToUse = computed((): Trade[] => {
+	const arrDefaultTrades = Array(6).fill(defaultTrade);
+	const tradesData = props.agent.trades;
+	if (Array.isArray(tradesData)) {
+		return tradesData.length ? tradesData : arrDefaultTrades;
+	} else if (tradesData && 'trades' in tradesData && Array.isArray(tradesData.trades)) {
+		return tradesData.trades.length ? tradesData.trades : arrDefaultTrades;
+	}
+	return arrDefaultTrades
+});
+
+const transactions = computed(() => {
+	return tradesToUse.value.map((trade: Trade) => {
+		let type: TrxType;
+		let account: string;
+
+		if (trade.seller.address.toLowerCase() === contractAddress.toLowerCase()) {
+			type = TrxType.BUY;
+			account = trade.buyer.address;
+		} else {
+			type = TrxType.SELL;
+			account = trade.seller.address;
+		}
+
+		return {
+			account,
+			type,
+			eth: trade.amount * trade.price,
+			tokenAmount: trade.amount,
+			date: trade.timestamp,
+			transactionHash: trade.txHash
+		};
+	});
+});
+
+const tokenHolderList = computed(() => {
+	return props.agent.tokenHolders?.holders?.holders?.length
+		? props.agent.tokenHolders.holders.holders
+		: dummyHolders.holders.holders
+})
+
+const totalHolders = computed(() => {
+	return props.agent.tokenHolders?.holders?.total || dummyHolders.holders.total
 })
 
 const tableHeaders = computed<TableHeader[]>(() => {
@@ -136,65 +232,15 @@ const defaultTrade: Trade = {
 	txHash: '4yTezz'
 }
 
-const tradesToUse = computed((): Trade[] => {
-	const tradesData = props.agent.trades;
-	if (Array.isArray(tradesData)) {
-		return tradesData.length ? tradesData : [defaultTrade];
-	} else if (tradesData && 'trades' in tradesData && Array.isArray(tradesData.trades)) {
-		return tradesData.trades.length ? tradesData.trades : [defaultTrade];
-	}
-	return [defaultTrade];
-});
-
-
-const transactions = computed(() => {
-	return tradesToUse.value.map((trade: Trade) => {
-		let type: TrxType;
-		let account: string;
-
-		if (trade.seller.address.toLowerCase() === contractAddress.toLowerCase()) {
-			type = TrxType.BUY;
-			account = trade.buyer.address;
-		} else {
-			type = TrxType.SELL;
-			account = trade.seller.address;
-		}
-
-		return {
-			account,
-			type,
-			eth: trade.amount * trade.price,
-			tokenAmount: trade.amount,
-			date: trade.timestamp,
-			transactionHash: trade.txHash
-		};
-	});
-});
-
 const dummyHolders = {
 	holders: {
-		holders: [
+		holders: Array(6).fill(null).flatMap(() => [
 			{ user: { address: '0x123' }, balance: 100, percentage: 10 },
-			{ user: { address: '0x456' }, balance: 200, percentage: 20 },
-		],
-		total: 2,
+		]),
+		total: 6,
 	},
-}
+};
 
-const tokenHolderList = computed(() => {
-	return props.agent.tokenHolders?.holders?.holders?.length
-		? props.agent.tokenHolders.holders.holders
-		: dummyHolders.holders.holders
-})
-
-const totalHolders = computed(() => {
-	return props.agent.tokenHolders?.holders?.total || dummyHolders.holders.total
-})
-
-onMounted(() => {
-	updateScreenSize()
-	window.addEventListener('resize', updateScreenSize)
-})
 </script>
 
 <style scoped lang="scss">
@@ -220,8 +266,73 @@ onMounted(() => {
 	}
 }
 
+.comments-container {
+	height: 100%;
+	background-color: black;
+	gap: 20px;
+	display: flex;
+	flex-direction: column;
+	padding: 24px 0px;
+	color: #00FA00;
+
+	.add-comment-section {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 0px 36px;
+
+		input {
+			flex: 1;
+			padding: 4px 8px;
+			color: #00fa00;
+			background: black;
+			border: 1px solid #59596d;
+		}
+
+		button {
+			cursor: pointer;
+			background: #00fa00;
+			color: black;
+			border: none;
+			padding: 6px 12px;
+			transition: background-color 0.3s ease;
+
+			&:hover {
+				background-color: #00dd00;
+			}
+		}
+	}
+
+	.comment-row {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 12px 36px;
+		transition: background-color 0.3s ease;
+
+		&:hover {
+			cursor: pointer;
+			background-color: rgba(0, 250, 0, 0.12);
+		}
+
+		div {
+			display: flex;
+			flex-direction: row;
+
+			span {
+				margin: 0 10px;
+			}
+		}
+
+		.time {
+			opacity: 0.5;
+		}
+	}
+}
+
 .transactions-table-container,
-.holders-table-container {
+.holders-table-container,
+.comments-container {
 	max-height: 240px;
 	overflow-y: auto;
 }
@@ -336,6 +447,28 @@ onMounted(() => {
 	.holders-table tbody td:nth-child(3) {
 		text-align: right;
 	}
+
+	.comments-container {
+		.comment-row {
+			padding: 12px 16px;
+		}
+
+		.add-comment-section {
+			flex-wrap: wrap;
+			padding: 0px 16px;
+
+			button {
+				width: 100%;
+			}
+		}
+	}
+
+	.transactions-table-container,
+	.holders-table-container,
+	.comments-container {
+		max-height: 440px;
+	}
+
 
 }
 </style>
