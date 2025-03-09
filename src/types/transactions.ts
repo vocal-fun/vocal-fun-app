@@ -12,8 +12,14 @@ export enum TypeOfTable {
 export type Transaction = {
 	account: string
 	type: TrxType
-	sol: number
+	eth: number
 	tokenAmount: number
 	date: string
 	transactionHash: string
+}
+type TransactionKey = keyof Transaction
+
+export type TableHeader = {
+	key: TransactionKey;
+	label: string;
 }

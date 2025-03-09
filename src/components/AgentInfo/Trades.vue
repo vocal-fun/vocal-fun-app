@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<Graphic :token="token" />
+		<Graphic token="BONK" />
 		<div>
 			<div class="holders">
 				<p :class="{ selected: selectedTab === TypeOfTable.HOLDERS }" @click="selectedTab = TypeOfTable.HOLDERS">
@@ -55,7 +55,7 @@
 									{{ holder.percentage }}%
 								</template>
 								<template v-else-if="header.key === 'balance'">
-									{{ holder.balance * tokenPrice }}$
+									{{ holder.balance * agent.price }}$
 								</template>
 							</td>
 						</tr>
@@ -68,25 +68,19 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, defineProps } from 'vue'
-import { TrxType, TypeOfTable, type Transaction } from '~/types/transactions'
-import type { TokenHoldersResponse } from '~/types'
+import { TrxType, TypeOfTable, type TableHeader } from '~/types/transactions'
+import type { Trade, Agent } from '~/types'
+import { formatContract, timeAgo } from '~/utils/formatters'
 import Graphic from './Graphic.vue'
 
 const props = defineProps({
-	token: {
-		type: String,
+	agent: {
+		type: Object as () => Agent,
 		required: true,
-	},
-	tokenPrice: {
-		type: Number,
-		required: true,
-	},
-	holders: {
-		type: Object as () => TokenHoldersResponse,
-		required: true,
-	},
+	}
 })
 
+const contractAddress = props.agent.contract
 const selectedTab = ref<TypeOfTable.HOLDERS | TypeOfTable.TRADES>(TypeOfTable.TRADES)
 const isSmallScreen = ref(false)
 const updateScreenSize = () => {
@@ -97,24 +91,24 @@ onUnmounted(() => {
 	window.removeEventListener('resize', updateScreenSize)
 })
 
-const tableHeaders = computed(() => {
+const tableHeaders = computed<TableHeader[]>(() => {
 	if (isSmallScreen.value) {
 		return [
 			{ key: 'date', label: 'Date' },
 			{ key: 'type', label: 'Type' },
-			{ key: 'sol', label: 'ETH' },
-		]
+			{ key: 'eth', label: 'ETH' },
+		];
 	} else {
 		return [
 			{ key: 'account', label: 'Account' },
 			{ key: 'type', label: 'Type' },
-			{ key: 'sol', label: 'ETH' },
-			{ key: 'tokenAmount', label: `$${props.token}` },
+			{ key: 'eth', label: 'ETH' },
+			{ key: 'tokenAmount', label: `$${props.agent.tokenName}` },
 			{ key: 'date', label: 'Date' },
-			{ key: 'transactionHash', label: 'Transaction #' },
-		]
+			{ key: 'transactionHash', label: 'Transaction' },
+		];
 	}
-})
+});
 
 const holdersTableHeaders = computed(() => {
 	if (isSmallScreen.value) {
@@ -133,21 +127,50 @@ const holdersTableHeaders = computed(() => {
 	}
 })
 
-const baseTransaction: Transaction = {
-	account: '0x1cd9a56c8c2ea913c70319a44da75e99255aa46f',
-	type: TrxType.SELL,
-	sol: 0.841,
-	tokenAmount: 4242,
-	date: '10s ago',
-	transactionHash: '0x1cd9a56c8c2ea913c70319a44da75e99255aa46f',
+const defaultTrade: Trade = {
+	timestamp: timeAgo('2025-03-05T18:32:34.746Z'),
+	buyer: { address: '0xBuyerAddress' },
+	seller: { address: contractAddress },
+	amount: 100,
+	price: 0.01,
+	txHash: '4yTezz'
 }
 
-const transactions = ref(Array(6).fill(baseTransaction))
-const formatContract = (address: string) => {
-	return address.slice(0, 4) + '...' + address.slice(-4)
-}
+const tradesToUse = computed((): Trade[] => {
+	const tradesData = props.agent.trades;
+	if (Array.isArray(tradesData)) {
+		return tradesData.length ? tradesData : [defaultTrade];
+	} else if (tradesData && 'trades' in tradesData && Array.isArray(tradesData.trades)) {
+		return tradesData.trades.length ? tradesData.trades : [defaultTrade];
+	}
+	return [defaultTrade];
+});
 
-// Computed properties for holders tab.
+
+const transactions = computed(() => {
+	return tradesToUse.value.map((trade: Trade) => {
+		let type: TrxType;
+		let account: string;
+
+		if (trade.seller.address.toLowerCase() === contractAddress.toLowerCase()) {
+			type = TrxType.BUY;
+			account = trade.buyer.address;
+		} else {
+			type = TrxType.SELL;
+			account = trade.seller.address;
+		}
+
+		return {
+			account,
+			type,
+			eth: trade.amount * trade.price,
+			tokenAmount: trade.amount,
+			date: trade.timestamp,
+			transactionHash: trade.txHash
+		};
+	});
+});
+
 const dummyHolders = {
 	holders: {
 		holders: [
@@ -156,16 +179,17 @@ const dummyHolders = {
 		],
 		total: 2,
 	},
-};
+}
 
 const tokenHolderList = computed(() => {
-	return props.holders?.holders?.holders?.length ? props.holders.holders.holders : dummyHolders.holders.holders;
-});
+	return props.agent.tokenHolders?.holders?.holders?.length
+		? props.agent.tokenHolders.holders.holders
+		: dummyHolders.holders.holders
+})
 
 const totalHolders = computed(() => {
-	return props.holders?.holders?.total || dummyHolders.holders.total;
-});
-
+	return props.agent.tokenHolders?.holders?.total || dummyHolders.holders.total
+})
 
 onMounted(() => {
 	updateScreenSize()
@@ -227,6 +251,11 @@ onMounted(() => {
 .transactions-table th:nth-child(2),
 .transactions-table td:nth-child(2) {
 	text-align: left;
+}
+
+.transactions-table th:nth-child(3),
+.transactions-table td:nth-child(3) {
+	padding-right: 10px;
 }
 
 .holders-table th:nth-child(2),
@@ -297,5 +326,16 @@ onMounted(() => {
 		width: 30%;
 		text-align: left;
 	}
+
+	.transactions-table thead th:nth-child(2),
+	.transactions-table tbody td:nth-child(2) {
+		text-align: center;
+	}
+
+	.holders-table thead th:nth-child(3),
+	.holders-table tbody td:nth-child(3) {
+		text-align: right;
+	}
+
 }
 </style>

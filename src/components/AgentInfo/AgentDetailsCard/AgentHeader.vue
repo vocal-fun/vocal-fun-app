@@ -70,18 +70,21 @@ function closeModal() {
 <style scoped lang="scss">
 .header-info {
 	background: linear-gradient(180deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
+
 	.header {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
 		padding: 24px 18px 22px;
 		border-bottom: 1px solid #37D339;
+
 		.avatar-img {
 			border-radius: 50%;
 			object-fit: cover;
 			width: 74px;
 			height: 74px;
 		}
+
 		.header-text {
 			display: flex;
 			flex-direction: column;
@@ -102,24 +105,30 @@ function closeModal() {
 		flex-direction: column;
 		margin-top: 12px;
 		gap: 0.8rem;
+
 		.info-row {
 			display: flex;
 			justify-content: space-between;
+
 			&:first-child {
 				padding: 0px 14px 16px 14px;
 				border-bottom: 1px solid #37D339;
 			}
+
 			&:last-child {
 				padding: 0px 14px 0px 14px;
 			}
+
 			.value {
 				cursor: pointer;
+
 				&:hover {
 					text-decoration: underline;
 				}
 			}
 		}
 	}
+
 	.actions {
 		display: flex;
 		flex-direction: row;
@@ -143,6 +152,12 @@ function closeModal() {
 				border-right: 1px solid #00FA00;
 			}
 		}
+	}
+}
+
+@media (max-width: 1250px) {
+	.header-info .contract-info .info-row:first-child {
+		gap: 8px;
 	}
 }
 </style>

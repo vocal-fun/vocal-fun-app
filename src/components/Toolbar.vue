@@ -70,9 +70,9 @@ const emit = defineEmits([
 const options = [
   { value: 'mcap', label: 'Top mcap 24h' },
   { value: 'price', label: 'Price' },
-  { value: '24hvol', label: '24h vol.' },
-  { value: '24hpercent', label: '24h %' },
-  { value: '7dpercent', label: '7d %' },
+  { value: 'volume24h', label: '24h vol.' },
+  { value: 'change24h', label: '24h %' },
+  { value: 'change7d', label: '7d %' },
   { value: 'holders', label: 'Holders' }
 ]
 
@@ -253,12 +253,14 @@ const currentLabel = computed(() => {
     padding: 20px 24px;
     gap: 1rem;
   }
+
   .watchlist {
     margin-left: auto;
   }
 
   .view-toggle {
     button {
+
       .grid,
       .table {
         width: 20px;

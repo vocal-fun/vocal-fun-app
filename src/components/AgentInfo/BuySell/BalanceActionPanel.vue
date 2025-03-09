@@ -199,6 +199,22 @@ function handleAction() {
 	}
 }
 
+@media (max-width: 1250px) {
+	.balance-select {
+		.balance-user {
+			padding: 12px;
+
+			.amount {
+				max-width: 150px;
+			}
+		}
+	}
+
+	.select-amount {
+		flex-wrap: wrap;
+	}
+}
+
 @media (max-width: 1100px) {
 	.select-amount {
 		flex-wrap: unset;

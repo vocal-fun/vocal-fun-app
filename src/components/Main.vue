@@ -151,7 +151,6 @@ async function create() {
 }
 
 const filteredAgents = computed(() => {
-  console.info('agentsStore', agentsStore.agents)
   let results = [...agentsStore.agents]
 
   if (searchQuery.value) {
@@ -184,6 +183,7 @@ const filteredAgents = computed(() => {
 
   return results
 })
+
 
 
 function toggleWatchlist() {

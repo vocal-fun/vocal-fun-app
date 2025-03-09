@@ -89,7 +89,7 @@ function setCustom() {
 
 	.slippage-options {
 		padding: 10px;
-		margin-top: 5px;
+		margin-top: 12px;
 		display: flex;
 		flex-direction: column;
 
@@ -154,6 +154,7 @@ function setCustom() {
 		.slippage-options {
 			ul {
 				flex-wrap: wrap;
+
 				li {
 					padding: 4px;
 				}

@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { defineProps, computed } from 'vue'
 import { NuxtImg } from '#components'
-import { formatShortNumber } from '~/utils/formatters'
+import { formatShortNumber, timeAgo } from '~/utils/formatters'
 import type { Agent } from '~/types'
 
 const props = defineProps<{ agent: Agent }>()
@@ -58,7 +58,7 @@ const pricesData = computed(() => ({
 	values: [
 		`$${props.agent.price}`,
 		`$${props.agent.price}`,
-		`${props.agent.createdAt.toUpperCase()} AGO`
+		timeAgo(props.agent.createdAt).toUpperCase()
 	]
 }))
 
