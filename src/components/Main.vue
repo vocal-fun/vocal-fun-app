@@ -64,7 +64,6 @@
                 <button @click.stop="openModal(person, 'preview')" class="preview-btn">Preview</button>
                 <button @click.stop="openModal(person, 'call')" class="call-btn">Call</button>
                 <button class="buy-btn">Buy</button>
-                <!-- <button @click.stop="create" class="buy-btn">create</button> -->
               </td>
             </tr>
           </tbody>
@@ -119,7 +118,6 @@ const columns = [
   { key: 'change7d', label: '7d %' },
   { key: 'holders', label: 'Holders' }
 ]
-
 
 function goToAgentPage(person: Agent) {
   router.push(`/agent/${person.id}`)
@@ -214,12 +212,14 @@ function closeModal() {
 }
 
 onBeforeMount(async () => {
+  console.info('we are in onBeforeMount')
   await agentsStore.getAgents()
   // await agentsStore.getUserDetails('0x18e535Df172A16496DCBD0b39680018a4D5ad648')
   // await agentsStore.getConfig() // TODO not work
   // await agentsStore.getAgentDetails('679e1ec26707af8a10eeff1a')
 
   const agentRoute = route.params.slug?.[0] as string | undefined
+  console.info('agentRouted', agentRoute)
   if (agentRoute) {
     const person = agentsStore.agents.find(a => a.route === agentRoute)
     if (person) {

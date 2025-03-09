@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<Graphic token="BONK" />
+		<p>$isSmallScreen {{ $isSmallScreen }}</p>
 		<div>
 			<div class="holders">
 				<p :class="{ selected: selectedTab === TypeOfTable.HOLDERS }" @click="selectedTab = TypeOfTable.HOLDERS">
@@ -90,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, defineProps } from 'vue'
+import { ref, computed, defineProps } from 'vue'
 import { TrxType, TypeOfTable, type TableHeader } from '~/types/transactions'
 import type { Trade, Agent } from '~/types'
 import { formatContract, timeAgo } from '~/utils/formatters'
@@ -103,32 +104,15 @@ const props = defineProps({
 	}
 })
 
-onMounted(() => {
-	updateScreenSize()
-	window.addEventListener('resize', updateScreenSize)
-})
-
-onUnmounted(() => {
-	window.removeEventListener('resize', updateScreenSize)
-})
-
+const { $isSmallScreen } = useNuxtApp();
 const newComment = ref('');
 const agentsStore = useAgentsStore()
 const contractAddress = props.agent.contract
 const selectedTab = ref<TypeOfTable>(TypeOfTable.TRADES)
-const isSmallScreen = ref(false)
-const updateScreenSize = () => {
-	isSmallScreen.value = window.innerWidth < 600
-}
 
 const commentsList = computed(() => {
 	return Array.isArray(props.agent.comments) ? props.agent.comments : [];
 });
-
-async function addComment() {
-	console.info('props.agent.id', props.agent.id)
-	await agentsStore.addComment(props.agent.id, 'just some comment')
-}
 
 async function handleAddComment() {
 	if (!newComment.value.trim()) return;
@@ -188,7 +172,7 @@ const totalHolders = computed(() => {
 })
 
 const tableHeaders = computed<TableHeader[]>(() => {
-	if (isSmallScreen.value) {
+	if ($isSmallScreen.value) {
 		return [
 			{ key: 'date', label: 'Date' },
 			{ key: 'type', label: 'Type' },
@@ -206,8 +190,9 @@ const tableHeaders = computed<TableHeader[]>(() => {
 	}
 });
 
+
 const holdersTableHeaders = computed(() => {
-	if (isSmallScreen.value) {
+	if ($isSmallScreen) {
 		return [
 			{ key: 'account', label: 'Account' },
 			{ key: 'percentage', label: '% Owned' },
