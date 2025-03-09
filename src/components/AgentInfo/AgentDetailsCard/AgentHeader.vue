@@ -4,11 +4,12 @@
 			<NuxtImg class="avatar-img" :src="agent.image" alt="Agent Avatar" />
 			<div class="header-text">
 				<h3>{{ agent.tokenName }} OFFICIAL COIN</h3>
-				<p class="token">${{ agent.tokenName }}</p>
+				<p class="token">${{ agent.tokenName }} <span v-if="$isSmallScreen">{{ formatContract(agent.contract) }}</span>
+				</p>
 			</div>
 		</div>
 		<div class="contract-info">
-			<div class="info-row">
+			<div v-if="!$isSmallScreen" class="info-row">
 				<p class="label">CONTRACT</p>
 				<p class="value">{{ formatContract(agent.contract) }}</p>
 			</div>
@@ -39,7 +40,7 @@ import type { Agent } from '~/types'
 import Modal from '~/components/Modal.vue'
 import CallModalContent from '~/components/CallModalContent.vue'
 import { useWalletConnect } from '~/composables/useWalletConnect'
-
+const { $isSmallScreen } = useNuxtApp();
 defineProps<{ agent: Agent }>()
 const isModalOpen = ref(false)
 const modalType = ref<'preview' | 'call' | 'default'>('default')
@@ -158,6 +159,16 @@ function closeModal() {
 @media (max-width: 1250px) {
 	.header-info .contract-info .info-row:first-child {
 		gap: 8px;
+	}
+}
+
+@media (max-width: 600px) {
+	.header-info {
+		background: black;
+	}
+
+	.header-info .contract-info .info-row:first-child {
+		border-bottom: unset;
 	}
 }
 </style>

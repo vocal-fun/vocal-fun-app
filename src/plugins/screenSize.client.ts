@@ -7,6 +7,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     isSmallScreen.value = window.innerWidth < 600;
   };
 
+  // Initialize
   updateScreenSize();
   window.addEventListener('resize', updateScreenSize);
   onUnmounted(() => {

@@ -1,7 +1,7 @@
 <template>
 	<div class="agent-details-card">
 		<AgentHeader :agent="agent" />
-		<CoinInfo :agent="agent" />
+		<CoinInfo v-if="!$isSmallScreen" :agent="agent" />
 	</div>
 </template>
 
@@ -10,7 +10,7 @@ import { defineProps } from 'vue'
 import type { Agent } from '~/types'
 import AgentHeader from './AgentHeader.vue';
 import CoinInfo from './CoinInfo.vue';
-
+const { $isSmallScreen } = useNuxtApp();
 const props = defineProps<{ agent: Agent }>()
 </script>
 

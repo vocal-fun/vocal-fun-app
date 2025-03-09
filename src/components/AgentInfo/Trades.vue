@@ -1,7 +1,8 @@
 <template>
 	<div>
 		<Graphic token="BONK" />
-		<p>$isSmallScreen {{ $isSmallScreen }}</p>
+		<CoinInfo v-if="$isSmallScreen" :agent="agent" />
+		<BondingCurve class="curve-small" v-if="$isSmallScreen" :progressPercentage="4" />
 		<div>
 			<div class="holders">
 				<p :class="{ selected: selectedTab === TypeOfTable.HOLDERS }" @click="selectedTab = TypeOfTable.HOLDERS">
@@ -96,6 +97,8 @@ import { TrxType, TypeOfTable, type TableHeader } from '~/types/transactions'
 import type { Trade, Agent } from '~/types'
 import { formatContract, timeAgo } from '~/utils/formatters'
 import Graphic from './Graphic.vue'
+import CoinInfo from './AgentDetailsCard/CoinInfo.vue'
+import BondingCurve from './BuySell/BondingCurve.vue'
 
 const props = defineProps({
 	agent: {
@@ -172,6 +175,8 @@ const totalHolders = computed(() => {
 })
 
 const tableHeaders = computed<TableHeader[]>(() => {
+	console.info('we are in table headers')
+	console.info('$isSmallScreen', $isSmallScreen)
 	if ($isSmallScreen.value) {
 		return [
 			{ key: 'date', label: 'Date' },
@@ -192,7 +197,7 @@ const tableHeaders = computed<TableHeader[]>(() => {
 
 
 const holdersTableHeaders = computed(() => {
-	if ($isSmallScreen) {
+	if ($isSmallScreen.value) {
 		return [
 			{ key: 'account', label: 'Account' },
 			{ key: 'percentage', label: '% Owned' },
@@ -328,6 +333,12 @@ const dummyHolders = {
 	border-collapse: collapse;
 }
 
+.transactions-table thead th {
+	position: sticky;
+	top: 0;
+	background-color: #212133
+}
+
 .transactions-table th,
 .transactions-table td,
 .holders-table th,
@@ -454,6 +465,16 @@ const dummyHolders = {
 		max-height: 440px;
 	}
 
+	.curve-small {
+		padding: 0 20px;
+		border-bottom: 1px solid #59596D;
+		margin-bottom: unset;
+	}
+
+	.holders {
+		border-bottom: unset;
+		padding-bottom: 12px;
+	}
 
 }
 </style>

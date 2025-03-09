@@ -159,7 +159,7 @@ const currentLabel = computed(() => {
   padding: 12px 10px;
   gap: 12px;
   margin-left: auto;
-  border: 2px solid #59596D;
+  border: 2px solid #303149;
   max-width: 240px;
 
   input {

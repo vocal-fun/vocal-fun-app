@@ -124,7 +124,6 @@ function formatChange(value: number): { formatted: string; color: string } {
 		border-block: 1px solid #59596D;
 		justify-content: space-between;
 		color: white;
-		opacity: 0.5;
 		font-size: 11px;
 		flex-wrap: wrap;
 
@@ -138,7 +137,19 @@ function formatChange(value: number): { formatted: string; color: string } {
 			&:not(:last-child) {
 				border-right: 1px solid #59596D;
 			}
+
+			p {
+				&:last-child {
+					opacity: 0.5;
+				}
+			}
 		}
+	}
+}
+
+@media (max-width: 600px) {
+	.coin-info {
+		gap: 16px;
 	}
 }
 </style>

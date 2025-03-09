@@ -3,7 +3,7 @@
 		<BuySellTabs :selectedTab="selectedTab" @update:selectedTab="selectedTab = $event" />
 		<BalanceActionPanel :userBalance="userBalance" :amounts="amounts" :selectedTab="selectedTab" />
 		<SlippageSettings />
-		<BondingCurve :progressPercentage="progressPercentage" />
+		<BondingCurve v-if="!$isSmallScreen" :progressPercentage="progressPercentage" />
 	</div>
 </template>
 
@@ -18,6 +18,7 @@ import SlippageSettings from './SlippageSettings.vue'
 import BondingCurve from './BondingCurve.vue'
 
 const selectedTab = ref('BUY')
+const { $isSmallScreen } = useNuxtApp();
 const { getNativeBalance } = useBlockchain()
 const { accountAddress, isConnected } = useWalletConnect()
 const amounts = ref(['0.01', '0.02', '0.1', '0.2', 'MAX'])
