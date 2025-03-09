@@ -175,8 +175,6 @@ const totalHolders = computed(() => {
 })
 
 const tableHeaders = computed<TableHeader[]>(() => {
-	console.info('we are in table headers')
-	console.info('$isSmallScreen', $isSmallScreen)
 	if ($isSmallScreen.value) {
 		return [
 			{ key: 'date', label: 'Date' },

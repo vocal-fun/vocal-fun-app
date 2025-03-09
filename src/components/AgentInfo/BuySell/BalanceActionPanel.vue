@@ -19,7 +19,7 @@
 			</div>
 		</div>
 
-		<div class="action">
+		<div v-if="!$isSmallScreen" class="action">
 			<EQ class="equalizer" :repeatTimes="3" />
 			<button @click="handleAction">
 				{{ selectedTab === 'BUY' ? 'BUY' : 'SELL' }}
@@ -32,6 +32,7 @@
 import { defineProps, ref, watch } from 'vue'
 import EQ from '~/components/EQ.vue'
 
+const { $isSmallScreen } = useNuxtApp()
 const props = defineProps<{
 	userBalance: string
 	amounts: string[]
@@ -241,9 +242,13 @@ function handleAction() {
 	}
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
 	.select-amount {
 		flex-wrap: wrap;
+
+		.select-amount-btn {
+			width: unset;
+		}
 	}
 }
 </style>
