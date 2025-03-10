@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { ref, computed, defineEmits, onMounted } from 'vue'
 import { NuxtImg } from '#components'
-
+import type { ExampleVoice } from '~/types';
 
 const emit = defineEmits<{
   (e: 'update:voiceFile', file: File | null): void;
@@ -58,16 +58,6 @@ const voiceInput = ref<HTMLInputElement | null>(null);
 const uploadedAudioUrl = ref<string | null>(null);
 const uploadedAudio = ref<HTMLAudioElement | null>(null);
 const isPlaying = ref(false);
-
-
-interface ExampleVoice {
-  id: string;
-  file: string;    
-  label: string;
-  description: string;
-  isPlaying: boolean;
-  audio: HTMLAudioElement | null;
-}
 
 const examples = ref<ExampleVoice[]>([
   {
@@ -95,7 +85,6 @@ const examples = ref<ExampleVoice[]>([
     audio: null,
   },
 ]);
-
 
 const displayVoiceFileName = computed(() => {
   if (!voiceFileName.value) return '';

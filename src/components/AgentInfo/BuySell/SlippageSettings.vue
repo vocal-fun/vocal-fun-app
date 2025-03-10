@@ -67,10 +67,10 @@ function setCustom() {
 		align-items: center;
 		color: white;
 		cursor: pointer;
-		transition: background 0.3s;
+		transition: background-color 0.3s;
 
 		&:hover {
-			background: #73737326;
+			background-color: #73737326;
 		}
 
 		.slippage-img {

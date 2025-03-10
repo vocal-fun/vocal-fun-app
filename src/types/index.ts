@@ -173,3 +173,21 @@ export enum TypeGridTable  {
   TABLE = 'table'
 }
 
+export type ExampleVoice = {
+  id: string;
+  file: string;    
+  label: string;
+  description: string;
+  isPlaying: boolean;
+  audio: HTMLAudioElement | null;
+}
+
+export type AgentInfo = {
+  name: string;
+  ticker: string;
+  description: string;
+  twitter: string;
+  website: string;
+  image: File | string | null;
+  voiceSample: File | string | null;
+}

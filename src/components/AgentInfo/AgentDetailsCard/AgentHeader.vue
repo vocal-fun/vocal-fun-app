@@ -142,7 +142,7 @@ function closeModal() {
 			cursor: pointer;
 			background-color: #37D33933;
 			padding: 22px;
-			transition: background 0.2s;
+			transition: background-color 0.2s;
 
 			&:hover {
 				background-color: #37D339;

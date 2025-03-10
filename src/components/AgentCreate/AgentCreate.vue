@@ -10,32 +10,46 @@
 			<AgentCreateInfo v-model:agentInfo="agentInfo" />
 			<AgentCreatePic v-model:imageFile="imageFile" />
 			<AgentCreateVoice v-model:voiceFile="voiceFile" v-model:exampleVoice="exampleVoice" />
+
 			<button class="create-btn" :class="{ filled: isInfoFilled }" :disabled="!isInfoFilled" @click="handleCreateAgent">
 				{{ isInfoFilled ? "Generate Agent Preview" : "Fill in details to create agent" }}
 			</button>
 		</div>
+
+		<Modal :isOpen="isModalOpen" @close="closeModal">
+			<ClientOnly>
+				<ModalCreate ref="modalContent" @close="closeModal" @closePublishAgent="handleClosePublishAgent"
+					:agentData="previewAgent" />
+			</ClientOnly>
+		</Modal>
 	</div>
 </template>
 
+
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import AgentCreateInfo from './AgentCreateInfo.vue';
-import AgentCreatePic from './AgentCreatePic.vue';
-import AgentCreateVoice from './AgentCreateVoice.vue';
-import { useAgentsStore } from '~/stores/agents';
+import { ref, computed } from 'vue'
+import AgentCreateInfo from './AgentCreateInfo.vue'
+import AgentCreatePic from './AgentCreatePic.vue'
+import AgentCreateVoice from './AgentCreateVoice.vue'
+import Modal from '~/components/Modal.vue'
+import ModalCreate from './ModalCreate.vue'
+import type { AgentInfo } from '~/types'
 
-const agentsStore = useAgentsStore();
+const agentInfo = ref<AgentInfo>({
+	name: '',
+	ticker: '',
+	description: '',
+	twitter: '',
+	website: '',
+	image: null,
+	voiceSample: null,
+})
 
-interface AgentInfo {
-	name: string;
-	ticker: string;
-	description: string;
-}
-
-const agentInfo = ref<AgentInfo>({ name: '', ticker: '', description: '' });
-const imageFile = ref<File | null>(null);
-const voiceFile = ref<File | null>(null);
-const exampleVoice = ref<string | null>(null);
+const imageFile = ref<File | null>(null)
+const voiceFile = ref<File | null>(null)
+const exampleVoice = ref<string | null>(null)
+const isModalOpen = ref(false)
+const previewAgent = ref<any>(null)
 
 const isInfoFilled = computed(() => {
 	return (
@@ -44,35 +58,52 @@ const isInfoFilled = computed(() => {
 		agentInfo.value.description.trim() !== '' &&
 		imageFile.value !== null &&
 		(voiceFile.value !== null || exampleVoice.value !== null)
-	);
-});
+	)
+})
 
-async function handleCreateAgent() {
-	if (!isInfoFilled.value) return;
+function closeModal() {
+	isModalOpen.value = false
+}
 
-	try {
-		const imageParam: File | string = imageFile.value ? imageFile.value : '/img/grid.png';
-		const voiceParam: File | string = voiceFile.value
+function handleCreateAgent() {
+	if (!isInfoFilled.value) return
+	const imageParam: File | string = imageFile.value ? imageFile.value : '/img/grid.png'
+	const voiceParam: File | string =
+		voiceFile.value
 			? voiceFile.value
 			: exampleVoice.value
 				? `/audio/${exampleVoice.value}`
-				: '';
-		const res = await agentsStore.createAgent({
-			name: agentInfo.value.name,
-			symbol: agentInfo.value.ticker,
-			description: agentInfo.value.description,
-			systemPrompt: agentInfo.value.name,
-			twitter: '',
-			website: '',
-			image: imageParam,
-			voiceSample: voiceParam,
-		});
-	} catch (error) {
-		console.error('Error creating agent:', error);
+				: ''
+
+	previewAgent.value = {
+		name: agentInfo.value.name,
+		symbol: agentInfo.value.ticker,
+		description: agentInfo.value.description,
+		systemPrompt: agentInfo.value.name,
+		twitter: '',
+		website: '',
+		image: imageParam,
+		voiceSample: voiceParam
 	}
+	isModalOpen.value = true
+}
+
+function handleClosePublishAgent() {
+	agentInfo.value = {
+		name: '',
+		ticker: '',
+		description: '',
+		twitter: '',
+		website: '',
+		image: null,
+		voiceSample: null,
+	}
+	imageFile.value = null
+	voiceFile.value = null
+	exampleVoice.value = null
+	isModalOpen.value = false
 }
 </script>
-
 
 <style scoped lang="scss">
 .main-page {
