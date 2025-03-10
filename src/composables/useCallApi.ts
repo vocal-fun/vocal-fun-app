@@ -8,9 +8,9 @@ import type { Agent } from '~/types';
 export function useCallApi() {
   const audioPlayer = new AudioStreamPlayer();
   audioPlayer.setCallbacks(() => {
-    pauseRecording();
+    // pauseRecording();
   }, () => {
-    resumeRecording();
+    // resumeRecording();
   });
 
   const authStore = useAuthStore();
