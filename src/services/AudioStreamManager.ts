@@ -149,6 +149,10 @@ export class AudioStreamPlayer {
     }
   }
 
+  public async interrupt() {
+    this.audioQueue = [];
+  }
+
   public async cleanup(): Promise<void> {
     try {
       await this.stop();

@@ -76,6 +76,13 @@ export function useCallApi() {
           audioPlayer?.cleanup();
           reject(new Error('Disconnected from server'));
         });
+        ws.value.on('message', (data) => {
+          console.log('Message from server:', data);
+          if (data.type == "new_conversation_turn") {
+            console.log('[CALL API] New conversation turn');
+            audioPlayer?.interrupt();
+          }
+        });
         ws.value.on('audio_stream', handleTTSStream);
         ws.value.on('audio_stream_end', () => {
           console.log('[CALL API] Audio stream ended');
