@@ -114,7 +114,7 @@ const contractAddress = props.agent.contract
 const selectedTab = ref<TypeOfTable>(TypeOfTable.TRADES)
 
 const commentsList = computed(() => {
-	return Array.isArray(props.agent.comments) ? props.agent.comments : [];
+	return Array.isArray(props.agent.comments.comments) ? props.agent.comments.comments : [];
 });
 
 async function handleAddComment() {
@@ -122,7 +122,8 @@ async function handleAddComment() {
 	try {
 		await agentsStore.addComment(props.agent.id, newComment.value);
 		await agentsStore.getAgentComments(props.agent.id);
-		props.agent.comments = agentsStore.agentComments[props.agent.id];
+		const agentCommentData = agentsStore.agentComments[props.agent.id];
+		props.agent.comments = { comments: agentCommentData.data };
 		newComment.value = '';
 	} catch (err) {
 		console.warn('Error adding comment:', err);

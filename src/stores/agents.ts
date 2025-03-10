@@ -1,21 +1,71 @@
 import { useLocalStorage } from '@vueuse/core';
-import type { AgentDto, Agent, PreviewDto, AgentsResponse, AgentTradesResponse, Trade, UserDetailsResponse, CommentsApiResponse } from '~/types';
+import type {
+  Agent,
+  PreviewDto,
+  AgentsResponse,
+  Trade,
+  UserDetailsResponse,
+  CommentsApiResponse,
+  TokenHoldersResponse,
+  Comment,
+} from '~/types';
 
 export const useAgentsStore = defineStore('agents', () => {
   const loading = ref(false);
   const agents = ref<Agent[]>([]);
-  const previews = ref<Record<string, PreviewDto>>({});
-  const config = ref<{ createAgentFees: string; chainId: number } | null>(null);
-  const agentComments = ref<Record<string, any>>({});
-  const tokenHolders = ref<Record<string, any>>({});
-  const agentTrades = ref<Record<string, AgentTradesResponse>>({});
-  const userDetails = ref<UserDetailsResponse | null>(null);
+  const agentsPagination = ref({
+    page: 1,
+    limit: 20,
+    sort: 'newest',
+  });
+  const agentComments = ref<Record<
+    string,
+    {
+      data: Comment[];
+      total: number;
+      page: number;
+      limit: number;
+    }
+  >>({});
 
-  async function getAgents(): Promise<void> {
+  const tokenHolders = ref<Record<
+    string,
+    {
+      holders: {
+        holders: TokenHoldersResponse['holders']['holders'];
+        total: number;
+      };
+      page: number;
+      limit: number;
+    }
+  >>({});
+  const agentTrades = ref<Record<
+    string,
+    {
+      trades: Trade[];
+      total: number;
+      page: number;
+      limit: number;
+    }
+  >>({});
+  const config = ref<{ createAgentFees: string; chainId: number } | null>(null);
+  const userDetails = ref<UserDetailsResponse | null>(null);
+  const previews = ref<Record<string, PreviewDto>>({});
+  async function getAgents(
+    page = agentsPagination.value.page,
+    limit = agentsPagination.value.limit,
+    sort = agentsPagination.value.sort
+  ): Promise<void> {
     try {
       loading.value = true;
-      const res = await $fetch<AgentsResponse>('https://api.vocal.fun/api/v1/launchpad/agents');
-      console.log('res', res)
+      const queryParams = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+        sort: sort,
+      });
+
+      const url = `https://api.vocal.fun/api/v1/launchpad/agents?${queryParams.toString()}`;
+      const res = await $fetch<AgentsResponse & { pagination: { page: number; limit: number } }>(url);
       agents.value = res.agents.map(({ _id, name, symbol, marketCap, currentPrice, createdBy, tokenAddress, rate, imageUrl, createdAt }) => ({
         id: _id,
         name,
@@ -39,14 +89,34 @@ export const useAgentsStore = defineStore('agents', () => {
         trades: { trades: [] },
       }));
 
+      agentsPagination.value.page = res.pagination.page;
+      agentsPagination.value.limit = res.pagination.limit;
+
       await Promise.all(
         agents.value.map(async (agent) => {
-          await Promise.all([getAgentComments(agent.id), getTokenHolders(agent.id), getAgentTrades(agent.id)]);
-          agent.comments = agentComments.value[agent.id];
-          agent.tokenHolders = tokenHolders.value[agent.id];
-          agent.trades = agentTrades.value[agent.id];
+          await Promise.all([
+            getAgentComments(agent.id),
+            getTokenHolders(agent.id),
+            getAgentTrades(agent.id)
+          ]);
+
+          agent.comments = {
+            comments: agentComments.value[agent.id]?.data ?? [],
+          };
+
+          agent.tokenHolders = {
+            holders: {
+              holders: tokenHolders.value[agent.id]?.holders.holders ?? [],
+              total: tokenHolders.value[agent.id]?.holders.total ?? 0
+            }
+          };
+
+          agent.trades = {
+            trades: agentTrades.value[agent.id]?.trades ?? []
+          };
         })
       );
+
     } catch (error) {
       console.warn('[AGENTS] Error fetching agents:', error);
       agents.value = [];
@@ -55,47 +125,130 @@ export const useAgentsStore = defineStore('agents', () => {
     }
   }
 
-  function readPreviewCache(agentId: string): PreviewDto | null {
-    const previewCookie = useLocalStorage(`preview-${agentId}`, null);
-    if (previewCookie.value) {
-      try {
-        const data: PreviewDto = JSON.parse(previewCookie.value);
-        if (data.audio) return data;
-      } catch (error) { }
-    }
-    return null;
-  }
-
-  function writePreviewCache(agentId: string, data: PreviewDto): void {
+  async function getAgentComments(
+    agentId: string,
+    page = 1,
+    limit = 20
+  ): Promise<void> {
     try {
-      useLocalStorage(`preview-${agentId}`, JSON.stringify(data));
-    } catch (error) {
-      // Might be full; ignore.
-    }
-  }
-
-  /**
-   * Fetches the agent preview data. Returns base64 wav audio data.
-   */
-  async function getAgentPreview(agent: Agent): Promise<void> {
-    const agentId = agent.id;
-    if (previews.value[agentId]) return;
-    const previewCache = readPreviewCache(agentId);
-    if (previewCache) {
-      previews.value[agentId] = previewCache;
-      return;
-    }
-    try {
-      loading.value = true;
-      const res = await $fetch<PreviewDto>(`/api/v1/agents/preview?agentId=${agentId}`, {
-        method: 'POST',
-        headers: { 'Cache-Control': 'max-age=86400' },
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
       });
 
-      writePreviewCache(agentId, res);
-      previews.value[agentId] = res;
+      const res = await $fetch<CommentsApiResponse>(
+        `https://api.vocal.fun/api/v1/launchpad/comments/${agentId}?${params.toString()}`
+      );
+      agentComments.value[agentId] = {
+        data: res.comments?.comments || [],
+        total: res.comments?.total || 0,
+        page: res.pagination.page,
+        limit: res.pagination.limit,
+      };
     } catch (error) {
-      console.warn(`[PREVIEW] Error fetching ${agent.name} (id: ${agentId}) agent preview:`, error);
+      console.warn(`[AGENT COMMENTS] Error fetching comments for agent ${agentId}:`, error);
+      agentComments.value[agentId] = {
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 20,
+      };
+    }
+  }
+
+  async function getCommentsForAllAgents(page = 1, limit = 20): Promise<void> {
+    try {
+      loading.value = true;
+      const promises = agents.value.map((agent) =>
+        getAgentComments(agent.id, page, limit)
+      );
+      await Promise.all(promises);
+    } catch (error) {
+      console.warn('[ALL AGENT COMMENTS] Error fetching comments for all agents:', error);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function getTokenHolders(
+    agentId: string,
+    page = 1,
+    limit = 20
+  ): Promise<void> {
+    try {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+      });
+      const res = await $fetch<{
+        holders: { holders: TokenHoldersResponse['holders']['holders']; total: number };
+        pagination: { page: number; limit: number };
+      }>(`https://api.vocal.fun/api/v1/launchpad/holders/${agentId}?${params.toString()}`);
+
+      tokenHolders.value[agentId] = {
+        holders: {
+          holders: res.holders.holders,
+          total: res.holders.total,
+        },
+        page: res.pagination.page,
+        limit: res.pagination.limit,
+      };
+    } catch (error) {
+      console.warn(`[TOKEN HOLDERS] Error fetching holders for agent ${agentId}:`, error);
+      tokenHolders.value[agentId] = {
+        holders: {
+          holders: [],
+          total: 0,
+        },
+        page,
+        limit,
+      };
+    }
+  }
+
+  async function getAgentTrades(
+    agentId: string,
+    page = 1,
+    limit = 20
+  ): Promise<void> {
+    try {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+      });
+      const res = await $fetch<{
+        trades: { trades: Trade[]; total: number };
+        pagination: { page: number; limit: number };
+      }>(
+        `https://api.vocal.fun/api/v1/launchpad/trades/${agentId}?${params.toString()}`
+      );
+
+      agentTrades.value[agentId] = {
+        trades: res.trades.trades,
+        total: res.trades.total,
+        page: res.pagination.page,
+        limit: res.pagination.limit,
+      };
+    } catch (error) {
+      console.warn(`[AGENT TRADES] Error fetching trades for agent ${agentId}:`, error);
+      agentTrades.value[agentId] = {
+        trades: [],
+        total: 0,
+        page,
+        limit,
+      };
+    }
+  }
+
+  async function getTradesForAllAgents(page = 1, limit = 20): Promise<void> {
+    try {
+      loading.value = true;
+      const promises = agents.value.map((agent) =>
+        getAgentTrades(agent.id, page, limit)
+      );
+      await Promise.all(promises);
+    } catch (error) {
+      console.warn('[ALL AGENT TRADES] Error fetching trades for all agents:', error);
     } finally {
       loading.value = false;
     }
@@ -117,60 +270,45 @@ export const useAgentsStore = defineStore('agents', () => {
     }
   }
 
-  async function getAgentComments(agentId: string): Promise<void> {
+  function readPreviewCache(agentId: string): PreviewDto | null {
+    const previewCookie = useLocalStorage(`preview-${agentId}`, null);
+    if (previewCookie.value) {
+      try {
+        const data: PreviewDto = JSON.parse(previewCookie.value);
+        if (data.audio) return data;
+      } catch (error) { console.info(error) }
+    }
+    return null;
+  }
+
+  function writePreviewCache(agentId: string, data: PreviewDto): void {
     try {
-      const res = await $fetch<CommentsApiResponse>(`https://api.vocal.fun/api/v1/launchpad/comments/${agentId}`);
-      // Now TypeScript knows res is of type CommentsApiResponse.
-      agentComments.value[agentId] = res.comments?.comments || [];
+      useLocalStorage(`preview-${agentId}`, JSON.stringify(data));
     } catch (error) {
-      console.warn(`[AGENT COMMENTS] Error fetching comments for agent ${agentId}:`, error);
-      agentComments.value[agentId] = [];
+      console.info(error)
     }
   }
 
+  async function getAgentPreview(agent: Agent): Promise<void> {
+    const agentId = agent.id;
+    if (previews.value[agentId]) return;
 
-  async function getTokenHolders(agentId: string): Promise<void> {
-    try {
-      const res = await $fetch(`https://api.vocal.fun/api/v1/launchpad/holders/${agentId}`);
-      tokenHolders.value[agentId] = res;
-    } catch (error) {
-      console.warn(`[TOKEN HOLDERS] Error fetching holders for agent ${agentId}:`, error);
-      tokenHolders.value[agentId] = null;
+    const previewCache = readPreviewCache(agentId);
+    if (previewCache) {
+      previews.value[agentId] = previewCache;
+      return;
     }
-  }
 
-  async function getCommentsForAllAgents(): Promise<void> {
     try {
       loading.value = true;
-      const promises = agents.value.map((agent) => getAgentComments(agent.id));
-      await Promise.all(promises);
+      const res = await $fetch<PreviewDto>(`/api/v1/agents/preview?agentId=${agentId}`, {
+        method: 'POST',
+        headers: { 'Cache-Control': 'max-age=86400' },
+      });
+      writePreviewCache(agentId, res);
+      previews.value[agentId] = res;
     } catch (error) {
-      console.warn('[ALL AGENT COMMENTS] Error fetching comments for all agents:', error);
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  async function getAgentTrades(agentId: string): Promise<void> {
-    try {
-      const res = await $fetch<{ trades: { trades: Trade[]; total: number } }>(
-        `https://api.vocal.fun/api/v1/launchpad/trades/${agentId}`
-      );
-      agentTrades.value[agentId] = { trades: res.trades.trades };
-    } catch (error) {
-      console.warn(`[AGENT TRADES] Error fetching trades for agent ${agentId}:`, error);
-      agentTrades.value[agentId] = { trades: [] };
-    }
-  }
-
-
-  async function getTradesForAllAgents(): Promise<void> {
-    try {
-      loading.value = true;
-      const promises = agents.value.map((agent) => getAgentTrades(agent.id));
-      await Promise.all(promises);
-    } catch (error) {
-      console.warn('[ALL AGENT TRADES] Error fetching trades for all agents:', error);
+      console.warn(`[PREVIEW] Error fetching ${agent.name} (id: ${agentId}) agent preview:`, error);
     } finally {
       loading.value = false;
     }
@@ -251,7 +389,6 @@ export const useAgentsStore = defineStore('agents', () => {
     }
   }
 
-
   async function addComment(agentId: string, content: string): Promise<any> {
     try {
       loading.value = true;
@@ -272,22 +409,27 @@ export const useAgentsStore = defineStore('agents', () => {
     }
   }
 
+
   return {
     loading,
     agents,
-    config,
+    agentsPagination,
     previews,
+    config,
     agentComments,
     tokenHolders,
+    agentTrades,
     userDetails,
     getAgents,
-    createAgent,
-    addComment,
     getAgentPreview,
     getConfig,
     getAgentComments,
     getCommentsForAllAgents,
-    getUserDetails,
+    getTokenHolders,
+    getAgentTrades,
     getTradesForAllAgents,
+    getUserDetails,
+    createAgent,
+    addComment,
   };
 });
