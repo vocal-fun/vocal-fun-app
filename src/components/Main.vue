@@ -3,7 +3,7 @@
     <div class="content-header">
       <div>
         <h2>Voice AI agent coins</h2>
-        <button>Launch my coin</button>
+        <button @click="createAgent">Launch my coin</button>
       </div>
       <EQ class="equalizer" />
     </div>
@@ -123,6 +123,11 @@ function goToAgentPage(person: Agent) {
   router.push(`/agent/${person.id}`)
 }
 
+function createAgent() {
+  router.push('/create')
+}
+
+
 function setSort(field: string) {
   if (sortBy.value === field) {
     sortDirection.value = (sortDirection.value === 'desc') ? 'asc' : 'desc'
@@ -135,7 +140,6 @@ function setSort(field: string) {
 async function create() {
   const userId = authStore.user?._id
   await agentsStore.getUserDetails(userId || '')
-  // await agentsStore.addComment('67cb962e2fcbfdb6e517d632', 'just some comment')
   // await agentsStore.createAgent({
   //   name: 'agent-main',
   //   symbol: 'agent-main',
