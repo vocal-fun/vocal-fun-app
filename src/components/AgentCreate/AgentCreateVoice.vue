@@ -1,94 +1,260 @@
 <template>
   <div class="profile-voice">
-    <p>Voice sample</p>
     <p class="warning">
       Upload a 10-15s clip of voice you want to clone. High quality only.
       Or pick one of the existing ones.
     </p>
-
-    <!-- Upload voice block -->
-    <div class="upload-voice">
-      <NuxtImg
-        class="speaker"
-        src="/logo/logo.png"
-        alt="Speaker logo"
-        format="webp"
-        loading="lazy"
-      />
+    <div class="upload-voice" :class="{ selected: selectedVoice === 'uploaded', loaded: voiceFile }"
+      @click="selectUploadedVoice">
+      <NuxtImg v-if="!voiceFile" class="speaker" src="/logo/logo.png" alt="Speaker logo" format="webp" loading="lazy" />
+      <button v-else class="speaker" @click.stop="togglePlayPause">
+        <NuxtImg v-if="!isPlaying" class="play" src="/img/play.png" alt="Play" format="webp" loading="lazy" />
+        <span v-else>||</span>
+      </button>
       <div class="description">
-        <p>Upload a voice sample</p>
-        <p>.mp4, max 1mb</p>
+        <p v-if="voiceFileName">{{ displayVoiceFileName }}</p>
+        <template v-else>
+          <p>Upload a voice sample</p>
+          <p>.mp4, wav, mp3</p>
+        </template>
       </div>
-      <button>Upload</button>
+      <button @click.stop="handleVoiceButtonClick">
+        {{ voiceFile ? "Remove" : "Upload" }}
+      </button>
+      <input ref="voiceInput" type="file" accept="audio/*,video/mp4" @change="onVoiceChange" style="display: none;" />
+      <audio ref="uploadedAudio" :src="uploadedAudioUrl || ''" style="display: none;" />
     </div>
-
-    <!-- "OR" divider -->
     <div class="divider">
       <span>OR</span>
     </div>
-
-    <!-- Example voice block -->
-    <div class="example-voice">
-      <!-- Play button -->
-      <button>
-        <NuxtImg
-          class="play"
-          src="/img/play.png"
-          alt="Play button"
-          format="webp"
-          loading="lazy"
-        />
+    <div v-for="ex in examples" :key="ex.id" class="example-voice" :class="{ selected: selectedVoice === ex.id }"
+      @click="selectExampleVoice(ex)">
+      <button @click.stop="toggleExample(ex)">
+        <NuxtImg v-if="!ex.isPlaying" class="play" src="/img/play.png" alt="Play" format="webp" loading="lazy" />
+        <span v-else>||</span>
       </button>
-
       <div class="description">
-        <p>Kawaii</p>
-        <p>cute japanese girl</p>
+        <p>{{ ex.label }}</p>
+        <p>{{ ex.description }}</p>
       </div>
-
-      <!-- "Select" button -->
-      <button class="select" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, defineEmits, onMounted } from 'vue'
 import { NuxtImg } from '#components'
+
+
+const emit = defineEmits<{
+  (e: 'update:voiceFile', file: File | null): void;
+  (e: 'update:exampleVoice', voice: string | null): void;
+}>();
+
+const selectedVoice = ref<string | null>(null);
+const voiceFile = ref<File | null>(null);
+const voiceFileName = ref('');
+const voiceInput = ref<HTMLInputElement | null>(null);
+const uploadedAudioUrl = ref<string | null>(null);
+const uploadedAudio = ref<HTMLAudioElement | null>(null);
+const isPlaying = ref(false);
+
+
+interface ExampleVoice {
+  id: string;
+  file: string;    
+  label: string;
+  description: string;
+  isPlaying: boolean;
+  audio: HTMLAudioElement | null;
+}
+
+const examples = ref<ExampleVoice[]>([
+  {
+    id: 'kawaii',
+    file: 'example.mp3',
+    label: 'Kawaii',
+    description: 'cute japanese girl',
+    isPlaying: false,
+    audio: null,
+  },
+  {
+    id: 'robotic',
+    file: 'example.mp3',
+    label: 'Robotic',
+    description: 'futuristic robot voice',
+    isPlaying: false,
+    audio: null,
+  },
+  {
+    id: 'oldman',
+    file: 'example.mp3',
+    label: 'Old Man',
+    description: 'wise old man voice',
+    isPlaying: false,
+    audio: null,
+  },
+]);
+
+
+const displayVoiceFileName = computed(() => {
+  if (!voiceFileName.value) return '';
+  if (voiceFileName.value.length <= 5) return voiceFileName.value;
+  const dotIndex = voiceFileName.value.lastIndexOf('.');
+  if (dotIndex !== -1) {
+    const namePart = voiceFileName.value.slice(0, 5);
+    const ext = voiceFileName.value.slice(dotIndex);
+    return namePart + '...' + ext;
+  }
+  return voiceFileName.value.slice(0, 5) + '...';
+});
+
+function toggleExample(ex: ExampleVoice) {
+  if (!ex.audio) {
+    ex.audio = new Audio(`/audio/${ex.file}`);
+    ex.audio.addEventListener('ended', () => {
+      ex.isPlaying = false;
+    });
+  }
+  if (ex.audio.paused) {
+    examples.value.forEach((other) => {
+      if (other !== ex && other.audio && !other.audio.paused) {
+        other.audio.pause();
+        other.isPlaying = false;
+      }
+    });
+    ex.audio.play().catch((err) => {
+      console.warn(`Error playing example audio ${ex.file}:`, err);
+    });
+    ex.isPlaying = true;
+  } else {
+    ex.audio.pause();
+    ex.isPlaying = false;
+  }
+}
+
+function selectExampleVoice(ex: ExampleVoice) {
+  selectedVoice.value = ex.id;
+  emit('update:exampleVoice', ex.file);
+}
+
+function handleVoiceButtonClick() {
+  if (voiceFile.value) {
+    voiceFile.value = null;
+    voiceFileName.value = '';
+    uploadedAudioUrl.value = null;
+    isPlaying.value = false;
+    if (voiceInput.value) {
+      voiceInput.value.value = '';
+    }
+    emit('update:voiceFile', null);
+    if (selectedVoice.value === 'uploaded') {
+      selectedVoice.value = null;
+    }
+  } else {
+    voiceInput.value?.click();
+  }
+}
+
+function onVoiceChange(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const selectedFile = target.files ? target.files[0] : null;
+  if (selectedFile) {
+    voiceFile.value = selectedFile;
+    voiceFileName.value = selectedFile.name;
+    uploadedAudioUrl.value = URL.createObjectURL(selectedFile);
+    isPlaying.value = false;
+    emit('update:voiceFile', selectedFile);
+    selectedVoice.value = 'uploaded';
+  }
+}
+
+function togglePlayPause() {
+  const audioEl = uploadedAudio.value;
+  if (!audioEl) return;
+  if (audioEl.paused) {
+    audioEl.play().catch(err => {
+      console.warn('Error playing uploaded audio:', err);
+    });
+    isPlaying.value = true;
+  } else {
+    audioEl.pause();
+    isPlaying.value = false;
+  }
+}
+
+onMounted(() => {
+  const audioEl = uploadedAudio.value;
+  if (audioEl) {
+    audioEl.addEventListener('ended', () => {
+      isPlaying.value = false;
+    });
+  }
+});
+
+function selectUploadedVoice() {
+  if (voiceFile.value) {
+    selectedVoice.value = "uploaded";
+    emit('update:exampleVoice', null);
+  }
+}
 </script>
 
 <style scoped lang="scss">
 .profile-voice {
   display: flex;
-  width: 100%;
   flex-direction: column;
+  width: 100%;
 
   .warning {
     color: #fa6400;
-    margin-bottom: 32px;
     margin-top: 16px;
+    margin-bottom: 24px;
     font-size: 12px;
   }
 
   /* Upload voice block */
   .upload-voice {
     display: flex;
-    flex-direction: row;
     align-items: center;
     padding: 16px;
-    background-color: #59596D26;
-    border: 1.8px solid #59596D33;
+    background-color: #59596d26;
+    border: 1.8px solid #59596d33;
+    transition: background-color 0.3s, border 0.3s;
 
-    img.speaker {
+    &.selected {
+      background-color: #00fa000F;
+      border: 1.82px solid #00fa00;
+    }
+
+    /* Hover effect for upload block only when file is loaded */
+    &.loaded:hover {
+      cursor: pointer;
+      background-color: #00fa001F;
+    }
+
+    .speaker {
       width: 63px;
       height: 63px;
       padding: 12px;
-      border: 1px solid #59596D33;
+      border: 1px solid #59596d33;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      cursor: pointer;
+
+      img {
+        width: 22px;
+        height: 22px;
+      }
     }
 
     .description {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-left: 32px;
+      margin-right: auto;
 
       p:last-child {
         opacity: 0.5;
@@ -97,7 +263,6 @@ import { NuxtImg } from '#components'
 
     button {
       position: relative;
-      margin-left: auto;
 
       &::after {
         content: '';
@@ -111,9 +276,13 @@ import { NuxtImg } from '#components'
         background-color: white;
       }
     }
+
+    audio {
+      display: none;
+    }
   }
 
-  /* Divider (OR) inline */
+  /* Divider inline */
   .divider {
     display: flex;
     align-items: center;
@@ -138,26 +307,41 @@ import { NuxtImg } from '#components'
     }
   }
 
-  /* Example voice block */
+  /* Example voices */
   .example-voice {
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: 16px;
-    background-color: #59596D26;
-    border: 1.8px solid #59596D33;
+    background-color: #59596d26;
+    border: 1.8px solid #59596d33;
+    margin-bottom: 12px;
+    transition: background-color 0.3s, border 0.3s;
 
-    /* Play button */
+    &.selected {
+      background-color: #00fa000F;
+      border: 1.82px solid #00fa00;
+    }
+
+    /* Add hover effect for all example voices */
+    &:hover {
+      background-color: #00fa001F;
+      cursor: pointer;
+    }
+
     button:first-child {
-      border: 1px solid #59596D33;
+      border: 1px solid #59596d33;
       margin: unset;
       width: 63px;
       height: 63px;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
+      font-size: 24px;
+      color: #ffffff;
 
-      img.play {
+      img {
         width: 22px;
         height: 22px;
       }
@@ -171,26 +355,6 @@ import { NuxtImg } from '#components'
 
       p:last-child {
         opacity: 0.5;
-      }
-    }
-
-    /* "Select" button */
-    .select {
-      width: 32px;
-      height: 32px;
-      background-color: transparent;
-      border: 1px solid #59596D;
-      cursor: pointer;
-      transition: border-color 0.3s ease;
-      margin-left: auto;
-
-      &:hover {
-        border-color: #ffffff;
-      }
-
-      &:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px #ffffff;
       }
     }
   }

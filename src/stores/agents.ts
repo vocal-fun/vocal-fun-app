@@ -15,7 +15,7 @@ export const useAgentsStore = defineStore('agents', () => {
     try {
       loading.value = true;
       const res = await $fetch<AgentsResponse>('https://api.vocal.fun/api/v1/launchpad/agents');
-      console.info('res', res)
+      console.log('res', res)
       agents.value = res.agents.map(({ _id, name, symbol, marketCap, currentPrice, createdBy, tokenAddress, rate, imageUrl, createdAt }) => ({
         id: _id,
         name,
@@ -91,7 +91,7 @@ export const useAgentsStore = defineStore('agents', () => {
         method: 'POST',
         headers: { 'Cache-Control': 'max-age=86400' },
       });
-      console.info('result agent preview', res);
+
       writePreviewCache(agentId, res);
       previews.value[agentId] = res;
     } catch (error) {
@@ -107,7 +107,7 @@ export const useAgentsStore = defineStore('agents', () => {
       const res = await $fetch<{ createAgentFees: string; chainId: number }>(
         'https://api.vocal.fun/api/v1/launchpad/config'
       );
-      console.info('res', res);
+      console.log('res', res);
       config.value = res;
     } catch (error) {
       console.warn('[CONFIG] Error fetching configuration:', error);
@@ -196,8 +196,8 @@ export const useAgentsStore = defineStore('agents', () => {
     systemPrompt: string;
     twitter?: string;
     website?: string;
-    imagePath: string;
-    voiceSamplePath: string;
+    image: File | string;
+    voiceSample: File | string;
   }): Promise<any> {
     try {
       loading.value = true;
@@ -211,22 +211,29 @@ export const useAgentsStore = defineStore('agents', () => {
       formData.append('twitter', params.twitter || '');
       formData.append('website', params.website || '');
 
-      const imageResponse = await fetch(params.imagePath);
-      if (!imageResponse.ok) {
-        throw new Error(`Failed to fetch image from ${params.imagePath}`);
+      if (params.image instanceof File) {
+        formData.append('image', params.image);
+      } else {
+        const imageResponse = await fetch(params.image);
+        if (!imageResponse.ok) {
+          throw new Error(`Failed to fetch image from ${params.image}`);
+        }
+        const imageBlob = await imageResponse.blob();
+        const imageFile = new File([imageBlob], 'image.png', { type: imageBlob.type });
+        formData.append('image', imageFile);
       }
-      const imageBlob = await imageResponse.blob();
-      const imageFile = new File([imageBlob], 'image.png', { type: imageBlob.type });
-      formData.append('image', imageFile);
 
-      const voiceResponse = await fetch(params.voiceSamplePath);
-      if (!voiceResponse.ok) {
-        throw new Error(`Failed to fetch voice sample from ${params.voiceSamplePath}`);
+      if (params.voiceSample instanceof File) {
+        formData.append('voiceSample', params.voiceSample);
+      } else {
+        const voiceResponse = await fetch(params.voiceSample);
+        if (!voiceResponse.ok) {
+          throw new Error(`Failed to fetch voice sample from ${params.voiceSample}`);
+        }
+        const voiceBlob = await voiceResponse.blob();
+        const voiceFile = new File([voiceBlob], 'voiceSample.mp3', { type: voiceBlob.type });
+        formData.append('voiceSample', voiceFile);
       }
-      const voiceBlob = await voiceResponse.blob();
-      const voiceFile = new File([voiceBlob], 'voiceSample.png', { type: voiceBlob.type });
-      formData.append('voiceSample', voiceFile);
-
 
       const res = await $fetch('https://api.vocal.fun/api/v1/launchpad/create', {
         method: 'POST',
@@ -243,6 +250,7 @@ export const useAgentsStore = defineStore('agents', () => {
       loading.value = false;
     }
   }
+
 
   async function addComment(agentId: string, content: string): Promise<any> {
     try {
@@ -263,10 +271,6 @@ export const useAgentsStore = defineStore('agents', () => {
       loading.value = false;
     }
   }
-
-
-
-  // https://api.vocal.fun/api/v1/launchpad/user
 
   return {
     loading,

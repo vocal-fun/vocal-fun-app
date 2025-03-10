@@ -137,21 +137,6 @@ function setSort(field: string) {
   }
 }
 
-async function create() {
-  const userId = authStore.user?._id
-  await agentsStore.getUserDetails(userId || '')
-  // await agentsStore.createAgent({
-  //   name: 'agent-main',
-  //   symbol: 'agent-main',
-  //   description: 'agent-main',
-  //   systemPrompt: 'agent-main',
-  //   twitter: '',
-  //   website: '',
-  //   imagePath: '/img/grid.png',
-  //   voiceSamplePath: '/img/grid.png',
-  // });
-}
-
 const filteredAgents = computed(() => {
   let results = [...agentsStore.agents]
 
@@ -185,8 +170,6 @@ const filteredAgents = computed(() => {
 
   return results
 })
-
-
 
 function toggleWatchlist() {
   showWatchlist.value = !showWatchlist.value
