@@ -1,5 +1,5 @@
 <template>
-  <div class="person shake-little" :class="{ disabled: isDisabled }" @click="goToAgentPage">
+  <div v-play-click-sound class="person shake-little" :class="{ disabled: isDisabled }" @click="goToAgentPage">
     <div class="info">
       <div>
         <p>{{ name }}</p>
@@ -17,9 +17,11 @@
     </div>
 
     <div class="buttons">
-      <button class="preview shake" :disabled="isDisabled" @click.stop="openModal('preview')">PREVIEW</button>
-      <button class="preview shake" :disabled="isDisabled" @click.stop="openModal('call')">CALL</button>
-      <button class="shake" @click.stop="handleBuy">BUY</button>
+      <button v-play-click-sound class="preview shake" :disabled="isDisabled"
+        @click.stop="openModal('preview')">PREVIEW</button>
+      <button v-play-click-sound class="preview shake" :disabled="isDisabled"
+        @click.stop="openModal('call')">CALL</button>
+      <button v-play-click-sound class="shake" @click.stop="handleBuy">BUY</button>
     </div>
   </div>
 </template>

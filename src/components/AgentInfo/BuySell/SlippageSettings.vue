@@ -1,20 +1,20 @@
 <template>
 	<div class="slippage">
-		<div @click="toggleOptions">
+		<div v-play-click-sound @click="toggleOptions">
 			<NuxtImg class="slippage-img" src="/img/slippage.png" alt="Slippage Settings" format="webp" loading="lazy" />
 			<p>{{ selectedSlippage !== null ? selectedSlippage + '%' : 'SLIPPAGE SETTINGS' }}</p>
 			<p class="slippage-arrow">></p>
 		</div>
 		<transition name="fade-slide">
 			<div v-if="showOptions" class="slippage-options" @click.stop>
-				<ul>
+				<ul v-play-click-sound>
 					<li v-for="option in slippageOptions" :key="option" @click.stop="selectOption(option)">
 						{{ option }}%
 					</li>
 				</ul>
 				<div class="custom-slippage">
 					<input type="number" v-model.number="customValue" placeholder="Custom" @input="validateCustom" />
-					<button @click="setCustom">Set</button>
+					<button v-play-click-sound @click="setCustom">Set</button>
 				</div>
 			</div>
 		</transition>
@@ -58,6 +58,7 @@ function setCustom() {
 
 <style scoped lang="scss">
 .slippage {
+
 	.fade-slide-enter-active,
 	.fade-slide-leave-active {
 		transition: all 0.3s ease;

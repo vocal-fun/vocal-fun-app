@@ -3,7 +3,7 @@
     <div class="content-header">
       <div>
         <h2>Voice AI agent coins</h2>
-        <button @click="createAgent">Launch my coin</button>
+        <button v-play-click-sound @click="createAgent">Launch my coin</button>
       </div>
       <EQ class="equalizer" />
     </div>
@@ -24,8 +24,8 @@
           <thead>
             <tr>
               <th>Vocal agent</th>
-              <th v-for="col in columns" :key="col.key" :class="{ sorted: sortBy === col.key, sorting: true }"
-                @click="setSort(col.key)">
+              <th v-play-click-sound v-for="col in columns" :key="col.key"
+                :class="{ sorted: sortBy === col.key, sorting: true }" @click="setSort(col.key)">
                 <div class="label-wrapper">
                   <p class="column-title">{{ col.label }}</p>
                   <div class="sort-arrows">
@@ -40,7 +40,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="person in filteredAgents" :key="person.id" @click="goToAgentPage(person)">
+            <tr v-play-click-sound v-for="person in filteredAgents" :key="person.id" @click="goToAgentPage(person)">
               <td class="table-avatar-column" data-label="Vocal agent">
                 <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
                   placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
@@ -61,9 +61,10 @@
               </td>
               <td data-label="Holders">{{ person.tokenHolders.holders.total }}</td>
               <td data-label="Actions" class="actions-buttons">
-                <button @click.stop="openModal(person, 'preview')" class="preview-btn">Preview</button>
-                <button @click.stop="openModal(person, 'call')" class="call-btn">Call</button>
-                <button @click.stop="buy(person)" class="buy-btn">Buy</button>
+                <button v-play-click-sound @click.stop="openModal(person, 'preview')"
+                  class="preview-btn">Preview</button>
+                <button v-play-click-sound @click.stop="openModal(person, 'call')" class="call-btn">Call</button>
+                <button v-play-click-sound @click.stop="buy(person)" class="buy-btn">Buy</button>
               </td>
             </tr>
           </tbody>

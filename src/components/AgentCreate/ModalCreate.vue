@@ -15,14 +15,14 @@
 			<div class="input">
 				<p>Prompt question <span>(you cannot change this)</span></p>
 				<input placeholder="Who are you and what do you do?" v-model="inputValue" />
-				<button @click="testResponse">
+				<button v-play-click-sound @click="testResponse">
 					Play agent's test response <span>▶</span>
 				</button>
 			</div>
 
 			<div v-if="!isLoading" class="actions">
-				<button @click="publishAgent">PUBLISH THIS.</button>
-				<button @click="$emit('close')">NEED TO TWEAK.</button>
+				<button v-play-click-sound @click="publishAgent">PUBLISH THIS.</button>
+				<button v-play-click-sound @click="$emit('close')">NEED TO TWEAK.</button>
 			</div>
 			<div v-else class="loader"></div>
 		</div>

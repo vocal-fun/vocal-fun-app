@@ -15,11 +15,11 @@
     <div v-if="viewMode === TypeGridTable.GRID" class="sort">
       <label>Sort by:</label>
       <div class="dropdown" ref="dropdownRef">
-        <button class="dropdown-trigger" @click="toggleDropdown">
+        <button v-play-click-sound class="dropdown-trigger" @click="toggleDropdown">
           {{ currentLabel }}
           <span class="arrow" />
         </button>
-        <ul v-if="isOpen" class="dropdown-menu">
+        <ul v-play-click-sound v-if="isOpen" class="dropdown-menu">
           <li v-for="option in options" :key="option.value" :class="{ active: option.value === sortBy }"
             @click="selectOption(option.value)">
             {{ option.label }}

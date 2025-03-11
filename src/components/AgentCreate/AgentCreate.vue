@@ -11,7 +11,8 @@
 			<AgentCreatePic v-model:imageFile="imageFile" />
 			<AgentCreateVoice v-model:voiceFile="voiceFile" v-model:exampleVoice="exampleVoice" />
 
-			<button class="create-btn" :class="{ filled: isInfoFilled }" :disabled="!isInfoFilled" @click="handleCreateAgent">
+			<button v-play-click-sound class="create-btn" :class="{ filled: isInfoFilled }" :disabled="!isInfoFilled"
+				@click="handleCreateAgent">
 				{{ isInfoFilled ? "Generate Agent Preview" : "Fill in details to create agent" }}
 			</button>
 		</div>

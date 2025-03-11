@@ -11,7 +11,7 @@
           <p>png, jpg, jpeg. Max 1mb</p>
         </template>
       </div>
-      <button @click="handleButtonClick">
+      <button v-play-click-sound @click="handleButtonClick">
         {{ file ? "Remove" : "Upload" }}
       </button>
       <input ref="fileInput" type="file" accept="image/*" @change="onFileChange" style="display: none;" />

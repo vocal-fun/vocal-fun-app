@@ -19,8 +19,8 @@
 			</div>
 		</div>
 		<div class="actions">
-			<button @click="openModal('preview')" class="preview">PREVIEW</button>
-			<button @click="openModal('call')" class="call">CALL</button>
+			<button v-play-click-sound @click="openModal('preview')" class="preview">PREVIEW</button>
+			<button v-play-click-sound @click="openModal('call')" class="call">CALL</button>
 		</div>
 	</div>
 

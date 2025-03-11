@@ -1,12 +1,12 @@
 <template>
 	<div :class="['tabs', { 'small-screen': $isSmallScreen }]">
-		<button :class="{ active: selectedTab === 'BUY' }" @click="handleClick('BUY')">
+		<button v-play-click-sound :class="{ active: selectedTab === 'BUY' }" @click="handleClick('BUY')">
 			BUY
 		</button>
-		<button :class="{ active: selectedTab === 'SELL' }" @click="handleClick('SELL')">
+		<button v-play-click-sound :class="{ active: selectedTab === 'SELL' }" @click="handleClick('SELL')">
 			SELL
 		</button>
-		<button v-if="$isSmallScreen" @click="$emit('close')" class="close-btn">x</button>
+		<button v-play-click-sound v-if="$isSmallScreen" @click="$emit('close')" class="close-btn">x</button>
 	</div>
 </template>
 

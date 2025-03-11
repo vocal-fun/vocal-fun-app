@@ -4,10 +4,10 @@
       Upload a 10-15s clip of voice you want to clone. High quality only.
       Or pick one of the existing ones.
     </p>
-    <div class="upload-voice" :class="{ selected: selectedVoice === 'uploaded', loaded: voiceFile }"
+    <div v-play-click-sound class="upload-voice" :class="{ selected: selectedVoice === 'uploaded', loaded: voiceFile }"
       @click="selectUploadedVoice">
       <NuxtImg v-if="!voiceFile" class="speaker" src="/logo/logo.png" alt="Speaker logo" format="webp" loading="lazy" />
-      <button v-else class="speaker" @click.stop="togglePlayPause">
+      <button v-play-click-sound v-else class="speaker" @click.stop="togglePlayPause">
         <NuxtImg v-if="!isPlaying" class="play" src="/img/play.png" alt="Play" format="webp" loading="lazy" />
         <span v-else>||</span>
       </button>
@@ -18,7 +18,7 @@
           <p>.mp4, wav, mp3</p>
         </template>
       </div>
-      <button @click.stop="handleVoiceButtonClick">
+      <button v-play-click-sound @click.stop="handleVoiceButtonClick">
         {{ voiceFile ? "Remove" : "Upload" }}
       </button>
       <input ref="voiceInput" type="file" accept="audio/*,video/mp4" @change="onVoiceChange" style="display: none;" />
@@ -27,8 +27,8 @@
     <div class="divider">
       <span>OR</span>
     </div>
-    <div v-for="ex in examples" :key="ex.id" class="example-voice" :class="{ selected: selectedVoice === ex.id }"
-      @click="selectExampleVoice(ex)">
+    <div v-play-click-sound v-for="ex in examples" :key="ex.id" class="example-voice"
+      :class="{ selected: selectedVoice === ex.id }" @click="selectExampleVoice(ex)">
       <button @click.stop="toggleExample(ex)">
         <NuxtImg v-if="!ex.isPlaying" class="play" src="/img/play.png" alt="Play" format="webp" loading="lazy" />
         <span v-else>||</span>
@@ -263,6 +263,7 @@ function selectUploadedVoice() {
       }
 
       transition: color 0.3s ease-in-out;
+
       &:hover {
         color: rgb(201, 195, 195);
 

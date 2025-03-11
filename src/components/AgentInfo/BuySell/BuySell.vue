@@ -8,7 +8,7 @@
 		</div>
 
 		<div v-else class="buy-sell-mobile">
-			<button class="buy-sell-toggle" @click="handleMobileButtonClick">
+			<button v-play-click-sound class="buy-sell-toggle" @click="handleMobileButtonClick">
 				{{ selectedTab }}
 			</button>
 

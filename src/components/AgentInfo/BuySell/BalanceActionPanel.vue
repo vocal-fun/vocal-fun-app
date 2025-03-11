@@ -12,7 +12,8 @@
 				</div>
 			</div>
 			<div class="select-amount">
-				<button v-for="amount in amounts" :key="amount" class="select-amount-btn" @click="selectAmount(amount)">
+				<button v-play-click-sound v-for="amount in amounts" :key="amount" class="select-amount-btn"
+					@click="selectAmount(amount)">
 					<NuxtImg class="solana-icon" alt="Solana icon" format="webp" loading="lazy" src="/img/solana.png" />
 					<span>{{ amount }}</span>
 				</button>
@@ -21,7 +22,7 @@
 
 		<div v-if="!$isSmallScreen" class="action">
 			<EQ class="equalizer" :repeatTimes="3" />
-			<button @click="handleAction">
+			<button v-play-click-sound @click="handleAction">
 				{{ selectedTab === 'BUY' ? 'BUY' : 'SELL' }}
 			</button>
 		</div>

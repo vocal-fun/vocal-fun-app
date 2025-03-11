@@ -5,13 +5,16 @@
 		<BondingCurve class="curve-small" v-if="$isSmallScreen" :progressPercentage="4" />
 		<div>
 			<div class="holders">
-				<p :class="{ selected: selectedTab === TypeOfTable.HOLDERS }" @click="selectedTab = TypeOfTable.HOLDERS">
+				<p v-play-click-sound :class="{ selected: selectedTab === TypeOfTable.HOLDERS }"
+					@click="selectedTab = TypeOfTable.HOLDERS">
 					Holders ({{ totalHolders }})
 				</p>
-				<p :class="{ selected: selectedTab === TypeOfTable.TRADES }" @click="selectedTab = TypeOfTable.TRADES">
+				<p v-play-click-sound :class="{ selected: selectedTab === TypeOfTable.TRADES }"
+					@click="selectedTab = TypeOfTable.TRADES">
 					All trades
 				</p>
-				<p :class="{ selected: selectedTab === TypeOfTable.COMMENTS }" @click="selectedTab = TypeOfTable.COMMENTS">
+				<p v-play-click-sound :class="{ selected: selectedTab === TypeOfTable.COMMENTS }"
+					@click="selectedTab = TypeOfTable.COMMENTS">
 					Thread
 				</p>
 			</div>
@@ -30,8 +33,8 @@
 							<td v-for="header in tableHeaders" :key="header.key"
 								:class="header.key === 'type' && tx[header.key] === TrxType.SELL ? 'sell-trx' : ''">
 								{{ header.key === 'account' || header.key === 'transactionHash'
-									? formatContract(tx[header.key])
-									: tx[header.key] }}
+								? formatContract(tx[header.key])
+								: tx[header.key] }}
 							</td>
 						</tr>
 					</tbody>
@@ -41,7 +44,7 @@
 			<div v-else-if="selectedTab === TypeOfTable.COMMENTS" class="comments-container">
 				<div class="add-comment-section">
 					<input v-model="newComment" placeholder="Type your comment..." @keyup.enter="handleAddComment" />
-					<button @click="handleAddComment">Add comment</button>
+					<button v-play-click-sound @click="handleAddComment">Add comment</button>
 				</div>
 				<div v-for="(comment, index) in commentsList" :key="index" class="comment-row">
 					<div>
