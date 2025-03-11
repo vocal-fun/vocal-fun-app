@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { debounce } from 'lodash'
+import debounce from 'lodash/debounce';
 import { TypeGridTable } from '~/types'
 
 const props = defineProps({
