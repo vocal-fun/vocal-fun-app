@@ -382,6 +382,12 @@ section.main {
   display: flex;
   flex-direction: column;
   gap: 14px;
+
+  .token-name {
+    max-width: 6ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .actions-buttons {
@@ -445,10 +451,26 @@ section.main {
   }
 }
 
+@media (max-width:1100px) {
+  .agents-table tbody tr td:not(:first-child):not(:last-child) {
+    padding: unset;
+  }
+
+
+}
+
 @media (max-width: 1048px) {
   section.main .agents-table {
     min-width: unset;
     border-top: unset;
+  }
+
+  .person-info .token-name {
+    all: unset
+  }
+
+  .agents-table tbody tr td {
+    padding: 4px 8px;
   }
 
   .table-container {
