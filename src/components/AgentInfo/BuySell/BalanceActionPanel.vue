@@ -161,7 +161,8 @@ function handleAction() {
 			background-color: transparent;
 			color: white;
 			cursor: pointer;
-			transition: background-color 0.3s;
+
+			transition: background-color 0.3s ease-in-out;
 
 			&:hover {
 				background-color: rgba(89, 89, 109, 0.2);
@@ -194,8 +195,10 @@ function handleAction() {
 		background-color: #00fa00;
 		text-align: center;
 
+		transition: background-color 0.3s ease-in-out;
+
 		&:hover {
-			background-color: #37d339;
+			background-color: #3cdb3c;
 		}
 	}
 }

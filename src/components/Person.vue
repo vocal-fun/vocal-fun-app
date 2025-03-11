@@ -119,7 +119,6 @@ $circle-gradient: linear-gradient(180deg,
     width: 110px;
     height: 110px;
     border-radius: 50%;
-    overflow: hidden;
     position: relative;
 
     .avatar-img {

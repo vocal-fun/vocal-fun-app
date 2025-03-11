@@ -50,7 +50,7 @@ function handleClick(tab: 'BUY' | 'SELL') {
 		border: none;
 		cursor: pointer;
 		font-size: 15px;
-		transition: background 0.3s;
+		transition: background-color 0.3s ease-in-out;
 		color: #fff;
 
 		&.active {
@@ -59,7 +59,7 @@ function handleClick(tab: 'BUY' | 'SELL') {
 		}
 
 		&:not(.active):hover {
-			background: #2c2c3d;
+			background-color: #273920;
 		}
 	}
 

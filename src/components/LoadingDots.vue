@@ -28,7 +28,7 @@
 }
 
 .loading-dots span:nth-child(2) {
-  animation-delay: 0.3s;
+  animation-delay: 0.3s ease-in-out
 }
 
 .loading-dots span:nth-child(3) {
@@ -36,9 +36,12 @@
 }
 
 @keyframes dots {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }

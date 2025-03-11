@@ -63,10 +63,11 @@
               <td data-label="Actions" class="actions-buttons">
                 <button @click.stop="openModal(person, 'preview')" class="preview-btn">Preview</button>
                 <button @click.stop="openModal(person, 'call')" class="call-btn">Call</button>
-                <button class="buy-btn">Buy</button>
+                <button @click.stop="buy(person)" class="buy-btn">Buy</button>
               </td>
             </tr>
           </tbody>
+
         </table>
       </div>
     </div>
@@ -125,6 +126,10 @@ function goToAgentPage(person: Agent) {
 
 function createAgent() {
   router.push('/create')
+}
+
+function buy(person: Agent) {
+  console.log('Buying token for:', person.name);
 }
 
 
@@ -226,6 +231,10 @@ section.main {
     margin-bottom: 1rem;
     gap: 1rem;
 
+    button {
+      width: auto;
+    }
+
     div:first-child {
       display: flex;
       flex-direction: column;
@@ -233,7 +242,7 @@ section.main {
       font-size: 20px;
 
       &:hover {
-        transition: color 0.2s;
+        transition: color 0.3s ease-in-out;
         color: #60FF60;
       }
 
@@ -317,6 +326,8 @@ section.main {
           color: white;
         }
 
+        transition: opacity 0.3s ease-in-out;
+
         &:hover {
           opacity: 0.8;
         }
@@ -329,9 +340,11 @@ section.main {
       tr {
         border-bottom: 1px solid #333;
 
+        transition: background-color 0.3s ease-in-out;
+
         &:hover {
           cursor: pointer;
-          background: #2b2b3b;
+          background-color: #2b2b3b;
         }
 
         td {
@@ -390,7 +403,8 @@ section.main {
       background-color: #37D33933;
       display: flex;
       cursor: pointer;
-      transition: background 0.2s;
+
+      transition: background-color 0.3s ease-in-out;
 
       &:hover {
         background-color: #37D339;

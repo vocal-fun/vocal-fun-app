@@ -209,7 +209,8 @@ function selectUploadedVoice() {
     padding: 16px;
     background-color: #59596d26;
     border: 1.8px solid #59596d33;
-    transition: background-color 0.3s, border 0.3s;
+
+    transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out;
 
     &.selected {
       background-color: #00fa000F;
@@ -257,12 +258,18 @@ function selectUploadedVoice() {
         content: '';
         display: block;
         height: 1px;
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: white;
         margin-top: 6px;
       }
 
+      transition: color 0.3s ease-in-out;
+      &:hover {
+        color: rgb(201, 195, 195);
+
+      }
+
       &:hover::after {
-        background-color: white;
+        background-color: rgb(201, 195, 195);
       }
     }
 
@@ -305,7 +312,8 @@ function selectUploadedVoice() {
     background-color: #59596d26;
     border: 1.8px solid #59596d33;
     margin-bottom: 12px;
-    transition: background-color 0.3s, border 0.3s;
+
+    transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out;
 
     &.selected {
       background-color: #00fa000F;

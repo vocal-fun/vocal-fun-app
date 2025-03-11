@@ -155,6 +155,13 @@ function testResponse() {
 				width: 100%;
 				margin: 24px 0px;
 				color: #00FA00;
+				transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+
+				&:hover {
+					background-color: #00FA0022;
+					cursor: pointer;
+					border-color: #00FA00;
+				}
 			}
 
 			button {
@@ -166,8 +173,10 @@ function testResponse() {
 				border: 1.3px solid #00FA00;
 				cursor: pointer;
 
+				transition: background-color 0.3s ease-in-out;
+
 				&:hover {
-					background-color: #18ee18;
+					background-color: #2ee12e;
 				}
 
 				span {
@@ -191,16 +200,15 @@ function testResponse() {
 				border: 1px solid #00FA00;
 				padding: 22px;
 				width: 100%;
-				transition: background-color 0.3s;
-				cursor: pointer;
+				transition: background-color 0.3s ease-in-out;
 
 				&:hover {
+					cursor: pointer;
 					background-color: #09ec0988;
 				}
 			}
 		}
 
-		/* Loader: a rotating spinner circle */
 		.loader {
 			margin-top: 30px;
 			align-self: center;
@@ -214,7 +222,6 @@ function testResponse() {
 	}
 }
 
-/* Keyframes for spinner animation */
 @keyframes spin {
 	0% {
 		transform: rotate(0deg);

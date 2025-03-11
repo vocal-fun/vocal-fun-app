@@ -164,9 +164,10 @@ function handleClosePublishAgent() {
 		.filled {
 			background-color: #00fa00;
 			color: black;
+			transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 
 			&:hover:not(:disabled) {
-				background-color: #1fe71f;
+				background-color: #12d512;
 				color: black;
 			}
 		}

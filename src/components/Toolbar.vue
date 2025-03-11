@@ -1,11 +1,11 @@
 <template>
   <div class="toolbar">
     <div class="view-toggle">
-      <button :class="{ active: viewMode === TypeGridTable.GRID }"
+      <button v-play-click-sound :class="{ active: viewMode === TypeGridTable.GRID }"
         @click="$emit('update:viewMode', TypeGridTable.GRID)">
         <NuxtImg class="grid" src="/img/grid.png" alt="Grid button" format="webp" sizes="48px" loading="lazy" />
       </button>
-      <button :class="{ active: viewMode === TypeGridTable.TABLE }"
+      <button v-play-click-sound :class="{ active: viewMode === TypeGridTable.TABLE }"
         @click="$emit('update:viewMode', TypeGridTable.TABLE)">
         <NuxtImg class="table" src="/img/table.png" alt="Table button" format="webp" sizes="48px" loading="lazy" />
       </button>
@@ -149,8 +149,10 @@ function handleSearchInput(event: Event) {
     align-items: center;
     justify-content: center;
 
+    transition: opacity 0.3s ease-in-out;
+
     &:hover {
-      opacity: 0.8;
+      opacity: 0.7;
     }
   }
 
@@ -158,7 +160,7 @@ function handleSearchInput(event: Event) {
   .table {
     width: 24px;
     height: 24px;
-    transition: opacity 0.2s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
     opacity: 0.5;
   }
 
@@ -219,9 +221,11 @@ function handleSearchInput(event: Event) {
 
 .dropdown {
   position: relative;
+
 }
 
 .dropdown-trigger {
+
   background-color: transparent;
   color: #00fa00;
   cursor: pointer;
@@ -229,6 +233,12 @@ function handleSearchInput(event: Event) {
   font: inherit;
   display: inline-flex;
   align-items: center;
+
+  transition: color 0.3s ease-in-out;
+
+  &:hover {
+    color: #0ac80a;
+  }
 
   .arrow {
     margin-left: 8px;
@@ -259,9 +269,16 @@ function handleSearchInput(event: Event) {
   cursor: pointer;
 }
 
-.dropdown-menu li:hover {
-  background: #00fa00;
-  color: #161622;
+.dropdown-menu {
+  li {
+
+    transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+
+    &:hover {
+      background-color: #00fa00;
+      color: #161622;
+    }
+  }
 }
 
 .dropdown-menu li.active {

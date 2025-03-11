@@ -49,6 +49,15 @@ function updateField(field: keyof AgentInfo, value: string) {
       &::placeholder {
         opacity: 0.5;
       }
+
+      transition: border-color 0.3s ease-in-out,
+      background-color 0.3s ease-in-out;
+
+      &:hover {
+        border-color: #37D339; // Changes border color on hover
+        background-color: #59596d40; // Slightly brighter background on hover
+        cursor: pointer;
+      }
     }
   }
 }

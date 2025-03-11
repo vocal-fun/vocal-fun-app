@@ -119,12 +119,18 @@ function onFileChange(e: Event) {
         content: '';
         display: block;
         height: 1px;
-        background-color: rgba(255, 255, 255, 0.5);
+        background-color: white;
         margin-top: 6px;
       }
 
+      transition: color 0.3s ease-in-out;
+
+      &:hover {
+        color: rgb(201, 195, 195);
+      }
+
       &:hover::after {
-        background-color: white;
+        background-color: rgb(201, 195, 195);
       }
     }
   }

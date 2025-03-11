@@ -244,8 +244,10 @@ const dummyHolders = {
 	p {
 		opacity: 0.5;
 
+		transition: opacity 0.3s ease-in-out;
+
 		&:hover {
-			opacity: 0.7;
+			opacity: 0.8;
 			cursor: pointer;
 		}
 
@@ -403,9 +405,12 @@ const dummyHolders = {
 .transactions-table td:last-child,
 .holders-table td:first-child,
 .holders-table td:last-child {
+	transition: color 0.3s ease-in-out;
+
 	&:hover {
 		cursor: pointer;
 		text-decoration: underline;
+		color: #37D339;
 	}
 }
 

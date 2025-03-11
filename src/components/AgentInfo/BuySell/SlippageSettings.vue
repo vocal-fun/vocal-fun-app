@@ -67,10 +67,11 @@ function setCustom() {
 		align-items: center;
 		color: white;
 		cursor: pointer;
-		transition: background-color 0.3s;
+
+		transition: background-color 0.3s ease-in-out;
 
 		&:hover {
-			background-color: #73737326;
+			background-color: #ada9a926;
 		}
 
 		.slippage-img {
@@ -93,6 +94,11 @@ function setCustom() {
 		display: flex;
 		flex-direction: column;
 
+		&:hover {
+			background-color: #59596d26;
+			cursor: default;
+		}
+
 		ul {
 			list-style: none;
 			padding: 0;
@@ -105,6 +111,8 @@ function setCustom() {
 				padding: 4px;
 				border: 1px solid #59596d;
 				cursor: pointer;
+
+				transition: background-color 0.3s ease-in-out;
 
 				&:hover {
 					background-color: rgba(89, 89, 109, 0.2);
@@ -131,6 +139,14 @@ function setCustom() {
 
 				&:focus-visible {
 					outline: unset;
+				}
+			}
+
+			button {
+				transition: color 0.3s ease-in-out;
+
+				&:hover {
+					color: rgb(185, 184, 184)
 				}
 			}
 		}
