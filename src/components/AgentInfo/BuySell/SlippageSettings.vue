@@ -5,19 +5,22 @@
 			<p>{{ selectedSlippage !== null ? selectedSlippage + '%' : 'SLIPPAGE SETTINGS' }}</p>
 			<p class="slippage-arrow">></p>
 		</div>
-		<div v-if="showOptions" class="slippage-options" @click.stop>
-			<ul>
-				<li v-for="option in slippageOptions" :key="option" @click.stop="selectOption(option)">
-					{{ option }}%
-				</li>
-			</ul>
-			<div class="custom-slippage">
-				<input type="number" v-model.number="customValue" placeholder="Custom" @input="validateCustom" />
-				<button @click="setCustom">Set</button>
+		<transition name="fade-slide">
+			<div v-if="showOptions" class="slippage-options" @click.stop>
+				<ul>
+					<li v-for="option in slippageOptions" :key="option" @click.stop="selectOption(option)">
+						{{ option }}%
+					</li>
+				</ul>
+				<div class="custom-slippage">
+					<input type="number" v-model.number="customValue" placeholder="Custom" @input="validateCustom" />
+					<button @click="setCustom">Set</button>
+				</div>
 			</div>
-		</div>
+		</transition>
 	</div>
 </template>
+
 
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -55,6 +58,23 @@ function setCustom() {
 
 <style scoped lang="scss">
 .slippage {
+	.fade-slide-enter-active,
+	.fade-slide-leave-active {
+		transition: all 0.3s ease;
+	}
+
+	.fade-slide-enter-from,
+	.fade-slide-leave-to {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+
+	.fade-slide-enter-to,
+	.fade-slide-leave-from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
 	position: relative;
 	border-bottom: 1px solid #59596d;
 
