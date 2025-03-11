@@ -6,12 +6,14 @@
         <p>{{ tokenName }}</p>
       </div>
       <p><span class="dim">mcap </span>${{ formatShortNumber(mcap) }} </p>
-      <p class="dim">{{ createdAt }} ago by <span>{{ formatContract(createdBy) }}</span></p>
+      <p class="dim">
+        {{ timeAgo(createdAt, true) }} by <span>{{ createdBy.slice(0, 4) + '...' }}</span>
+      </p>
     </div>
 
     <div class="avatar-block">
-      <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="100%"
-        placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="image" :alt="name" />
+      <NuxtImg class="avatar-img" format="webp" loading="lazy" placeholder="/img/user-avatar.png"
+        placeholder-class="image-placeholder" :src="image" :alt="name" />
     </div>
 
     <div class="buttons">
@@ -25,33 +27,33 @@
 <script setup lang="ts">
 import { audioService } from '~/services/audio';
 import type { Agent, OpenModalState } from '~/types';
-import { formatShortNumber, formatContract } from '~/utils/formatters'
+import { formatShortNumber, timeAgo } from '~/utils/formatters';
 
-type PersonProps = Pick<Agent, 'id' | 'name' | 'createdAt' | 'createdBy' | 'image' | 'rate' | 'tokenName' | 'mcap'> & { disabled: boolean };
+type PersonProps = Pick<Agent, 'id' | 'name' | 'createdAt' | 'createdBy' | 'image' | 'rate' | 'tokenName' | 'mcap'> & {
+  disabled: boolean;
+};
 
 const props = defineProps<PersonProps>();
 const isDisabled = computed(() => props.disabled || !props.name);
-const router = useRouter()
+const router = useRouter();
 const emit = defineEmits<{
   'open-modal': [state: OpenModalState],
 }>();
 
-const playClickSound = () => audioService.click();
 function goToAgentPage() {
-  if (isDisabled.value) return
-  router.push(`/agent/${props.id}`)
+  if (isDisabled.value) return;
+  router.push(`/agent/${props.id}`);
 }
 
-const openModal = (state: OpenModalState = 'default') => {
+function openModal(state: OpenModalState = 'default') {
   if (props.disabled) return;
-  playClickSound();
+  audioService.click();
   emit('open-modal', state);
-};
+}
 
-const handleBuy = () => {
+function handleBuy() {
   console.log("Buy button clicked!");
-};
-
+}
 </script>
 
 <style scoped lang="scss">
@@ -87,15 +89,83 @@ $circle-gradient: linear-gradient(180deg,
     3px 0 0 0 #59596D,
     0 -1.5px 0 0 #000000;
 
-  >* {
-    flex: 1 1 50%;
+  .info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-left: 18px;
+    padding-bottom: 24px;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .dim {
+      opacity: 0.5;
+
+      &:last-of-type {
+        margin-top: 20px;
+      }
+    }
   }
 
-  >.buttons {
+  .avatar-block {
+    flex: 0 0 auto;
+    margin-right: 16px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+
+    .avatar-img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: $circle-gradient;
+    }
+
+    &::before {
+      width: 150px;
+      height: 150px;
+      opacity: 0.3;
+    }
+
+    &::after {
+      width: 130px;
+      height: 130px;
+      opacity: 0.5;
+    }
+  }
+
+  .buttons {
     flex: 1 1 100%;
     display: flex;
     z-index: 1;
-    border-top: 1px solid #37D339;
+    border-top: 1px solid rgba(55, 211, 57, 0.4);
 
     >button {
       flex: 1 1 50%;
@@ -107,9 +177,8 @@ $circle-gradient: linear-gradient(180deg,
       justify-content: center;
 
       &:first-child {
-        border-right: 1px solid #37D339;
+        border-right: 1px solid rgba(55, 211, 57, 0.4)
       }
-
 
       &[disabled] {
         cursor: not-allowed;
@@ -129,69 +198,6 @@ $circle-gradient: linear-gradient(180deg,
 
       &[disabled] {
         color: #37d33a66;
-      }
-    }
-  }
-
-  .avatar-block {
-    position: relative;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 24px;
-
-    .avatar-img {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      margin-right: 10px;
-      object-fit: cover;
-      position: relative;
-      z-index: 1;
-    }
-
-    &::before,
-    &::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-25%, -50%);
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      background: $circle-gradient;
-      opacity: 0.3;
-    }
-
-    &::after {
-      transform: translate(-10%, -50%);
-      width: 120px;
-      height: 120px;
-      opacity: 0.56;
-    }
-  }
-
-
-  .info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding-left: 18px;
-    padding-bottom: 24px;
-
-    div {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .dim {
-      opacity: 0.5;
-
-      &:last-of-type {
-        margin-top: 20px;
       }
     }
   }
@@ -221,35 +227,36 @@ $circle-gradient: linear-gradient(180deg,
 
 @media (max-width: 680px) {
   .person {
-    flex-direction: column;
+    flex-direction: row;
     width: 90%;
     align-items: center;
 
-    >* {
-      flex: auto;
-    }
-
-    >.buttons {
+    .buttons {
       flex: auto;
       width: 100%;
     }
 
     .info {
+      font-size: 12px;
       gap: 1rem;
       align-items: start;
-      width: 100%;
     }
   }
 
   .avatar-block {
-    &::before {
-      transform: translate(-55%, -50%) !important;
-      width: 160px !important;
-      height: 160px !important;
+    margin-right: 6px !important;
+
+    .avatar-img {
+      width: 90px !important;
+      height: 90px !important;
     }
 
     &::after {
-      transform: translate(-55%, -50%) !important;
+      width: 105px !important;
+      height: 105px !important;
+    }
+
+    &::before {
       width: 130px !important;
       height: 130px !important;
     }

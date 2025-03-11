@@ -81,9 +81,10 @@ function formatChange(value: number): { formatted: string; color: string } {
 
 <style scoped lang="scss">
 .coin-info {
-	margin-top: 20px;
+	padding-top: 20px;
 	display: flex;
 	flex-direction: column;
+	background-color: #161622;
 	gap: 28px;
 
 	.prices,
@@ -126,6 +127,7 @@ function formatChange(value: number): { formatted: string; color: string } {
 		color: white;
 		font-size: 11px;
 		flex-wrap: wrap;
+		border-bottom: unset;
 
 		div {
 			display: flex;

@@ -32,6 +32,8 @@ defineProps<{ progressPercentage: number }>()
 	color: white;
 	margin-top: 24px;
 	margin-bottom: 22px;
+	border-bottom: 1px solid #59596D;
+	border-left: 1px solid #59596D;
 
 	.title {
 		display: flex;
@@ -89,6 +91,21 @@ defineProps<{ progressPercentage: number }>()
 			vertical-align: middle;
 			margin-left: 6px;
 		}
+	}
+}
+
+@media (max-width: 1250px) {
+	.curve {
+		margin-top: unset;
+		padding-top: 24px !important;
+	}
+
+}
+
+@media (max-width: 1100px) {
+	.curve {
+		border-bottom: unset;
+		border-left: unset;
 	}
 }
 </style>

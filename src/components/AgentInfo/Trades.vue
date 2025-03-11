@@ -263,6 +263,7 @@ const dummyHolders = {
 	flex-direction: column;
 	padding: 24px 0px;
 	color: #00FA00;
+	border-bottom: 1px solid #59596d;
 
 	.add-comment-section {
 		display: flex;
@@ -335,7 +336,7 @@ const dummyHolders = {
 .transactions-table thead th {
 	position: sticky;
 	top: 0;
-	background-color: #212133
+	background-color: #161622;
 }
 
 .transactions-table th,
@@ -417,10 +418,6 @@ const dummyHolders = {
 .holders-table tr {
 	border-bottom: 2px solid #59596D;
 	padding: 20px 30px;
-
-	&:last-child {
-		border-bottom: none;
-	}
 }
 
 @media (max-width: 600px) {
@@ -462,11 +459,14 @@ const dummyHolders = {
 	.holders-table-container,
 	.comments-container {
 		max-height: 440px;
+		padding-bottom: 80px;
 	}
+
 
 	.curve-small {
 		padding: 0 20px;
 		border-bottom: 1px solid #59596D;
+		border-top: 1px solid #59596D;
 		margin-bottom: unset;
 	}
 

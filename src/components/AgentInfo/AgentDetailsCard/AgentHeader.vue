@@ -70,7 +70,7 @@ function closeModal() {
 
 <style scoped lang="scss">
 .header-info {
-	background: linear-gradient(180deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
+	background: black;
 
 	.header {
 		display: flex;
@@ -78,6 +78,7 @@ function closeModal() {
 		gap: 1rem;
 		padding: 24px 18px 22px;
 		border-bottom: 1px solid #37D339;
+		background: linear-gradient(180deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
 
 		.avatar-img {
 			border-radius: 50%;
@@ -165,6 +166,10 @@ function closeModal() {
 @media (max-width: 600px) {
 	.header-info {
 		background: black;
+
+		.header {
+			background: unset;
+		}
 	}
 
 	.header-info .contract-info .info-row:first-child {

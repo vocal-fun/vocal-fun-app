@@ -263,13 +263,14 @@ section.main {
     flex-wrap: wrap;
     justify-content: center;
     gap: 1.25rem;
-    padding: 1.875rem;
-    margin-bottom: 1rem;
+    padding: 1.8rem;
+    margin-bottom: 3rem;
   }
 
   .table-container {
     width: 100%;
     overflow-x: auto;
+    margin-bottom: 3rem;
   }
 
   .agents-table {
@@ -494,6 +495,11 @@ section.main {
 @media (max-width: 768px) {
   section.main {
     margin: 0;
+
+    .content-header {
+      flex-wrap: wrap;
+      margin: 2rem;
+    }
   }
 }
 
@@ -504,13 +510,30 @@ section.main {
       width: unset;
     }
 
+    .table-agents {
+      box-shadow:
+        1.39px -2.09px 0 0 #1B1B2A,
+        -1.39px -1.39px 0 0 #1B1B2A,
+        1.39px 0 0 0 #59596D,
+        0 -0.7px 0 0 #000000
+    }
+
     .agents-grid {
       padding: 0.75rem;
+      // margin-bottom: 3rem;
     }
 
     .content-header {
       flex-direction: column;
       text-align: center;
+    }
+
+    .agents-table {
+      tr {
+        font-size: 12px;
+        gap: 4px;
+        padding: 8px;
+      }
     }
   }
 }

@@ -40,6 +40,7 @@ function handleClick(tab: 'BUY' | 'SELL') {
 	display: flex;
 	flex-direction: row;
 	position: relative;
+	border-top: 2px solid black;
 
 	button {
 		flex: 1;

@@ -102,6 +102,13 @@ watch([isConnected, accountAddress], () => {
 
 		> :nth-child(3) {
 			padding-bottom: 24px;
+			border-left: 1px solid #59596D;
+		}
+	}
+
+	@media (max-width: 1100px) {
+		> :nth-child(3) {
+			border-left: unset
 		}
 	}
 }

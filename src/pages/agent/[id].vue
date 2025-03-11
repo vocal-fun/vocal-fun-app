@@ -43,6 +43,8 @@ onMounted(async () => {
 <style scoped lang="scss">
 .agent-info {
   display: flex;
+  background-color: #161622;
+  min-height: 100vh;
 
   &>* {
     width: 100%;

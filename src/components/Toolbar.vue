@@ -14,7 +14,7 @@
     <div class="divider" />
     <div v-if="viewMode === TypeGridTable.GRID" class="sort">
       <label>Sort by:</label>
-      <div class="dropdown">
+      <div class="dropdown" ref="dropdownRef">
         <button class="dropdown-trigger" @click="toggleDropdown">
           {{ currentLabel }}
           <span class="arrow" />
@@ -31,16 +31,16 @@
     <p class="watchlist">Watchlist</p>
     <div class="search">
       <NuxtImg class="icon" src="/img/search.png" alt="Search Icon" format="webp" sizes="16px" loading="lazy" />
-      <input type="text" :value="searchQuery"
-        @input="$emit('update:searchQuery', ($event.target as HTMLInputElement).value)" placeholder="Search" />
-
+      <input type="text" :value="searchQuery" @input="handleSearchInput" placeholder="Search" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { debounce } from 'lodash'
 import { TypeGridTable } from '~/types'
+
 const props = defineProps({
   searchQuery: {
     type: String,
@@ -77,6 +77,7 @@ const options = [
 ]
 
 const isOpen = ref(false)
+const dropdownRef = ref<HTMLDivElement | null>(null)
 
 function toggleDropdown() {
   isOpen.value = !isOpen.value
@@ -87,10 +88,34 @@ function selectOption(value: string) {
   isOpen.value = false
 }
 
+function handleClickOutside(event: MouseEvent) {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+    isOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+  debouncedSearch.cancel()
+})
+
 const currentLabel = computed(() => {
   const found = options.find(o => o.value === props.sortBy)
   return found ? found.label : 'Select an option'
 })
+
+const debouncedSearch = debounce((value: string) => {
+  emit('update:searchQuery', value)
+}, 300)
+
+function handleSearchInput(event: Event) {
+  const value = (event.target as HTMLInputElement).value
+  debouncedSearch(value)
+}
 </script>
 
 <style scoped lang="scss">
@@ -243,7 +268,6 @@ const currentLabel = computed(() => {
   font-weight: bold;
 }
 
-
 @media (max-width: 1048px) {
   .divider {
     display: none;
@@ -292,6 +316,16 @@ const currentLabel = computed(() => {
 
   .divider {
     display: none;
+  }
+}
+
+@media (max-width: 500px) {
+  .dropdown-menu {
+    font-size: 14px;
+
+    li {
+      padding: 5px;
+    }
   }
 }
 </style>
