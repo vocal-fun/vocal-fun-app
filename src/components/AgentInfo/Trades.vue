@@ -33,8 +33,8 @@
 							<td v-for="header in tableHeaders" :key="header.key"
 								:class="header.key === 'type' && tx[header.key] === TrxType.SELL ? 'sell-trx' : ''">
 								{{ header.key === 'account' || header.key === 'transactionHash'
-								? formatContract(tx[header.key])
-								: tx[header.key] }}
+									? formatContract(tx[header.key])
+									: tx[header.key] }}
 							</td>
 						</tr>
 					</tbody>
@@ -330,6 +330,7 @@ const dummyHolders = {
 .comments-container {
 	max-height: 240px;
 	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 .transactions-table,

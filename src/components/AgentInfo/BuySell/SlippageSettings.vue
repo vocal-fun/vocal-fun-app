@@ -174,6 +174,17 @@ function setCustom() {
 	}
 }
 
+@media (max-width: 1250px) {
+	.slippage {
+		.slippage-options {
+			ul {
+				flex-wrap: wrap;
+				gap: 6px;
+			}
+		}
+	}
+}
+
 @media (max-width: 1100px) {
 	.slippage {
 		.slippage-options {

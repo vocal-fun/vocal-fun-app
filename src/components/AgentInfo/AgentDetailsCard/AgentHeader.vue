@@ -164,6 +164,12 @@ function closeModal() {
 	.header-info .contract-info .info-row:first-child {
 		gap: 8px;
 	}
+
+	.header-info {
+		.header {
+			padding: 10px 6px
+		}
+	}
 }
 
 @media (max-width: 600px) {
