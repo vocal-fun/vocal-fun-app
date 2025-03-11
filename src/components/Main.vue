@@ -7,12 +7,14 @@
       </div>
       <EQ class="equalizer" />
     </div>
-
     <div class="table-agents">
       <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
         v-model:viewMode="viewMode" :showSort="viewMode === TypeGridTable.GRID" @toggle-watchlist="toggleWatchlist" />
-
-      <div v-if="viewMode === TypeGridTable.GRID" class="agents-grid">
+      <div v-if="loading && viewMode === TypeGridTable.GRID" class="agents-grid">
+        <Person v-for="n in 6" :key="n" :disabled="true" name="" tokenName="" :mcap="0" createdAt="" created-by="0x0000"
+          :image="''" :id="String(n)" :rate="0" @open-modal="() => { }" />
+      </div>
+      <div v-else-if="viewMode === TypeGridTable.GRID" class="agents-grid">
         <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
           :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap"
           :createdAt="person.createdAt" :created-by="person.createdBy" :disabled="modalLoading"
@@ -51,8 +53,8 @@
                 </div>
               </td>
               <td data-label="Price">${{ person.price }}</td>
-              <td data-label="Mcap">${{ formatShortNumber(person.mcap) }}</td>
-              <td data-label="24h vol.">${{ person.volume24h }}</td>
+              <td data-label="Mcap">{{ formatShortNumber(person.mcap) }}</td>
+              <td data-label="24h vol.">{{ person.volume24h }}</td>
               <td data-label="24h %" :class="{ negative: person.change24h < 0 }">
                 {{ person.change24h > 0 ? `+${person.change24h}` : person.change24h }}%
               </td>
@@ -61,14 +63,18 @@
               </td>
               <td data-label="Holders">{{ person.tokenHolders.holders.total }}</td>
               <td data-label="Actions" class="actions-buttons">
-                <button v-play-click-sound @click.stop="openModal(person, 'preview')"
-                  class="preview-btn">Preview</button>
-                <button v-play-click-sound @click.stop="openModal(person, 'call')" class="call-btn">Call</button>
-                <button v-play-click-sound @click.stop="buy(person)" class="buy-btn">Buy</button>
+                <button v-play-click-sound @click.stop="openModal(person, 'preview')" class="preview-btn">
+                  Preview
+                </button>
+                <button v-play-click-sound @click.stop="openModal(person, 'call')" class="call-btn">
+                  Call
+                </button>
+                <button v-play-click-sound @click.stop="buy(person)" class="buy-btn">
+                  Buy
+                </button>
               </td>
             </tr>
           </tbody>
-
         </table>
       </div>
     </div>
@@ -83,8 +89,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onBeforeMount } from 'vue'
-import { useRoute } from 'vue-router'
-
+import { useRoute, useRouter } from 'vue-router'
 import { useAgentsStore } from '~/stores/agents'
 import { useAuthStore } from '~/stores/auth'
 import { useWalletConnect } from '~/composables/useWalletConnect'
@@ -111,6 +116,7 @@ const showWatchlist = ref(false)
 const viewMode = ref<TypeGridTable.GRID | TypeGridTable.TABLE>(TypeGridTable.GRID)
 const sortBy = ref('mcap')
 const sortDirection = ref<'asc' | 'desc'>('desc')
+const loading = ref(true)
 
 const columns = [
   { key: 'price', label: 'Price' },
@@ -130,13 +136,12 @@ function createAgent() {
 }
 
 function buy(person: Agent) {
-  console.log('Buying token for:', person.name);
+  console.log('Buying token for:', person.name)
 }
-
 
 function setSort(field: string) {
   if (sortBy.value === field) {
-    sortDirection.value = (sortDirection.value === 'desc') ? 'asc' : 'desc'
+    sortDirection.value = sortDirection.value === 'desc' ? 'asc' : 'desc'
   } else {
     sortBy.value = field
     sortDirection.value = 'desc'
@@ -212,222 +217,222 @@ onBeforeMount(async () => {
     if (person) {
       selectedPerson.value = person
       await openModal(person, 'default')
+      loading.value = false
       return
     }
   }
-
   selectedPerson.value = agentsStore.agents[0]
+  loading.value = false
 })
 </script>
 
 <style scoped lang="scss">
 section.main {
   margin: 2.3rem 5.5rem 0 5.5rem;
+}
 
-  .content-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    gap: 1rem;
+.content-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
 
-    button {
-      width: auto;
-    }
+.content-header button {
+  width: auto;
+}
 
-    div:first-child {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      font-size: 20px;
+.content-header div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  font-size: 20px;
+}
 
-      &:hover {
-        transition: color 0.3s ease-in-out;
-        color: #60FF60;
-      }
+.content-header div:first-child:hover {
+  transition: color 0.3s ease-in-out;
+  color: #60FF60;
+}
 
-      h2 {
-        color: white;
-      }
-    }
-  }
+.content-header h2 {
+  color: white;
+}
 
-  .table-agents {
-    box-shadow:
-      1.39px 1.39px 0 0 #59596D,
-      1.39px -2.09px 0 0 #1B1B2A,
-      -1.39px -1.39px 0 0 #1B1B2A,
-      1.39px 0 0 0 #59596D,
-      0 -0.7px 0 0 #000000;
-  }
+.table-agents {
+  box-shadow:
+    1.39px 1.39px 0 0 #59596D,
+    1.39px -2.09px 0 0 #1B1B2A,
+    -1.39px -1.39px 0 0 #1B1B2A,
+    1.39px 0 0 0 #59596D,
+    0 -0.7px 0 0 #000000;
+}
 
-  .agents-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    max-width: 2048px;
-    margin: auto;
-    background: #161622;
-    border-top: 2px solid #59596D;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.25rem;
-    padding: 1.8rem;
-    margin-bottom: 3rem;
-  }
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  max-width: 2048px;
+  margin: auto;
+  background: #161622;
+  border-top: 2px solid #59596D;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.8rem;
+  margin-bottom: 3rem;
+}
 
-  .table-container {
-    width: 100%;
-    overflow-x: auto;
-    margin-bottom: 3rem;
-  }
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 3rem;
+}
 
-  .agents-table {
-    width: 100%;
-    min-width: 1000px;
-    border-collapse: collapse;
-    background: #161622;
-    border-top: 2px solid #59596d;
-    box-shadow:
-      1.39px 1.39px 0 0 #59596D,
-      1.39px -2.09px 0 0 #1B1B2A,
-      -1.39px -1.39px 0 0 #1B1B2A,
-      1.39px 0 0 0 #59596D,
-      0 -0.7px 0 0 #000000;
+.agents-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  background: #161622;
+  border-top: 2px solid #59596d;
+  box-shadow:
+    1.39px 1.39px 0 0 #59596D,
+    1.39px -2.09px 0 0 #1B1B2A,
+    -1.39px -1.39px 0 0 #1B1B2A,
+    1.39px 0 0 0 #59596D,
+    0 -0.7px 0 0 #000000;
+}
 
-    .label-wrapper {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 6px;
-    }
+.label-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
 
-    .sort-arrows {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+.sort-arrows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-      .arrow-down {
-        margin-right: 1.5px;
-      }
-    }
+.arrow-down {
+  margin-right: 1.5px;
+}
 
-    thead {
-      background: #161622;
-      color: #8989AB;
-      font-size: 12px;
+.agents-table thead {
+  background: #161622;
+  color: #8989AB;
+  font-size: 12px;
+}
 
-      th {
-        padding: 1.25rem 0.75rem;
-        text-align: left;
-        cursor: pointer;
+.agents-table thead th {
+  padding: 1.25rem 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity 0.3s ease-in-out;
+}
 
-        &.sorted {
-          color: white;
-        }
+.agents-table thead th.sorted {
+  color: white;
+}
 
-        transition: opacity 0.3s ease-in-out;
+.agents-table thead th:hover {
+  opacity: 0.8;
+}
 
-        &:hover {
-          opacity: 0.8;
-        }
-      }
-    }
+.agents-table tbody {
+  background-color: #000000;
+}
 
-    tbody {
-      background-color: #000000;
+.agents-table tbody tr {
+  border-bottom: 1px solid #333;
+  transition: background-color 0.3s ease-in-out;
+}
 
-      tr {
-        border-bottom: 1px solid #333;
+.agents-table tbody tr:hover {
+  cursor: pointer;
+  background-color: #2b2b3b;
+}
 
-        transition: background-color 0.3s ease-in-out;
+.agents-table tbody tr td {
+  margin-top: 10px;
+  padding: 4px 8px;
+}
 
-        &:hover {
-          cursor: pointer;
-          background-color: #2b2b3b;
-        }
+.negative {
+  color: #FA6400;
+}
 
-        td {
-          margin-top: 10px;
-          padding: 4px 8px;
-        }
-      }
-    }
+.table-avatar-column {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  height: 100%;
+}
 
-    .negative {
-      color: #FA6400;
-    }
-  }
+.avatar-img {
+  border-radius: 50%;
+  object-fit: cover;
+}
 
-  .table-avatar-column {
-    display: flex;
-    flex-direction: row;
-    gap: 16px;
-    align-items: center;
-    height: 100%;
+.person-info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-    .avatar-img {
-      border-radius: 50%;
-      object-fit: cover;
-    }
+.actions-buttons {
+  display: flex;
+  margin-bottom: 16px;
+}
 
-    .person-info {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-  }
+.actions-buttons .preview-btn {
+  padding-right: 0;
+  border-right: 1px solid #37D339;
+}
 
-  .actions-buttons {
-    display: flex;
-    margin-bottom: 16px;
+.actions-buttons .call-btn {
+  padding-left: 0;
+  padding-right: 0;
+}
 
-    .preview-btn {
-      padding-right: 0;
-      border-right: 1px solid #37D339;
-    }
+.actions-buttons .buy-btn {
+  padding-left: 0;
+}
 
-    .call-btn {
-      padding-left: 0;
-      padding-right: 0;
-    }
+.actions-buttons .preview-btn,
+.actions-buttons .call-btn,
+.actions-buttons .buy-btn {
+  padding: 14px;
+  background-color: #37D33933;
+  display: flex;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
 
-    .buy-btn {
-      padding-left: 0;
-    }
+.actions-buttons .preview-btn:hover,
+.actions-buttons .call-btn:hover,
+.actions-buttons .buy-btn:hover {
+  background-color: #37D339;
+  color: #121212;
+}
 
-    .preview-btn,
-    .call-btn,
-    .buy-btn {
-      padding: 14px;
-      background-color: #37D33933;
-      display: flex;
-      cursor: pointer;
+.actions-buttons .buy-btn {
+  background-color: #00FA00;
+  color: #121212;
+}
 
-      transition: background-color 0.3s ease-in-out;
+.actions-buttons .buy-btn:hover {
+  background-color: #60FF60;
+  color: #000;
+}
 
-      &:hover {
-        background-color: #37D339;
-        color: #121212;
-      }
-    }
-
-    .buy-btn {
-      background-color: #00FA00;
-      color: #121212;
-
-      &:hover {
-        background-color: #60FF60;
-        color: #000;
-      }
-    }
-  }
-
-  .equalizer {
-    height: 120px;
-    width: 430px;
-  }
+.equalizer {
+  height: 120px;
+  width: 430px;
 }
 
 @media (max-width: 1200px) {
@@ -530,12 +535,11 @@ section.main {
         1.39px -2.09px 0 0 #1B1B2A,
         -1.39px -1.39px 0 0 #1B1B2A,
         1.39px 0 0 0 #59596D,
-        0 -0.7px 0 0 #000000
+        0 -0.7px 0 0 #000000;
     }
 
     .agents-grid {
       padding: 0.75rem;
-      // margin-bottom: 3rem;
     }
 
     .content-header {
@@ -543,12 +547,10 @@ section.main {
       text-align: center;
     }
 
-    .agents-table {
-      tr {
-        font-size: 12px;
-        gap: 4px;
-        padding: 8px;
-      }
+    .agents-table tr {
+      font-size: 12px;
+      gap: 4px;
+      padding: 8px;
     }
   }
 }

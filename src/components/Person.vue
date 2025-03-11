@@ -2,8 +2,9 @@
   <div v-play-click-sound class="person shake-little" :class="{ disabled: isDisabled }" @click="goToAgentPage">
     <div class="info">
       <div>
-        <p>{{ name }}</p>
-        <p>{{ tokenName }}</p>
+        <p>{{ name || 'Loading...' }}</p>
+        <p>{{ tokenName || 'Loading...' }}</p>
+
       </div>
       <p><span class="dim">mcap </span>${{ formatShortNumber(mcap) }} </p>
       <p class="dim">
@@ -211,7 +212,8 @@ $circle-gradient: linear-gradient(180deg,
   &.disabled {
     cursor: not-allowed;
 
-    .info>span {
+    .info p,
+    .info span {
       height: 1.5rem;
       color: transparent;
       box-shadow: 0 0 1.4rem rgba(55, 211, 57, 0.3);
