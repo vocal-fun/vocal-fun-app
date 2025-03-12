@@ -6,7 +6,9 @@
     </p>
     <div v-play-click-sound class="upload-voice" :class="{ selected: selectedVoice === 'uploaded', loaded: voiceFile }"
       @click="selectUploadedVoice">
-      <NuxtImg v-if="!voiceFile" class="speaker" src="/logo/logo.png" alt="Speaker logo" format="webp" loading="lazy" />
+      <div v-if="isConverting" class="loader"></div>
+      <NuxtImg v-else-if="!voiceFile" class="speaker" src="/logo/logo.png" alt="Speaker logo" format="webp"
+        loading="lazy" />
       <button v-play-click-sound v-else class="speaker" @click.stop="togglePlayPause">
         <NuxtImg v-if="!isPlaying" class="play" src="/img/play.png" alt="Play" format="webp" loading="lazy" />
         <span v-else>||</span>
@@ -42,9 +44,15 @@
 </template>
 
 <script setup lang="ts">
+
 import { ref, computed, defineEmits, onMounted } from 'vue'
 import { NuxtImg } from '#components'
-import type { ExampleVoice } from '~/types';
+import type { ExampleVoice } from '~/types'
+import { FFmpeg } from '@ffmpeg/ffmpeg'
+import { fetchFile, toBlobURL } from '@ffmpeg/util'
+const ffmpegWasm = new FFmpeg();
+const ffmpegLoaded = ref(false);
+const isConverting = ref(false);
 
 const emit = defineEmits<{
   (e: 'update:voiceFile', file: File | null): void;
@@ -60,30 +68,9 @@ const uploadedAudio = ref<HTMLAudioElement | null>(null);
 const isPlaying = ref(false);
 
 const examples = ref<ExampleVoice[]>([
-  {
-    id: 'kawaii',
-    file: 'example.mp3',
-    label: 'Kawaii',
-    description: 'cute japanese girl',
-    isPlaying: false,
-    audio: null,
-  },
-  {
-    id: 'robotic',
-    file: 'example.mp3',
-    label: 'Robotic',
-    description: 'futuristic robot voice',
-    isPlaying: false,
-    audio: null,
-  },
-  {
-    id: 'oldman',
-    file: 'example.mp3',
-    label: 'Old Man',
-    description: 'wise old man voice',
-    isPlaying: false,
-    audio: null,
-  },
+  { id: 'kawaii', file: 'example.mp3', label: 'Kawaii', description: 'cute japanese girl', isPlaying: false, audio: null },
+  { id: 'robotic', file: 'example.mp3', label: 'Robotic', description: 'futuristic robot voice', isPlaying: false, audio: null },
+  { id: 'oldman', file: 'example.mp3', label: 'Old Man', description: 'wise old man voice', isPlaying: false, audio: null },
 ]);
 
 const displayVoiceFileName = computed(() => {
@@ -97,6 +84,70 @@ const displayVoiceFileName = computed(() => {
   }
   return voiceFileName.value.slice(0, 5) + '...';
 });
+async function loadFFmpeg() {
+  if (!ffmpegLoaded.value) {
+    const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm';
+    await ffmpegWasm.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+      wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm')
+    });
+    ffmpegLoaded.value = true;
+  }
+}
+
+async function convertToWavAndTrim(file: File): Promise<File> {
+  isConverting.value = true;
+  await loadFFmpeg();
+  const inputFileName = 'inputFile';
+  await ffmpegWasm.writeFile(inputFileName, await fetchFile(file));
+  await ffmpegWasm.exec([
+    '-i', inputFileName,
+    '-ss', '0',
+    '-t', '20',
+    '-c:a', 'pcm_s16le',
+    '-ar', '44100',
+    '-ac', '2',
+    'output.wav'
+  ]);
+  const data = (await ffmpegWasm.readFile('output.wav')) as Uint8Array;
+  const wavBlob = new Blob([data], { type: 'audio/wav' });
+  const convertedFile = new File([wavBlob], `converted_${file.name}.wav`, { type: 'audio/wav' });
+  isConverting.value = false;
+  return convertedFile;
+}
+
+async function onVoiceChange(e: Event) {
+  const target = e.target as HTMLInputElement;
+  const selectedFile = target.files ? target.files[0] : null;
+  if (!selectedFile) return;
+
+  try {
+    const convertedFile = await convertToWavAndTrim(selectedFile);
+    voiceFile.value = convertedFile;
+    voiceFileName.value = convertedFile.name;
+    uploadedAudioUrl.value = URL.createObjectURL(convertedFile);
+    isPlaying.value = false;
+    emit('update:voiceFile', convertedFile);
+    selectedVoice.value = 'uploaded';
+  } catch (err) {
+    console.error('Error converting file:', err);
+    isConverting.value = false;
+  }
+}
+
+function togglePlayPause() {
+  const audioEl = uploadedAudio.value;
+  if (!audioEl) return;
+  if (audioEl.paused) {
+    audioEl.play().catch(err => {
+      console.warn('Error playing uploaded audio:', err);
+    });
+    isPlaying.value = true;
+  } else {
+    audioEl.pause();
+    isPlaying.value = false;
+  }
+}
 
 function toggleExample(ex: ExampleVoice) {
   if (!ex.audio) {
@@ -145,30 +196,10 @@ function handleVoiceButtonClick() {
   }
 }
 
-function onVoiceChange(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const selectedFile = target.files ? target.files[0] : null;
-  if (selectedFile) {
-    voiceFile.value = selectedFile;
-    voiceFileName.value = selectedFile.name;
-    uploadedAudioUrl.value = URL.createObjectURL(selectedFile);
-    isPlaying.value = false;
-    emit('update:voiceFile', selectedFile);
-    selectedVoice.value = 'uploaded';
-  }
-}
-
-function togglePlayPause() {
-  const audioEl = uploadedAudio.value;
-  if (!audioEl) return;
-  if (audioEl.paused) {
-    audioEl.play().catch(err => {
-      console.warn('Error playing uploaded audio:', err);
-    });
-    isPlaying.value = true;
-  } else {
-    audioEl.pause();
-    isPlaying.value = false;
+function selectUploadedVoice() {
+  if (voiceFile.value) {
+    selectedVoice.value = "uploaded";
+    emit('update:exampleVoice', null);
   }
 }
 
@@ -180,16 +211,29 @@ onMounted(() => {
     });
   }
 });
-
-function selectUploadedVoice() {
-  if (voiceFile.value) {
-    selectedVoice.value = "uploaded";
-    emit('update:exampleVoice', null);
-  }
-}
 </script>
 
 <style scoped lang="scss">
+.loader {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #ffffff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .profile-voice {
   display: flex;
   flex-direction: column;
@@ -202,14 +246,12 @@ function selectUploadedVoice() {
     font-size: 12px;
   }
 
-  /* Upload voice block */
   .upload-voice {
     display: flex;
     align-items: center;
     padding: 16px;
     background-color: #59596d26;
     border: 1.8px solid #59596d33;
-
     transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out;
 
     &.selected {
@@ -217,7 +259,6 @@ function selectUploadedVoice() {
       border: 1.82px solid #00fa00;
     }
 
-    /* Hover effect for upload block only when file is loaded */
     &.loaded:hover {
       cursor: pointer;
       background-color: #00fa001F;
@@ -266,7 +307,6 @@ function selectUploadedVoice() {
 
       &:hover {
         color: rgb(201, 195, 195);
-
       }
 
       &:hover::after {
@@ -279,7 +319,6 @@ function selectUploadedVoice() {
     }
   }
 
-  /* Divider inline */
   .divider {
     display: flex;
     align-items: center;
@@ -313,7 +352,6 @@ function selectUploadedVoice() {
     background-color: #59596d26;
     border: 1.8px solid #59596d33;
     margin-bottom: 12px;
-
     transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out;
 
     &.selected {

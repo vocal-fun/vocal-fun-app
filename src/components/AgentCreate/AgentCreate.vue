@@ -9,7 +9,9 @@
 		<div class="form-creating">
 			<AgentCreateInfo v-model:agentInfo="agentInfo" />
 			<AgentCreatePic v-model:imageFile="imageFile" />
-			<AgentCreateVoice v-model:voiceFile="voiceFile" v-model:exampleVoice="exampleVoice" />
+			<ClientOnly>
+				<AgentCreateVoice v-model:voiceFile="voiceFile" v-model:exampleVoice="exampleVoice" />
+			</ClientOnly>
 
 			<button v-play-click-sound class="create-btn" :class="{ filled: isInfoFilled }" :disabled="!isInfoFilled"
 				@click="handleCreateAgent">
