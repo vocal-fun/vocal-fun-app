@@ -6,9 +6,7 @@
 			<h3>TEST YOUR AGENT</h3>
 			<div class="agent-info">
 				<p>Review {{ props.agentData?.name }}'s response before tweaking or publishing</p>
-				<div class="avatar-block">
-					<NuxtImg v-if="props.agentData?.image" :src="imageSrc" alt="Agent Avatar" class="avatar-img" />
-				</div>
+				<AvatarCircle v-if="props.agentData?.image" :img="imageSrc" :size="$isSmallScreen ? 70 : 110" />
 			</div>
 		</div>
 		<div class="body">
@@ -31,9 +29,10 @@
 
 <script setup lang="ts">
 import { ref, computed, defineProps, defineEmits } from 'vue'
-import { NuxtImg } from '#components'
 import { useAgentsStore } from '@/stores/agents'
+import { AvatarCircle } from '#components';
 
+const agentsStore = useAgentsStore();
 const props = defineProps<{
 	agentData?: {
 		name: string
@@ -47,7 +46,6 @@ const props = defineProps<{
 	}
 }>()
 const { $isSmallScreen } = useNuxtApp();
-const agentsStore = useAgentsStore();
 const emit = defineEmits(['close', 'closePublishAgent'])
 
 const imageSrc = computed(() => {
@@ -66,7 +64,6 @@ async function publishAgent() {
 	if (!props.agentData) return
 	isLoading.value = true
 	try {
-		await new Promise(resolve => setTimeout(resolve, 10000))
 		const res = await agentsStore.createAgent(props.agentData)
 		console.log('The result is', res)
 		isLoading.value = false
@@ -113,26 +110,8 @@ function testResponse() {
 			position: relative;
 
 			p {
-				max-width: 360px;
 				font-size: 19px;
 				text-transform: uppercase;
-			}
-
-			.avatar-block {
-				position: relative;
-				display: flex;
-				justify-content: flex-end;
-				align-items: center;
-
-				.avatar-img {
-					width: 110px;
-					height: 110px;
-					border-radius: 50%;
-					margin-right: 10px;
-					object-fit: cover;
-					position: relative;
-					z-index: 1;
-				}
 			}
 		}
 	}
@@ -229,6 +208,14 @@ function testResponse() {
 
 	100% {
 		transform: rotate(360deg);
+	}
+}
+
+@media (max-width: 600px) {
+	.agent-info-modal .header .agent-info {
+		p {
+			font-size: 15px;
+		}
 	}
 }
 </style>

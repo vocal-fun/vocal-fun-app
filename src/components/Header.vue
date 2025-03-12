@@ -99,6 +99,7 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
   align-items: center;
   background-color: #212133;
   padding: 1.25rem;
+  border-bottom: 1px solid #555569;
 
   .logo {
     flex: 1;

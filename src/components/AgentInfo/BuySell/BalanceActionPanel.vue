@@ -1,16 +1,7 @@
 <template>
 	<div class="balance-action-panel">
 		<div class="balance-select">
-			<div class="balance-user">
-				<div class="amount">
-					<input type="text" v-model="inputValue" placeholder="0.00" @input="validateInput" />
-					<p>Balance {{ userBalance }} ETH</p>
-				</div>
-				<div class="token">
-					<p>ETH</p>
-					<NuxtImg class="eth" src="/img/sol.png" alt="ETH Blockchain" format="webp" loading="lazy" />
-				</div>
-			</div>
+			<UserBalance v-model="inputValue" />
 			<div class="select-amount">
 				<button v-play-click-sound v-for="amount in amounts" :key="amount" class="select-amount-btn"
 					@click="selectAmount(amount)">
@@ -30,10 +21,12 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, watch } from 'vue'
+import { defineProps, ref } from 'vue'
 import EQ from '~/components/EQ.vue'
+import UserBalance from '~/components/UserBalance.vue'
 
 const { $isSmallScreen } = useNuxtApp()
+
 const props = defineProps<{
 	userBalance: string
 	amounts: string[]
@@ -41,25 +34,6 @@ const props = defineProps<{
 }>()
 
 const inputValue = ref('')
-
-function validateInput() {
-	inputValue.value = inputValue.value.replace(/[^0-9.,]/g, '')
-	const normalizedValue = inputValue.value.replace(/,/g, '.')
-	const numberVal = parseFloat(normalizedValue)
-	const balanceNum = parseFloat(props.userBalance)
-	if (isNaN(numberVal)) return
-	if (numberVal < 0) {
-		inputValue.value = '0'
-	}
-	else if (numberVal > balanceNum) {
-		inputValue.value = props.userBalance
-	}
-}
-
-watch(inputValue, () => {
-	validateInput()
-})
-
 function selectAmount(amount: string) {
 	const balanceNum = parseFloat(props.userBalance)
 	if (amount === 'MAX') {
@@ -87,65 +61,13 @@ function handleAction() {
 }
 </script>
 
+
 <style scoped lang="scss">
 .balance-select {
 	display: flex;
 	flex-direction: column;
 	margin-top: 18px;
 	margin-bottom: 32px;
-
-	.balance-user {
-		display: flex;
-		flex-direction: row;
-		padding: 20px;
-		width: 100%;
-		background-color: #59596d26;
-		border: 1px solid #59596d;
-
-		.amount {
-			display: flex;
-			flex-direction: column;
-			gap: 16px;
-			color: white;
-			opacity: 0.5;
-			font-size: 10px;
-			border-right: 1px solid #59596d;
-			max-width: 220px;
-
-			input {
-				background-color: transparent;
-				border: unset;
-				color: white;
-				font-size: 18px;
-
-				&::-webkit-inner-spin-button {
-					-webkit-appearance: none;
-				}
-
-				&:focus-visible {
-					outline: unset;
-				}
-
-				&::placeholder {
-					color: white;
-				}
-			}
-		}
-
-		.token {
-			display: flex;
-			flex-direction: row;
-			color: white;
-			gap: 10px;
-			align-items: center;
-			margin-left: 22px;
-
-			.eth {
-				width: 24px;
-				height: 24px;
-			}
-		}
-	}
 
 	.select-amount {
 		display: flex;
@@ -205,16 +127,6 @@ function handleAction() {
 }
 
 @media (max-width: 1250px) {
-	.balance-select {
-		.balance-user {
-			padding: 12px;
-
-			.amount {
-				max-width: 150px;
-			}
-		}
-	}
-
 	.select-amount {
 		flex-wrap: wrap;
 	}
@@ -226,16 +138,6 @@ function handleAction() {
 
 		&-btn {
 			width: 100%;
-		}
-	}
-
-	.balance-select {
-		.balance-user {
-			padding: 12px;
-
-			.token {
-				margin-left: auto;
-			}
 		}
 	}
 

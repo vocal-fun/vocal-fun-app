@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 const { isLoggedIn, isConnected, accountAddress, openModal, handleConnectClick, trackConnection } = useWalletConnect();
-
+const balanceStore = useBalanceStore();
 const formattedAddress = computed(() => {
   if (accountAddress.value) {
     return `${accountAddress.value.slice(0, 6)}...${accountAddress.value.slice(-4)}`;
@@ -31,6 +31,11 @@ const formattedAddress = computed(() => {
 
 watch(isConnected, async (newVal, oldVal) => {
   await trackConnection(newVal, oldVal);
+  if (newVal && accountAddress.value) {
+    balanceStore.fetchBalance(accountAddress.value)
+  } else {
+    balanceStore.userBalance = '0.0'
+  }
 });
 </script>
 

@@ -29,6 +29,7 @@ const avatarStyles = computed(() => ({
 	border-radius: 50%;
 	position: relative;
 	margin-right: 16px;
+	flex-shrink: 0;
 
 	.avatar-img {
 		position: absolute;

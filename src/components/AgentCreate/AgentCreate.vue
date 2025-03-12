@@ -23,9 +23,14 @@
 					:agentData="previewAgent" />
 			</ClientOnly>
 		</Modal>
+
+		<Modal :isOpen="isModalBuyOpen" @close="closeModalBuy">
+			<ClientOnly>
+				<ModalBuy ref="modalContent" @close="closeModalBuy" :agentData="previewAgent" />
+			</ClientOnly>
+		</Modal>
 	</div>
 </template>
-
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
@@ -34,7 +39,11 @@ import AgentCreatePic from './AgentCreatePic.vue'
 import AgentCreateVoice from './AgentCreateVoice.vue'
 import Modal from '~/components/Modal.vue'
 import ModalCreate from './ModalCreate.vue'
+import ModalBuy from './ModalBuy.vue'
 import type { AgentInfo } from '~/types'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const agentInfo = ref<AgentInfo>({
 	name: '',
@@ -50,6 +59,7 @@ const imageFile = ref<File | null>(null)
 const voiceFile = ref<File | null>(null)
 const exampleVoice = ref<string | null>(null)
 const isModalOpen = ref(false)
+const isModalBuyOpen = ref(false)
 const previewAgent = ref<any>(null)
 
 const isInfoFilled = computed(() => {
@@ -64,6 +74,11 @@ const isInfoFilled = computed(() => {
 
 function closeModal() {
 	isModalOpen.value = false
+}
+
+function closeModalBuy() {
+	isModalBuyOpen.value = false
+	router.push('/')
 }
 
 function handleCreateAgent() {
@@ -103,6 +118,7 @@ function handleClosePublishAgent() {
 	voiceFile.value = null
 	exampleVoice.value = null
 	isModalOpen.value = false
+	isModalBuyOpen.value = true
 }
 </script>
 
@@ -111,9 +127,11 @@ function handleClosePublishAgent() {
 	display: flex;
 	flex-direction: column;
 	max-width: 600px;
+
 	color: white;
 	text-align: center;
 	margin: 0 auto;
+	margin-top: 40px;
 
 	h1 {
 		font-size: 24px;
@@ -126,6 +144,11 @@ function handleClosePublishAgent() {
 		font-size: 14px;
 		font-weight: 400;
 		opacity: 0.5;
+	}
+
+	h1,
+	h2 {
+		padding: 0 10px;
 	}
 
 	.form-creating {
