@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-
+const emit = defineEmits(['slippage-toggle'])
 const showOptions = ref(false)
 const slippageOptions = ref([0.1, 0.2, 0.5, 1, 2, 5])
 const selectedSlippage = ref<number | null>(null)
@@ -32,6 +32,7 @@ const customValue = ref<number | null>(null)
 
 function toggleOptions() {
 	showOptions.value = !showOptions.value
+	emit('slippage-toggle', showOptions.value)
 }
 
 function selectOption(option: number) {

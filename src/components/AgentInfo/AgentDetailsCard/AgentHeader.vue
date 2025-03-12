@@ -1,13 +1,23 @@
 <template>
 	<div class="header-info">
+		<!-- 1) "Back" arrow button -->
+		<div class="back-arrow" @click="goBack">
+			<p><- </p>
+		</div>
+
 		<div class="header">
+
+
 			<NuxtImg class="avatar-img" :src="agent.image" alt="Agent Avatar" />
 			<div class="header-text">
 				<h3>{{ agent.tokenName }} OFFICIAL COIN</h3>
-				<p class="token">${{ agent.tokenName }} <span v-if="$isSmallScreen">{{ formatContract(agent.contract) }}</span>
+				<p class="token">
+					${{ agent.tokenName }}
+					<span v-if="$isSmallScreen">{{ formatContract(agent.contract) }}</span>
 				</p>
 			</div>
 		</div>
+
 		<div class="contract-info">
 			<div v-if="!$isSmallScreen" class="info-row">
 				<p class="label">CONTRACT</p>
@@ -18,36 +28,45 @@
 				<p class="value">{{ agent.rate }} VOCAL</p>
 			</div>
 		</div>
+
 		<div class="actions">
 			<button v-play-click-sound @click="openModal('preview')" class="preview">PREVIEW</button>
 			<button v-play-click-sound @click="openModal('call')" class="call">CALL</button>
 		</div>
-	</div>
 
-	<Modal :isOpen="isModalOpen" @close="closeModal">
-		<ClientOnly>
-			<CallModalContent ref="modalContent" :person="agent" :modalType="modalType" @close="closeModal" />
-		</ClientOnly>
-	</Modal>
+		<Modal :isOpen="isModalOpen" @close="closeModal">
+			<ClientOnly>
+				<CallModalContent ref="modalContent" :person="agent" :modalType="modalType" @close="closeModal" />
+			</ClientOnly>
+		</Modal>
+	</div>
 </template>
 
 <script setup lang="ts">
 import { defineProps, ref, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
 import { NuxtImg } from '#components'
 import { formatContract } from '~/utils/formatters'
 import type { Agent } from '~/types'
 import Modal from '~/components/Modal.vue'
 import CallModalContent from '~/components/CallModalContent.vue'
 import { useWalletConnect } from '~/composables/useWalletConnect'
-const { $isSmallScreen } = useNuxtApp();
-defineProps<{ agent: Agent }>()
+
+const props = defineProps<{ agent: Agent }>()
+const authStore = useAuthStore()
+const user = computed(() => authStore.user)
+
+const router = useRouter()
+function goBack() {
+	router.push('/') // or router.back() if you want to go back in history
+}
+
+const { $isSmallScreen } = useNuxtApp()
 const isModalOpen = ref(false)
 const modalType = ref<'preview' | 'call' | 'default'>('default')
 const modalLoading = ref(false)
 const modalContent = ref<InstanceType<typeof CallModalContent> | null>(null)
-const authStore = useAuthStore()
-const user = computed(() => authStore.user)
 const { handleConnectClick } = useWalletConnect()
 
 async function openModal(type: 'preview' | 'call' | 'default') {
@@ -72,6 +91,23 @@ function closeModal() {
 .header-info {
 	background: black;
 
+	.back-arrow {
+		width: 100%;
+		background: rgba(55, 211, 57, 0.2);
+		padding: 6px;
+		transition: opacity 0.2s ease-in-out;
+
+
+		&:hover {
+			cursor: pointer;
+			opacity: 0.8;
+		}
+
+		p {
+			margin-left: 10px;
+		}
+	}
+
 	.header {
 		display: flex;
 		align-items: center;
@@ -79,6 +115,8 @@ function closeModal() {
 		padding: 24px 18px 22px;
 		border-bottom: 1px solid #37D339;
 		background: linear-gradient(180deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
+
+
 
 		.avatar-img {
 			border-radius: 50%;
@@ -145,7 +183,6 @@ function closeModal() {
 			cursor: pointer;
 			background-color: #37D33933;
 			padding: 22px;
-
 			transition: background-color 0.3s ease-in-out;
 
 			&:hover {
@@ -167,7 +204,7 @@ function closeModal() {
 
 	.header-info {
 		.header {
-			padding: 10px 6px
+			padding: 10px 6px;
 		}
 	}
 }

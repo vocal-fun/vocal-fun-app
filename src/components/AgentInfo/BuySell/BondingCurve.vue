@@ -1,5 +1,5 @@
 <template>
-	<div class="curve">
+	<div class="curve" :class="{ 'slippage-open': slippageOpen }">
 		<div class="title">
 			<p>BONDING CURVE</p>
 			<p>{{ progressPercentage }}%</p>
@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { defineProps } from 'vue'
-defineProps<{ progressPercentage: number }>()
+defineProps<{ progressPercentage: number, slippageOpen?: boolean }>()
 </script>
 
 <style scoped lang="scss">
@@ -33,7 +33,10 @@ defineProps<{ progressPercentage: number }>()
 	margin-top: 24px;
 	margin-bottom: 22px;
 	border-bottom: 1px solid #59596D;
-	border-left: 1px solid #59596D;
+
+	&.slippage-open {
+		border-left: 1px solid #59596D;
+	}
 
 	.title {
 		display: flex;
@@ -105,7 +108,10 @@ defineProps<{ progressPercentage: number }>()
 @media (max-width: 1100px) {
 	.curve {
 		border-bottom: unset;
-		border-left: unset;
+
+		&.slippage-open {
+			border-left: unset;
+		}
 	}
 }
 </style>

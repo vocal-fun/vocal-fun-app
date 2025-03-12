@@ -19,12 +19,14 @@
           {{ currentLabel }}
           <span class="arrow" />
         </button>
-        <ul v-play-click-sound v-if="isOpen" class="dropdown-menu">
-          <li v-for="option in options" :key="option.value" :class="{ active: option.value === sortBy }"
-            @click="selectOption(option.value)">
-            {{ option.label }}
-          </li>
-        </ul>
+        <transition name="dropdown">
+          <ul v-play-click-sound v-if="isOpen" class="dropdown-menu">
+            <li v-for="option in options" :key="option.value" :class="{ active: option.value === sortBy }"
+              @click="selectOption(option.value)">
+              {{ option.label }}
+            </li>
+          </ul>
+        </transition>
       </div>
     </div>
 
@@ -35,6 +37,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
@@ -148,7 +151,6 @@ function handleSearchInput(event: Event) {
     display: flex;
     align-items: center;
     justify-content: center;
-
     transition: opacity 0.3s ease-in-out;
 
     &:hover {
@@ -221,11 +223,9 @@ function handleSearchInput(event: Event) {
 
 .dropdown {
   position: relative;
-
 }
 
 .dropdown-trigger {
-
   background-color: transparent;
   color: #00fa00;
   cursor: pointer;
@@ -233,7 +233,6 @@ function handleSearchInput(event: Event) {
   font: inherit;
   display: inline-flex;
   align-items: center;
-
   transition: color 0.3s ease-in-out;
 
   &:hover {
@@ -261,17 +260,11 @@ function handleSearchInput(event: Event) {
   list-style: none;
   min-width: 140px;
   z-index: 1000;
-}
 
-.dropdown-menu li {
-  padding: 8px;
-  color: #00fa00;
-  cursor: pointer;
-}
-
-.dropdown-menu {
   li {
-
+    padding: 8px;
+    color: #00fa00;
+    cursor: pointer;
     transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
 
     &:hover {
@@ -283,6 +276,23 @@ function handleSearchInput(event: Event) {
 
 .dropdown-menu li.active {
   font-weight: bold;
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.dropdown-enter-to,
+.dropdown-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 @media (max-width: 1048px) {

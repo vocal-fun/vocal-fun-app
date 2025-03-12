@@ -3,8 +3,8 @@
 		<div v-if="!$isSmallScreen" class="buy-sell-tabs">
 			<BuySellTabs :selectedTab="selectedTab" @update:selectedTab="selectedTab = $event" />
 			<BalanceActionPanel :userBalance="userBalance" :amounts="amounts" :selectedTab="selectedTab" />
-			<SlippageSettings />
-			<BondingCurve :progressPercentage="progressPercentage" />
+			<SlippageSettings @slippage-toggle="handleSlippageToggle" />
+			<BondingCurve :progressPercentage="progressPercentage" :slippageOpen="isSlippageOpen" />
 		</div>
 
 		<div v-else class="buy-sell-mobile">
@@ -36,9 +36,14 @@ import BondingCurve from './BondingCurve.vue';
 const { $isSmallScreen } = useNuxtApp();
 const selectedTab = ref('BUY');
 const isPanelOpen = ref(false);
+const isSlippageOpen = ref(false)
 
 function togglePanel() {
 	isPanelOpen.value = !isPanelOpen.value;
+}
+
+function handleSlippageToggle(isOpen: boolean) {
+	isSlippageOpen.value = isOpen
 }
 
 function handleMobileButtonClick() {
@@ -102,13 +107,6 @@ watch([isConnected, accountAddress], () => {
 
 		> :nth-child(3) {
 			padding-bottom: 24px;
-			border-left: 1px solid #59596D;
-		}
-	}
-
-	@media (max-width: 1100px) {
-		> :nth-child(3) {
-			border-left: unset
 		}
 	}
 }
