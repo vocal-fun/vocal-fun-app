@@ -12,10 +12,7 @@
       </p>
     </div>
 
-    <div class="avatar-block">
-      <NuxtImg class="avatar-img" format="webp" loading="lazy" placeholder="/img/user-avatar.png"
-        placeholder-class="image-placeholder" :src="image" :alt="name" />
-    </div>
+    <AvatarCircle :img="image" :size="110" />
 
     <div class="buttons">
       <button v-play-click-sound class="preview shake" :disabled="isDisabled"
@@ -113,53 +110,6 @@ $circle-gradient: linear-gradient(180deg,
       &:last-of-type {
         margin-top: 20px;
       }
-    }
-  }
-
-  .avatar-block {
-    flex: 0 0 auto;
-    margin-right: 16px;
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    position: relative;
-
-    .avatar-img {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    &::before,
-    &::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
-      background: $circle-gradient;
-    }
-
-    &::before {
-      width: 150px;
-      height: 150px;
-      opacity: 0.3;
-    }
-
-    &::after {
-      width: 130px;
-      height: 130px;
-      opacity: 0.5;
     }
   }
 

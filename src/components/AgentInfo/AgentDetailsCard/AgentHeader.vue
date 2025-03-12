@@ -1,14 +1,11 @@
 <template>
 	<div class="header-info">
-		<!-- 1) "Back" arrow button -->
 		<div class="back-arrow" @click="goBack">
 			<p><- </p>
 		</div>
-
 		<div class="header">
-
-
-			<NuxtImg class="avatar-img" :src="agent.image" alt="Agent Avatar" />
+			<NuxtImg v-if="$isSmallScreen" class="avatar-img" :src="agent.image" alt="Agent Avatar" />
+			<AvatarCircle v-else :img="agent.image" :size="74" />
 			<div class="header-text">
 				<h3>{{ agent.tokenName }} OFFICIAL COIN</h3>
 				<p class="token">
@@ -116,8 +113,6 @@ function closeModal() {
 		border-bottom: 1px solid #37D339;
 		background: linear-gradient(180deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
 
-
-
 		.avatar-img {
 			border-radius: 50%;
 			object-fit: cover;
@@ -204,7 +199,7 @@ function closeModal() {
 
 	.header-info {
 		.header {
-			padding: 10px 6px;
+			padding: 16px 6px;
 		}
 	}
 }
