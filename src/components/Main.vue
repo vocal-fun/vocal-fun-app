@@ -563,6 +563,13 @@ section.main {
 
     .agents-grid {
       padding: 0.75rem;
+      margin-bottom: unset;
+      padding-bottom: 3rem;
+    }
+
+    .table-container {
+      margin-bottom: unset;
+      padding-bottom: 3rem;
     }
 
     .content-header {
@@ -574,6 +581,7 @@ section.main {
       font-size: 12px;
       gap: 4px;
       padding: 8px;
+
     }
   }
 }

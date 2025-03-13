@@ -15,4 +15,10 @@ import { AgentCreate } from '#components';
 	align-items: center;
 	margin-bottom: 80px;
 }
+
+@media (max-width: 600px) {
+	.center-container {
+		margin-bottom: unset;
+	}
+}
 </style>

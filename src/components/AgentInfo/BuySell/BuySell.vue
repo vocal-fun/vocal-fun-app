@@ -95,7 +95,7 @@ const formattedBalance = computed(() => balanceStore.userBalance)
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	padding: 24px;
+	padding: 25px;
 	cursor: pointer;
 	color: #121212;
 	text-align: center;
