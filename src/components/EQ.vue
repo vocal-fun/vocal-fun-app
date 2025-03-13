@@ -9,11 +9,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps } from 'vue'
+import { computed, defineProps } from 'vue';
 
 const props = defineProps<{
   repeatTimes?: number
-}>()
+}>();
 
 const baseEqData = [
   { quantity: 4, delay: 1 },
@@ -36,50 +36,48 @@ const baseEqData = [
   { quantity: 6, delay: 1 },
   { quantity: 7, delay: 1 },
   { quantity: 6, delay: 1 },
-]
+];
 
 const repeatedEqData = computed(() => {
-  const times = props.repeatTimes ?? 1
-  const out = []
+  const times = props.repeatTimes ?? 1;
+  const out = [];
   for (let i = 0; i < times; i++) {
-    out.push(...baseEqData)
+    out.push(...baseEqData);
   }
-  return out
-})
+  return out;
+});
 
 function reversedNumbers(num: number) {
-  return Array.from({ length: num }, (_, i) => num - i)
+  return Array.from({ length: num }, (_, i) => num - i);
 }
 </script>
 
 <style scoped lang="scss">
-@use 'sass:math';
-
-@keyframes changeMargin {
+@keyframes changeScale {
   0% {
-    margin-bottom: math.random(20)+px;
+    transform: scaleY(1);
   }
 
   50% {
-    margin-bottom: math.random(20)+px;
+    transform: scaleY(2.5);
   }
 
   100% {
-    margin-bottom: math.random(20)+px;
+    transform: scaleY(1);
   }
 }
 
-@keyframes changeHeight {
+@keyframes changeMargin {
   0% {
-    height: 10px;
+    margin-bottom: 2px;
   }
 
   50% {
-    height: 25px;
+    margin-bottom: 10px;
   }
 
   100% {
-    height: 10px;
+    margin-bottom: 2px;
   }
 }
 
@@ -94,55 +92,57 @@ function reversedNumbers(num: number) {
   justify-content: flex-end;
 }
 
+
 .block {
-  height: 10px;
+  height: 16px;
   width: 12px;
-  will-change: height;
+  transform-origin: bottom;
+  will-change: transform;
+  animation: changeScale 0.8s infinite ease-in-out;
 }
 
 .row-1 {
   .block {
-    animation: changeHeight .8s infinite ease-in-out;
-    animation-delay: .4s;
+    animation-duration: 0.8s;
+    animation-delay: 0.4s;
   }
 }
 
 .row-2 {
   .block {
-    animation: changeHeight .6s infinite ease-in-out;
-    animation-delay: .6s;
+    animation-duration: 0.6s;
+    animation-delay: 0.6s;
   }
 }
 
 .row-3 {
   .block {
-    animation: changeHeight .6s infinite ease-in-out;
-    animation-delay: .5s;
+    animation-duration: 0.6s;
+    animation-delay: 0.5s;
   }
 }
 
 .row-4 {
   .block {
-    animation: changeHeight .7s infinite ease-in-out;
-    animation-delay: .5s;
+    animation-duration: 0.7s;
+    animation-delay: 0.5s;
   }
 }
 
 .row-5 {
   .block {
-    animation: changeHeight .6s infinite ease-in-out;
-    animation-delay: .2s;
+    animation-duration: 0.6s;
+    animation-delay: 0.2s;
   }
 }
 
 .row-6 {
   .block {
-    animation: changeHeight .9s infinite ease-in-out;
-    animation-delay: .2s;
+    animation-duration: 0.9s;
+    animation-delay: 0.2s;
   }
 }
 
-/* color tones */
 .tone-1 {
   background: #197e0c;
 }
@@ -177,7 +177,7 @@ function reversedNumbers(num: number) {
   height: 7px;
   width: 12px;
   will-change: margin-bottom;
-  animation: changeMargin .5s infinite ease-in-out;
+  animation: changeMargin 0.5s infinite ease-in-out;
   animation-delay: 1s;
 }
 
