@@ -46,6 +46,9 @@ import type { AgentInfo } from '~/types'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const authStore = useAuthStore()
+const { handleConnectClick } = useWalletConnect()
+const user = computed(() => authStore.user)
 
 const agentInfo = ref<AgentInfo>({
 	name: '',
@@ -85,6 +88,10 @@ function closeModalBuy() {
 
 function handleCreateAgent() {
 	if (!isInfoFilled.value) return
+	if (!user.value) {
+		handleConnectClick()
+		return
+	}
 	const imageParam: File | string = imageFile.value ? imageFile.value : '/img/grid.png'
 	const voiceParam: File | string =
 		voiceFile.value

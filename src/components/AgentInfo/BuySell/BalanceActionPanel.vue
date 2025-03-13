@@ -26,6 +26,8 @@ import EQ from '~/components/EQ.vue'
 import UserBalance from '~/components/UserBalance.vue'
 
 const { $isSmallScreen } = useNuxtApp()
+const authStore = useAuthStore()
+const { handleConnectClick } = useWalletConnect()
 
 const props = defineProps<{
 	userBalance: string
@@ -33,6 +35,7 @@ const props = defineProps<{
 	selectedTab: string
 }>()
 
+const user = computed(() => authStore.user)
 const inputValue = ref('')
 function selectAmount(amount: string) {
 	const balanceNum = parseFloat(props.userBalance)
@@ -53,6 +56,10 @@ function sellFunction() {
 }
 
 function handleAction() {
+	if (!user.value) {
+		handleConnectClick()
+		return
+	}
 	if (props.selectedTab === 'BUY') {
 		buy()
 	} else {
