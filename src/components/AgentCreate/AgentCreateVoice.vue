@@ -23,7 +23,7 @@
       <button v-play-click-sound @click.stop="handleVoiceButtonClick">
         {{ voiceFile ? "Remove" : "Upload" }}
       </button>
-      <input ref="voiceInput" type="file" accept="audio/*,video/mp4" @change="onVoiceChange" style="display: none;" />
+      <input ref="voiceInput" type="file" accept="audio/*" @change="onVoiceChange" style="display: none;" />
       <audio ref="uploadedAudio" :src="uploadedAudioUrl || ''" style="display: none;" />
     </div>
     <div class="divider">
@@ -69,8 +69,8 @@ const isPlaying = ref(false);
 
 const examples = ref<ExampleVoice[]>([
   { id: 'kawaii', file: 'example.mp3', label: 'Kawaii', description: 'cute japanese girl', isPlaying: false, audio: null },
-  { id: 'robotic', file: 'example.mp3', label: 'Robotic', description: 'futuristic robot voice', isPlaying: false, audio: null },
-  { id: 'oldman', file: 'example.mp3', label: 'Old Man', description: 'wise old man voice', isPlaying: false, audio: null },
+  { id: 'robotic', file: 'robot.wav', label: 'Robotic', description: 'futuristic robot voice', isPlaying: false, audio: null },
+  { id: 'oldman', file: 'old_man.wav', label: 'Old Man', description: 'wise old man voice', isPlaying: false, audio: null },
 ]);
 
 const displayVoiceFileName = computed(() => {
@@ -343,7 +343,6 @@ onMounted(() => {
     }
   }
 
-  /* Example voices */
   .example-voice {
     display: flex;
     flex-direction: row;
@@ -359,7 +358,6 @@ onMounted(() => {
       border: 1.82px solid #00fa00;
     }
 
-    /* Add hover effect for all example voices */
     &:hover {
       background-color: #00fa001F;
       cursor: pointer;
@@ -393,6 +391,23 @@ onMounted(() => {
         opacity: 0.5;
       }
     }
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-voice {
+    .upload-voice {
+      font-size: 14px;
+
+      button {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  .loader {
+    width: 40px;
+    height: 30px;
   }
 }
 </style>

@@ -10,13 +10,13 @@
 			</div>
 		</div>
 		<div class="body">
-			<div class="input">
+			<!-- <div class="input">
 				<p>Prompt question <span>(you cannot change this)</span></p>
 				<input placeholder="Who are you and what do you do?" v-model="inputValue" />
 				<button v-play-click-sound @click="testResponse">
 					Play agent's test response <span>▶</span>
 				</button>
-			</div>
+			</div> -->
 
 			<div v-if="!isLoading" class="actions">
 				<button v-play-click-sound @click="publishAgent">PUBLISH THIS.</button>

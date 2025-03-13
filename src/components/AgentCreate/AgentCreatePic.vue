@@ -135,4 +135,17 @@ function onFileChange(e: Event) {
     }
   }
 }
+
+@media (max-width: 600px) {
+  .profile-pic {
+    .upload-pic {
+      font-size: 14px;
+
+      button {
+        margin-left: 10px;
+      }
+    }
+  }
+
+}
 </style>

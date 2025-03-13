@@ -2,18 +2,19 @@
   <div class="profile-basics">
     <p>Basics first</p>
     <div class="inputs">
-      <input placeholder="Name your agent..." :value="agentInfo.name"
+      <input :placeholder="$isSmallScreen ? 'Agent name...' : 'Name your agent...'" :value="agentInfo.name"
         @input="updateField('name', ($event.target as HTMLInputElement).value)" />
-      <input placeholder="Come up with a ticker (e.g $TRUMP)" :value="agentInfo.ticker"
-        @input="updateField('ticker', ($event.target as HTMLInputElement).value)" />
-      <input placeholder="Provide description to the agent..." :value="agentInfo.description"
-        @input="updateField('description', ($event.target as HTMLInputElement).value)" />
+      <input :placeholder="$isSmallScreen ? 'Ticker (e.g. $TRUMP)' : 'Come up with a ticker (e.g. $TRUMP)'"
+        :value="agentInfo.ticker" @input="updateField('ticker', ($event.target as HTMLInputElement).value)" />
+      <input :placeholder="$isSmallScreen ? 'Description...' : 'Provide description to the agent...'"
+        :value="agentInfo.description" @input="updateField('description', ($event.target as HTMLInputElement).value)" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
+const { $isSmallScreen } = useNuxtApp();
 
 interface AgentInfo {
   name: string;
