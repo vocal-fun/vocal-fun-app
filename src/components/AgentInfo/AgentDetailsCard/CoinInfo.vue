@@ -5,7 +5,7 @@
 				<p v-for="(title, index) in pricesData.titles" :key="`title-${index}`" :class="{ 'img-solana': index === 1 }">
 					<span>
 						<NuxtImg v-if="index === 1" class="solana-icon" alt="Solana icon" format="webp" loading="lazy"
-							src="/img/solana.png" />
+							src="/img/eth.png" />
 					</span>{{ title }}
 				</p>
 			</div>

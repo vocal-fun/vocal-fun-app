@@ -17,13 +17,14 @@
         <p v-if="voiceFileName">{{ displayVoiceFileName }}</p>
         <template v-else>
           <p>Upload a voice sample</p>
-          <p>.mp4, wav, mp3</p>
+          <p>.m4a, wav, mp3</p>
         </template>
       </div>
       <button v-play-click-sound @click.stop="handleVoiceButtonClick">
         {{ voiceFile ? "Remove" : "Upload" }}
       </button>
-      <input ref="voiceInput" type="file" accept="audio/*" @change="onVoiceChange" style="display: none;" />
+      <input ref="voiceInput" type="file" accept=".wav,.m4a,.mp3,.aif,.aiff,.flac,.alac,.aac,.ogg"
+        @change="onVoiceChange" style="display: none;" />
       <audio ref="uploadedAudio" :src="uploadedAudioUrl || ''" style="display: none;" />
     </div>
     <div class="divider">

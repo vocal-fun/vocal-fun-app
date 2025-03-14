@@ -6,7 +6,7 @@
 		</div>
 		<div class="token">
 			<p class="token-label">ETH</p>
-			<NuxtImg class="eth" src="/img/sol.png" alt="ETH Blockchain" format="webp" loading="lazy" />
+			<NuxtImg class="eth" src="/img/eth.png" alt="ETH Blockchain" format="webp" loading="lazy" />
 		</div>
 	</div>
 </template>

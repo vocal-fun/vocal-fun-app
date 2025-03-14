@@ -5,7 +5,7 @@
 			<div class="select-amount">
 				<button v-play-click-sound v-for="amount in amounts" :key="amount" class="select-amount-btn"
 					@click="selectAmount(amount)">
-					<NuxtImg class="solana-icon" alt="Solana icon" format="webp" loading="lazy" src="/img/solana.png" />
+					<NuxtImg class="solana-icon" alt="Solana icon" format="webp" loading="lazy" src="/img/eth.png" />
 					<span>{{ amount }}</span>
 				</button>
 			</div>

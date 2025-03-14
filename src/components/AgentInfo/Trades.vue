@@ -1,6 +1,7 @@
 <template>
 	<div>
-		<Graphic token="BONK" />
+		<Graphic v-if="isTradingView" token="BONK" />
+		<GraphicLightChart v-else />
 		<CoinInfo v-if="$isSmallScreen" :agent="agent" />
 		<BondingCurve class="curve-small" v-if="$isSmallScreen" :progressPercentage="4" />
 		<div>
@@ -100,9 +101,11 @@ import { TrxType, TypeOfTable, type TableHeader } from '~/types/transactions'
 import type { Trade, Agent } from '~/types'
 import { formatContract, timeAgo } from '~/utils/formatters'
 import Graphic from './Graphic.vue'
+import GraphicLightChart from './GraphicLightChart.vue'
 import CoinInfo from './AgentDetailsCard/CoinInfo.vue'
 import BondingCurve from './BuySell/BondingCurve.vue'
 
+const isTradingView = true;
 const props = defineProps({
 	agent: {
 		type: Object as () => Agent,

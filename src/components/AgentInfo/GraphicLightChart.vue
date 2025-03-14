@@ -22,36 +22,39 @@ const data = [
 ]
 
 onMounted(() => {
+	const containerWidth = chartContainer.value.clientWidth || 600;
 	const chartOptions = {
-		width: 600,
-		height: 300,
+		width: containerWidth,
+		height: 518,
 		layout: {
-			textColor: 'black',
+			textColor: '#cccccc',
 			background: {
 				type: 'solid',
-				color: 'white',
+				color: '#0d0d0d',
 			},
 		},
 		grid: {
-			vertLines: { color: '#e1ecf2' },
-			horzLines: { color: '#e1ecf2' },
+			vertLines: { color: '#1f1f1f' },
+			horzLines: { color: '#1f1f1f' },
 		},
 		timeScale: {
-			borderColor: '#cccccc',
-			timeVisible: true,   
+			borderColor: '#333333',
+			timeVisible: true,
 			secondsVisible: false,
 		},
 		rightPriceScale: {
-			borderColor: '#cccccc',
+			borderColor: '#333333',
 		},
 		crosshair: {
 			vertLine: {
-				color: '#8c8c8c',
+				color: '#888888',
 				labelVisible: true,
+				labelBackgroundColor: '#888888',
 			},
 			horzLine: {
-				color: '#8c8c8c',
+				color: '#888888',
 				labelVisible: true,
+				labelBackgroundColor: '#888888',
 			},
 		},
 	}
@@ -65,8 +68,10 @@ onMounted(() => {
 		wickDownColor: '#ef5350',
 	})
 
-	candlestickSeries.setData(data)		
+	candlestickSeries.setData(data)
 	chart.timeScale().fitContent()
+
+	
 })
 </script>
 
