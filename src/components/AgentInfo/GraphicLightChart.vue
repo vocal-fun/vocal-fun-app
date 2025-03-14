@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { CandlestickSeries, createChart } from 'lightweight-charts'
 
 const chartContainer = ref(null)
@@ -21,57 +21,68 @@ const data = [
 	{ open: 10.93, high: 11.53, low: 10.76, close: 10.96, time: 1643205476 },
 ]
 
+let chart
+
+function updateChartWidth() {
+	if (chart && chartContainer.value) {
+		chart.applyOptions({ width: chartContainer.value.clientWidth })
+	}
+}
+
 onMounted(() => {
-	const containerWidth = chartContainer.value.clientWidth || 600;
+	const containerWidth = chartContainer.value.clientWidth
 	const chartOptions = {
 		width: containerWidth,
-		height: 518,
+		height: 520,
 		layout: {
-			textColor: '#cccccc',
-			background: {
-				type: 'solid',
-				color: '#0d0d0d',
-			},
+			background: { type: 'solid', color: '#131722' },
+			textColor: '#d1d4dc',
 		},
 		grid: {
-			vertLines: { color: '#1f1f1f' },
-			horzLines: { color: '#1f1f1f' },
+			vertLines: { color: '#363c4e' },
+			horzLines: { color: '#363c4e' },
 		},
 		timeScale: {
-			borderColor: '#333333',
+			borderColor: '#485c7b',
 			timeVisible: true,
 			secondsVisible: false,
 		},
 		rightPriceScale: {
-			borderColor: '#333333',
+			borderColor: '#485c7b',
 		},
 		crosshair: {
 			vertLine: {
-				color: '#888888',
+				color: '#758696',
+				width: 1,
 				labelVisible: true,
-				labelBackgroundColor: '#888888',
+				labelBackgroundColor: '#1e222d',
 			},
 			horzLine: {
-				color: '#888888',
+				color: '#758696',
+				width: 1,
 				labelVisible: true,
-				labelBackgroundColor: '#888888',
+				labelBackgroundColor: '#1e222d',
 			},
 		},
 	}
 
-	const chart = createChart(chartContainer.value, chartOptions)
+	chart = createChart(chartContainer.value, chartOptions)
 	const candlestickSeries = chart.addSeries(CandlestickSeries, {
-		upColor: '#26a69a',
-		downColor: '#ef5350',
-		borderVisible: false,
-		wickUpColor: '#26a69a',
-		wickDownColor: '#ef5350',
+		upColor: '#4bffb5',
+		downColor: '#ff4976',
+		borderUpColor: '#4bffb5',
+		borderDownColor: '#ff4976',
+		wickUpColor: '#4bffb5',
+		wickDownColor: '#ff4976',
 	})
-
 	candlestickSeries.setData(data)
 	chart.timeScale().fitContent()
 
-	
+	window.addEventListener('resize', updateChartWidth)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('resize', updateChartWidth)
 })
 </script>
 
