@@ -44,7 +44,7 @@
           <tbody>
             <tr v-play-click-sound v-for="person in filteredAgents" :key="person.id" @click="goToAgentPage(person)">
               <td class="table-avatar-column" data-label="Vocal agent">
-                <NuxtImg class="avatar-img" sizes="90vw md:400px" format="webp" loading="lazy" width="48" height="48"
+                <NuxtImg class="avatar-img" format="webp" loading="lazy" width="48" height="48"
                   placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
                   :alt="person.name" />
                 <div class="person-info">
@@ -253,7 +253,7 @@ section.main {
 }
 
 .content-header div:first-child:hover {
-  transition: color 0.3s ease-in-out;
+  transition: color .3s ease-in-out;
   color: #60FF60;
 }
 
@@ -262,12 +262,7 @@ section.main {
 }
 
 .table-agents {
-  box-shadow:
-    1.39px 1.39px 0 0 #59596D,
-    1.39px -2.09px 0 0 #1B1B2A,
-    -1.39px -1.39px 0 0 #1B1B2A,
-    1.39px 0 0 0 #59596D,
-    0 -0.7px 0 0 #000000;
+  box-shadow: 1.39px 1.39px 0 0 #59596D, 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 #59596D, 0 -0.7px 0 0 #000000;
 }
 
 .agents-grid {
@@ -297,12 +292,7 @@ section.main {
   border-collapse: collapse;
   background: #161622;
   border-top: 2px solid #59596d;
-  box-shadow:
-    1.39px 1.39px 0 0 #59596D,
-    1.39px -2.09px 0 0 #1B1B2A,
-    -1.39px -1.39px 0 0 #1B1B2A,
-    1.39px 0 0 0 #59596D,
-    0 -0.7px 0 0 #000000;
+  box-shadow: 1.39px 1.39px 0 0 #59596D, 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 #59596D, 0 -0.7px 0 0 #000000;
 }
 
 .label-wrapper {
@@ -329,10 +319,10 @@ section.main {
 }
 
 .agents-table thead th {
-  padding: 1.25rem 0.75rem;
+  padding: 1.25rem .75rem;
   text-align: left;
   cursor: pointer;
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity .3s ease-in-out;
 }
 
 .agents-table thead th.sorted {
@@ -349,7 +339,7 @@ section.main {
 
 .agents-table tbody tr {
   border-bottom: 1px solid #333;
-  transition: background-color 0.3s ease-in-out;
+  transition: background-color .3s ease-in-out;
 }
 
 .agents-table tbody tr:hover {
@@ -383,12 +373,12 @@ section.main {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
 
-  .token-name {
-    max-width: 6ch;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.person-info .token-name {
+  max-width: 6ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .actions-buttons {
@@ -417,7 +407,7 @@ section.main {
   background-color: #37D33933;
   display: flex;
   cursor: pointer;
-  transition: background-color 0.3s ease-in-out;
+  transition: background-color .3s ease-in-out;
 }
 
 .actions-buttons .preview-btn:hover,
@@ -442,13 +432,13 @@ section.main {
   width: 430px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width:1200px) {
   section.main {
     margin: 2rem;
+  }
 
-    .agents-table {
-      min-width: 900px;
-    }
+  section.main .agents-table {
+    min-width: 900px;
   }
 }
 
@@ -456,18 +446,16 @@ section.main {
   .agents-table tbody tr td:not(:first-child):not(:last-child) {
     padding: unset;
   }
-
-
 }
 
-@media (max-width: 1048px) {
+@media (max-width:1048px) {
   section.main .agents-table {
     min-width: unset;
     border-top: unset;
   }
 
   .person-info .token-name {
-    all: unset
+    all: unset;
   }
 
   .agents-table tbody tr td {
@@ -481,108 +469,97 @@ section.main {
   .agents-table {
     display: block;
     border-collapse: separate;
+  }
 
-    thead {
-      display: none;
-    }
+  .agents-table thead {
+    display: none;
+  }
 
-    tbody {
-      display: block;
-    }
+  .agents-table tbody {
+    display: block;
+  }
 
-    tr {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-areas:
-        "col1 col1 col1 col1"
-        "col2 col3 col4 col4"
-        "col5 col6 col7 col7"
-        "col8 col8 col8 col8";
-      padding: 1rem;
-      gap: 1rem;
-      background: black;
-    }
+  .agents-table tr {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas: "col1 col1 col1 col1" "col2 col3 col4 col4" "col5 col6 col7 col7" "col8 col8 col8 col8";
+    padding: 1rem;
+    gap: 1rem;
+    background: black;
+  }
 
-    td {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-start;
-      padding: 0.5rem;
-      border: unset;
-    }
+  .agents-table td {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0.5rem;
+    border: unset;
+  }
 
-    td[data-label]:not(:nth-child(1)):not(:nth-child(8))::before {
-      content: attr(data-label);
-      display: block;
-      font-weight: bold;
-      color: #8989AB;
-      margin-bottom: 4px;
-    }
+  .agents-table td[data-label]:not(:nth-child(1)):not(:nth-child(8))::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: bold;
+    color: #8989AB;
+    margin-bottom: 4px;
+  }
 
-    td:nth-child(1) {
-      grid-area: col1;
-    }
+  .agents-table td:nth-child(1) {
+    grid-area: col1;
+  }
 
-    td:nth-child(8) {
-      grid-area: col8;
-      flex-direction: row;
+  .agents-table td:nth-child(8) {
+    grid-area: col8;
+    flex-direction: row;
+  }
 
-      button {
-        width: 100%;
-      }
-    }
+  .agents-table td:nth-child(8) button {
+    width: 100%;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width:768px) {
   section.main {
     margin: 0;
+  }
 
-    .content-header {
-      flex-wrap: wrap;
-      margin: 2rem;
-    }
+  section.main .content-header {
+    flex-wrap: wrap;
+    margin: 2rem;
   }
 }
 
-@media (max-width: 500px) {
-  section.main {
-    .equalizer {
-      height: 80px;
-      width: unset;
-    }
+@media (max-width:500px) {
+  section.main .equalizer {
+    height: 80px;
+    width: unset;
+  }
 
-    .table-agents {
-      box-shadow:
-        1.39px -2.09px 0 0 #1B1B2A,
-        -1.39px -1.39px 0 0 #1B1B2A,
-        1.39px 0 0 0 #59596D,
-        0 -0.7px 0 0 #000000;
-    }
+  section.main .table-agents {
+    box-shadow: 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 #59596D, 0 -0.7px 0 0 #000000;
+  }
 
-    .agents-grid {
-      padding: 0.75rem;
-      margin-bottom: unset;
-      padding-bottom: 3rem;
-    }
+  section.main .agents-grid {
+    padding: 0.75rem;
+    margin-bottom: unset;
+    padding-bottom: 3rem;
+  }
 
-    .table-container {
-      margin-bottom: unset;
-      padding-bottom: 3rem;
-    }
+  section.main .table-container {
+    margin-bottom: unset;
+    padding-bottom: 3rem;
+  }
 
-    .content-header {
-      flex-direction: column;
-      text-align: center;
-    }
+  section.main .content-header {
+    flex-direction: column;
+    text-align: center;
+  }
 
-    .agents-table tr {
-      font-size: 12px;
-      gap: 4px;
-      padding: 8px;
-
-    }
+  section.main .agents-table tr {
+    font-size: 12px;
+    gap: 4px;
+    padding: 8px;
   }
 }
 </style>

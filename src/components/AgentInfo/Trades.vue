@@ -245,22 +245,21 @@ const dummyHolders = {
 	gap: 24px;
 	padding: 20px 32px;
 	border-bottom: 1px solid #59596D;
-	color: #00FA00;
+	color: #00FA00
+}
 
-	p {
-		opacity: 0.5;
+.holders p {
+	opacity: 0.5;
+	transition: opacity .3s ease-in-out
+}
 
-		transition: opacity 0.3s ease-in-out;
+.holders p:hover {
+	opacity: 0.8;
+	cursor: pointer
+}
 
-		&:hover {
-			opacity: 0.8;
-			cursor: pointer;
-		}
-
-		&.selected {
-			opacity: 1;
-		}
-	}
+.holders p.selected {
+	opacity: 1
 }
 
 .comments-container {
@@ -269,63 +268,63 @@ const dummyHolders = {
 	gap: 20px;
 	display: flex;
 	flex-direction: column;
-	padding: 24px 0px;
+	padding: 24px 0;
 	color: #00FA00;
-	border-bottom: 1px solid #59596d;
+	border-bottom: 1px solid #59596d
+}
 
-	.add-comment-section {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 0px 36px;
+.comments-container .add-comment-section {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 0 36px
+}
 
-		input {
-			flex: 1;
-			padding: 4px 8px;
-			color: #00fa00;
-			background: black;
-			border: 1px solid #59596d;
-		}
+.comments-container .add-comment-section input {
+	flex: 1;
+	padding: 4px 8px;
+	color: #00fa00;
+	background: black;
+	border: 1px solid #59596d
+}
 
-		button {
-			cursor: pointer;
-			background: #00fa00;
-			color: black;
-			border: none;
-			padding: 6px 12px;
-			transition: background-color 0.3s ease;
+.comments-container .add-comment-section button {
+	cursor: pointer;
+	background: #00fa00;
+	color: black;
+	border: none;
+	padding: 6px 12px;
+	transition: background-color .3s ease
+}
 
-			&:hover {
-				background-color: #00dd00;
-			}
-		}
-	}
+.comments-container .add-comment-section button:hover {
+	background-color: #00dd00
+}
 
-	.comment-row {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		padding: 12px 36px;
-		transition: background-color 0.3s ease;
+.comments-container .comment-row {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 12px 36px;
+	transition: background-color .3s ease
+}
 
-		&:hover {
-			cursor: pointer;
-			background-color: rgba(0, 250, 0, 0.12);
-		}
+.comments-container .comment-row:hover {
+	cursor: pointer;
+	background-color: rgba(0, 250, 0, 0.12)
+}
 
-		div {
-			display: flex;
-			flex-direction: row;
+.comments-container .comment-row div {
+	display: flex;
+	flex-direction: row
+}
 
-			span {
-				margin: 0 10px;
-			}
-		}
+.comments-container .comment-row div span {
+	margin: 0 10px
+}
 
-		.time {
-			opacity: 0.5;
-		}
-	}
+.comments-container .comment-row .time {
+	opacity: 0.5
 }
 
 .transactions-table-container,
@@ -333,19 +332,19 @@ const dummyHolders = {
 .comments-container {
 	max-height: 240px;
 	overflow-y: auto;
-	-webkit-overflow-scrolling: touch;
+	-webkit-overflow-scrolling: touch
 }
 
 .transactions-table,
 .holders-table {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: collapse
 }
 
 .transactions-table thead th {
 	position: sticky;
 	top: 0;
-	background-color: #161622;
+	background-color: #161622
 }
 
 .transactions-table th,
@@ -353,7 +352,7 @@ const dummyHolders = {
 .holders-table th,
 .holders-table td {
 	text-align: right;
-	padding: 20px 0px;
+	padding: 20px 0
 }
 
 .transactions-table th:first-child,
@@ -361,131 +360,130 @@ const dummyHolders = {
 .holders-table th:first-child,
 .holders-table td:first-child {
 	padding-left: 32px;
-	text-align: left;
+	text-align: left
 }
 
 .transactions-table th:nth-child(2),
 .transactions-table td:nth-child(2) {
-	text-align: left;
+	text-align: left
 }
 
 .transactions-table th:nth-child(3),
 .transactions-table td:nth-child(3) {
-	padding-right: 10px;
+	padding-right: 10px
 }
 
 .holders-table th:nth-child(2),
 .holders-table td:nth-child(2),
 .holders-table th:nth-child(3),
 .holders-table td:nth-child(3) {
-	text-align: center;
+	text-align: center
 }
 
 .transactions-table th:nth-child(4),
 .transactions-table td:nth-child(4) {
 	text-align: left;
-	padding-left: 10px;
+	padding-left: 10px
 }
 
 .transactions-table th:nth-child(5) {
-	text-align: center;
+	text-align: center
 }
 
 .transactions-table td:last-child,
 .holders-table td:last-child,
 .transactions-table th:last-child,
 .holders-table th:last-child {
-	padding-right: 30px;
+	padding-right: 30px
 }
 
 .transactions-table td,
 .holders-table td {
 	background-color: black;
-	color: #00FA00;
+	color: #00FA00
 }
 
 .transactions-table td.sell-trx {
-	color: #FA6400;
+	color: #FA6400
 }
 
 .transactions-table td:first-child,
 .transactions-table td:last-child,
 .holders-table td:first-child,
 .holders-table td:last-child {
-	transition: color 0.3s ease-in-out;
+	transition: color .3s ease-in-out
+}
 
-	&:hover {
-		cursor: pointer;
-		text-decoration: underline;
-		color: #37D339;
-	}
+.transactions-table td:first-child:hover,
+.transactions-table td:last-child:hover,
+.holders-table td:first-child:hover,
+.holders-table td:last-child:hover {
+	cursor: pointer;
+	text-decoration: underline;
+	color: #37D339
 }
 
 .transactions-table th,
 .holders-table th {
-	color: #8989AB;
+	color: #8989AB
 }
 
 .transactions-table tr,
 .holders-table tr {
 	border-bottom: 2px solid #59596D;
-	padding: 20px 30px;
+	padding: 20px 30px
 }
 
-@media (max-width: 600px) {
+@media (max-width:600px) {
 
 	.transactions-table thead th:nth-child(1),
 	.transactions-table tbody td:nth-child(1),
 	.holders-table thead th:nth-child(1),
 	.holders-table tbody td:nth-child(1) {
 		width: 30%;
-		text-align: left;
+		text-align: left
 	}
 
 	.transactions-table thead th:nth-child(2),
 	.transactions-table tbody td:nth-child(2) {
-		text-align: center;
+		text-align: center
 	}
 
 	.holders-table thead th:nth-child(3),
 	.holders-table tbody td:nth-child(3) {
-		text-align: right;
+		text-align: right
 	}
 
-	.comments-container {
-		.comment-row {
-			padding: 12px 16px;
-		}
+	.comments-container .comment-row {
+		padding: 12px 16px
+	}
 
-		.add-comment-section {
-			flex-wrap: wrap;
-			padding: 0px 16px;
+	.comments-container .add-comment-section {
+		flex-wrap: wrap;
+		padding: 0 16px
+	}
 
-			button {
-				width: 100%;
-			}
-		}
+	.comments-container .add-comment-section button {
+		width: 100%
 	}
 
 	.transactions-table-container,
 	.holders-table-container,
 	.comments-container {
 		max-height: 440px;
-		padding-bottom: 80px;
+		padding-bottom: 80px
 	}
-
 
 	.curve-small {
 		padding: 0 20px;
 		border-bottom: 1px solid #59596D;
 		border-top: 1px solid #59596D;
-		margin-bottom: unset;
+		margin-bottom: unset
 	}
 
 	.holders {
 		border-bottom: unset;
-		padding-bottom: 12px;
+		padding-bottom: 12px
 	}
-
 }
 </style>
