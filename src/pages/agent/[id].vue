@@ -57,6 +57,7 @@ onMounted(async () => {
   }
 
   &> :nth-child(2) {
+    min-width: 0;
     border-inline: 1px solid #59596D;
   }
 
@@ -64,7 +65,7 @@ onMounted(async () => {
     max-width: 400px
   }
 
-  @media (max-width: 1250px) {
+  @media (max-width: 1300px) {
     &> :nth-child(1) {
       max-width: 250px;
       background-color: #212133;

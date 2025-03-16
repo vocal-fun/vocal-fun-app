@@ -133,7 +133,7 @@ function handleAction() {
 	}
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1300px) {
 	.select-amount {
 		flex-wrap: wrap;
 	}

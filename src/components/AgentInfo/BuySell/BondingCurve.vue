@@ -97,7 +97,7 @@ defineProps<{ progressPercentage: number, slippageOpen?: boolean }>()
 	}
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1300px) {
 	.curve {
 		margin-top: unset;
 		padding-top: 24px !important;

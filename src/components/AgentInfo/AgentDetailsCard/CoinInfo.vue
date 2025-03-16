@@ -90,6 +90,7 @@ function formatChange(value: number): { formatted: string; color: string } {
 	.prices,
 	.stats {
 		margin-left: 20px;
+		margin-right: 10px;
 		font-size: 12px;
 		color: white;
 		display: grid;

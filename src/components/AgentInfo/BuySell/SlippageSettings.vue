@@ -175,7 +175,7 @@ function setCustom() {
 	}
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1300px) {
 	.slippage {
 		.slippage-options {
 			ul {

@@ -192,7 +192,7 @@ function closeModal() {
 	border-right: 1px solid #00FA00
 }
 
-@media (max-width:1250px) {
+@media (max-width:1300px) {
 	.header-info .contract-info .info-row:first-child {
 		gap: 8px
 	}

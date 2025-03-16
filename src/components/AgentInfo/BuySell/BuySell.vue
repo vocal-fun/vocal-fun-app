@@ -75,7 +75,7 @@ const formattedBalance = computed(() => balanceStore.userBalance)
 		padding-bottom: 24px;
 	}
 
-	@media (max-width: 1250px) {
+	@media (max-width: 1300px) {
 		>*:not(:first-child) {
 			padding: 0 12px;
 		}

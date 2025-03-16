@@ -191,3 +191,11 @@ export type AgentInfo = {
   image: File | string | null;
   voiceSample: File | string | null;
 }
+
+export type CandleData = {
+	open: number
+	high: number
+	low: number
+	close: number
+	time: number
+}

@@ -135,7 +135,7 @@ const variantClass = computed(() => (variant === 'green' ? 'green' : ''))
 	}
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1300px) {
 	.balance-user {
 		padding: 12px;
 
