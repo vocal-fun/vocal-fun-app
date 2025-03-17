@@ -2,7 +2,7 @@
   <div class="agent-info" v-if="agent">
     <AgentDetailsCard :agent="agent" />
     <Trades :agent="agent" />
-    <BuySell />
+    <BuySell :agent="agent" />
   </div>
   <p v-else>Agent not found or still loading...</p>
 </template>

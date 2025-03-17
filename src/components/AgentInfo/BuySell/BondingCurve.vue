@@ -2,7 +2,7 @@
 	<div class="curve" :class="{ 'slippage-open': slippageOpen }">
 		<div class="title">
 			<p>BONDING CURVE</p>
-			<p>{{ progressPercentage }}%</p>
+			<p>{{ progressPercentage.toFixed() }}%</p>
 		</div>
 		<div class="progress-bar">
 			<div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>

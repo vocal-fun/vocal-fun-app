@@ -4,7 +4,7 @@
 			<BuySellTabs :selectedTab="selectedTab" @update:selectedTab="selectedTab = $event" />
 			<BalanceActionPanel :userBalance="formattedBalance" :amounts="amounts" :selectedTab="selectedTab" />
 			<SlippageSettings @slippage-toggle="handleSlippageToggle" />
-			<BondingCurve :progressPercentage="progressPercentage" :slippageOpen="isSlippageOpen" />
+			<BondingCurve :progressPercentage="getPercentage(props.agent.mcap)" :slippageOpen="isSlippageOpen" />
 		</div>
 
 		<div v-else class="buy-sell-mobile">
@@ -28,6 +28,10 @@ import BuySellTabs from './BuySellTabs.vue';
 import BalanceActionPanel from './BalanceActionPanel.vue';
 import SlippageSettings from './SlippageSettings.vue';
 import BondingCurve from './BondingCurve.vue';
+import { getPercentage } from '~/utils/helpers'
+import type { Agent } from '~/types';
+
+const props = defineProps<{ agent: Agent }>()
 
 const { $isSmallScreen } = useNuxtApp();
 const balanceStore = useBalanceStore()
@@ -57,7 +61,6 @@ function handleMobileButtonClick() {
 }
 
 const amounts = ref(['0.01', '0.02', '0.1', '0.2', 'MAX']);
-const progressPercentage = ref(4);
 const formattedBalance = computed(() => balanceStore.userBalance)
 
 </script>

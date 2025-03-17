@@ -3,7 +3,7 @@
 		<Graphic v-if="isTradingView" token="BONK" />
 		<GraphicLightChart v-else />
 		<CoinInfo v-if="$isSmallScreen" :agent="agent" />
-		<BondingCurve class="curve-small" v-if="$isSmallScreen" :progressPercentage="4" />
+		<BondingCurve class="curve-small" v-if="$isSmallScreen" :progressPercentage="getPercentage(props.agent.mcap)" />
 		<div>
 			<div class="holders">
 				<p v-play-click-sound :class="{ selected: selectedTab === TypeOfTable.HOLDERS }"
@@ -104,6 +104,7 @@ import Graphic from './Graphic.vue'
 import GraphicLightChart from './GraphicLightChart.vue'
 import CoinInfo from './AgentDetailsCard/CoinInfo.vue'
 import BondingCurve from './BuySell/BondingCurve.vue'
+import { getPercentage } from '~/utils/helpers'
 
 const isTradingView = false;
 const props = defineProps({

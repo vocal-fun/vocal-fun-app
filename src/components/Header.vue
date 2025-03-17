@@ -24,7 +24,7 @@
     </a>
 
     <div class="user">
-      <button v-if="user" v-play-click-sound class="account" @click="buyStore.openBuyModal">
+      <button v-if="user && isLoggedIn" v-play-click-sound class="account" @click="buyStore.openBuyModal">
         BALANCE: {{ user.balance }} $VOCAL
       </button>
       <ConnectWallet class="wallet" />
@@ -45,6 +45,7 @@ const buyStore = useBuyStore();
 const authStore = useAuthStore();
 
 const user = computed(() => authStore.user);
+const isLoggedIn = computed(() => authStore.loggedInAddress);
 const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 
 // const toggleBackgroundSound = () => {
