@@ -105,7 +105,7 @@ import GraphicLightChart from './GraphicLightChart.vue'
 import CoinInfo from './AgentDetailsCard/CoinInfo.vue'
 import BondingCurve from './BuySell/BondingCurve.vue'
 
-const isTradingView = true;
+const isTradingView = false;
 const props = defineProps({
 	agent: {
 		type: Object as () => Agent,

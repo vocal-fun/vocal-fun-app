@@ -197,5 +197,5 @@ export type CandleData = {
 	high: number
 	low: number
 	close: number
-	time: number
+	time: string
 }
