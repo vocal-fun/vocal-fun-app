@@ -6,7 +6,7 @@
 		</div>
 		<div class="progress-bar">
 			<div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
-			<NuxtImg class="plane" src="/img/plane.png" alt="Plane Progress"
+			<NuxtImg class="plane" src="/img/plane.png" loading="lazy" alt="Plane Progress"
 				:style="{ left: `calc(${progressPercentage}% - 15px)` }" />
 		</div>
 		<p class="description">

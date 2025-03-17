@@ -22,7 +22,10 @@ const agentsStore = useAgentsStore();
 const agent = ref<Agent | null>(null);
 
 onBeforeMount(async () => {
-  await agentsStore.getAgents()
+  const agents = agentsStore.agents;
+  if (agents.length === 0) {
+    await agentsStore.getAgents()
+  }
   const { id } = route.params;
   const found = agentsStore.agents.find(agent => agent.id === id);
   if (found) {

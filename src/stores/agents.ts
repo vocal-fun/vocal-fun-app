@@ -13,11 +13,13 @@ import type {
 export const useAgentsStore = defineStore('agents', () => {
   const loading = ref(false);
   const agents = ref<Agent[]>([]);
+  
   const agentsPagination = ref({
     page: 1,
     limit: 20,
     sort: 'newest',
   });
+
   const agentComments = ref<Record<
     string,
     {
@@ -38,7 +40,8 @@ export const useAgentsStore = defineStore('agents', () => {
       page: number;
       limit: number;
     }
-  >>({});
+    >>({});
+  
   const agentTrades = ref<Record<
     string,
     {
@@ -47,10 +50,12 @@ export const useAgentsStore = defineStore('agents', () => {
       page: number;
       limit: number;
     }
-  >>({});
+    >>({});
+  
   const config = ref<{ createAgentFees: string; chainId: number } | null>(null);
   const userDetails = ref<UserDetailsResponse | null>(null);
   const previews = ref<Record<string, PreviewDto>>({});
+
   async function getAgents(
     page = agentsPagination.value.page,
     limit = agentsPagination.value.limit,

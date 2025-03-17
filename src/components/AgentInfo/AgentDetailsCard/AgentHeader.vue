@@ -4,7 +4,7 @@
 			<p><- </p>
 		</div>
 		<div class="header">
-			<NuxtImg v-if="$isSmallScreen" class="avatar-img" :src="agent.image" alt="Agent Avatar" />
+			<NuxtImg v-if="$isSmallScreen" class="avatar-img" :src="agent.image" alt="Agent Avatar" loading="lazy" />
 			<AvatarCircle v-else :img="agent.image" :size="74" />
 			<div class="header-text">
 				<h3>{{ agent.tokenName }} OFFICIAL COIN</h3>
