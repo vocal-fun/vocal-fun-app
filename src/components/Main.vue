@@ -138,6 +138,7 @@ function createAgent() {
 }
 
 function buy(person: Agent) {
+  router.push(`/agent/${person.id}`)
   console.log('Buying token for:', person.name)
 }
 

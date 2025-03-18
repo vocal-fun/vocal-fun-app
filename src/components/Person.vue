@@ -53,6 +53,7 @@ function openModal(state: OpenModalState = 'default') {
 
 function handleBuy() {
   console.log("Buy button clicked!");
+  router.push(`/agent/${props.id}`);
 }
 </script>
 

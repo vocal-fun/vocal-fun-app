@@ -13,7 +13,7 @@
 
 		<div v-if="!$isSmallScreen" class="action">
 			<EQ class="equalizer" :repeatTimes="3" />
-			<button v-play-click-sound @click="handleAction">
+			<button v-play-click-sound :disabled="isActionDisabled" @click="handleAction">
 				{{ selectedTab === 'BUY' ? 'BUY' : 'SELL' }}
 			</button>
 		</div>
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from 'vue'
+import { defineProps, ref, computed } from 'vue'
 import EQ from '~/components/EQ.vue'
 import UserBalance from '~/components/UserBalance.vue'
 
@@ -37,6 +37,12 @@ const props = defineProps<{
 
 const user = computed(() => authStore.user)
 const inputValue = ref('')
+
+const isActionDisabled = computed(() => {
+	const value = parseFloat(inputValue.value)
+	return !inputValue.value || isNaN(value) || value <= 0
+})
+
 function selectAmount(amount: string) {
 	const balanceNum = parseFloat(props.userBalance)
 	if (amount === 'MAX') {
@@ -60,6 +66,7 @@ function handleAction() {
 		handleConnectClick()
 		return
 	}
+	if (isActionDisabled.value) return
 	if (props.selectedTab === 'BUY') {
 		buy()
 	} else {
@@ -67,7 +74,6 @@ function handleAction() {
 	}
 }
 </script>
-
 
 <style scoped lang="scss">
 .balance-select {
@@ -91,7 +97,6 @@ function handleAction() {
 			background-color: transparent;
 			color: white;
 			cursor: pointer;
-
 			transition: background-color 0.3s ease-in-out;
 
 			&:hover {
@@ -124,11 +129,15 @@ function handleAction() {
 		color: #121212;
 		background-color: #00fa00;
 		text-align: center;
-
 		transition: background-color 0.3s ease-in-out;
 
 		&:hover {
 			background-color: #3cdb3c;
+		}
+
+		&:disabled {
+			background-color: #164216;
+			cursor: not-allowed;
 		}
 	}
 }
