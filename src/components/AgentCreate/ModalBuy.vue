@@ -52,7 +52,7 @@ function createCoin() {
 
 <style scoped lang="scss">
 .optional-buy-modal {
-	color: #37D339;
+	color: var(--color-primary);
 	display: flex;
 	flex-direction: column;
 

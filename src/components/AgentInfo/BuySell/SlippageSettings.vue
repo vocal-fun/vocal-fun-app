@@ -78,11 +78,11 @@ function setCustom() {
 	}
 
 	position: relative;
-	border-bottom: 1px solid #59596d;
+	border-bottom: 1px solid var(--color-tertiary);
 
 	div {
-		background: #59596d26;
-		border: 1px solid #59596d;
+		background: var(--color-tertiary-faded);
+		border: 1px solid var(--color-tertiary);
 		padding: 18px;
 		display: flex;
 		flex-direction: row;
@@ -117,7 +117,7 @@ function setCustom() {
 		flex-direction: column;
 
 		&:hover {
-			background-color: #59596d26;
+			background-color: var(--color-tertiary-faded);
 			cursor: default;
 		}
 
@@ -131,7 +131,7 @@ function setCustom() {
 
 			li {
 				padding: 4px;
-				border: 1px solid #59596d;
+				border: 1px solid var(--color-tertiary);
 				cursor: pointer;
 
 				transition: background-color 0.3s ease-in-out;
@@ -151,7 +151,7 @@ function setCustom() {
 
 			input {
 				background-color: transparent;
-				border: 1px solid #59596d;
+				border: 1px solid var(--color-tertiary);
 				padding: 4px;
 				color: white;
 

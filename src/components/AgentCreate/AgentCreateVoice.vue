@@ -241,7 +241,7 @@ onMounted(() => {
   width: 100%;
 
   .warning {
-    color: #fa6400;
+    color: var(--color-warn);
     margin-top: 16px;
     margin-bottom: 24px;
     font-size: 12px;
@@ -251,13 +251,13 @@ onMounted(() => {
     display: flex;
     align-items: center;
     padding: 16px;
-    background-color: #59596d26;
-    border: 1.8px solid #59596d33;
+    background-color: var(--color-tertiary-faded);
+    border: 1.8px solid var(--color-tertiary-muted);
     transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out;
 
     &.selected {
       background-color: #00fa000F;
-      border: 1.82px solid #00fa00;
+      border: 1.82px solid var(--color-secondary);
     }
 
     &.loaded:hover {
@@ -269,7 +269,7 @@ onMounted(() => {
       width: 63px;
       height: 63px;
       padding: 12px;
-      border: 1px solid #59596d33;
+      border: 1px solid var(--color-tertiary-muted);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -349,14 +349,14 @@ onMounted(() => {
     flex-direction: row;
     align-items: center;
     padding: 16px;
-    background-color: #59596d26;
-    border: 1.8px solid #59596d33;
+    background-color: var(--color-tertiary-faded);
+    border: 1.8px solid var(--color-tertiary-muted);
     margin-bottom: 12px;
     transition: background-color 0.3s ease-in-out, border 0.3s ease-in-out;
 
     &.selected {
       background-color: #00fa000F;
-      border: 1.82px solid #00fa00;
+      border: 1.82px solid var(--color-secondary);
     }
 
     &:hover {
@@ -365,7 +365,7 @@ onMounted(() => {
     }
 
     button:first-child {
-      border: 1px solid #59596d33;
+      border: 1px solid var(--color-tertiary-muted);
       margin: unset;
       width: 63px;
       height: 63px;

@@ -93,7 +93,7 @@ function handleAction() {
 			font-size: 12px;
 			gap: 8px;
 			padding: 12px;
-			border: 1px solid #59596d;
+			border: 1px solid var(--color-tertiary);
 			background-color: transparent;
 			color: white;
 			cursor: pointer;
@@ -126,8 +126,8 @@ function handleAction() {
 	button {
 		padding: 24px;
 		width: 100%;
-		color: #121212;
-		background-color: #00fa00;
+		color: var(--color-deep);
+		background-color: var(--color-secondary);
 		text-align: center;
 		transition: background-color 0.3s ease-in-out;
 

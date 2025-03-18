@@ -100,9 +100,9 @@ const formattedBalance = computed(() => balanceStore.userBalance)
 	width: 100%;
 	padding: 25px;
 	cursor: pointer;
-	color: #121212;
+	color: var(--color-deep);
 	text-align: center;
-	background-color: #00FA00;
+	background-color: var(--color-secondary);
 	z-index: 999;
 }
 
@@ -110,7 +110,7 @@ const formattedBalance = computed(() => balanceStore.userBalance)
 	position: fixed;
 	bottom: 70px;
 	width: 100%;
-	background-color: #161622;
+	background-color: var(--color-background);
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;

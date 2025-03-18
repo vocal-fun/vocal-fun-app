@@ -111,7 +111,7 @@ function closeModal() {
 	align-items: center;
 	gap: 1rem;
 	padding: 24px 18px 22px;
-	border-bottom: 1px solid #37D339;
+	border-bottom: 1px solid var(--color-primary);
 	background: linear-gradient(180deg, rgba(0, 255, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%)
 }
 
@@ -150,7 +150,7 @@ function closeModal() {
 
 .header-info .contract-info .info-row:first-child {
 	padding: 0 14px 16px 14px;
-	border-bottom: 1px solid #37D339
+	border-bottom: 1px solid var(--color-primary)
 }
 
 .header-info .contract-info .info-row:last-child {
@@ -164,7 +164,7 @@ function closeModal() {
 
 .header-info .contract-info .info-row .value:hover {
 	text-decoration: underline;
-	color: #37D339
+	color: var(--color-primary)
 }
 
 .header-info .actions {
@@ -184,12 +184,12 @@ function closeModal() {
 }
 
 .header-info .actions button:hover {
-	background-color: #37D339;
-	color: #121212
+	background-color: var(--color-primary);
+	color: var(--color-deep);
 }
 
 .header-info .actions button.preview {
-	border-right: 1px solid #00FA00
+	border-right: 1px solid var(--color-secondary);
 }
 
 @media (max-width:1300px) {

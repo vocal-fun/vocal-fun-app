@@ -56,8 +56,8 @@ const variantClass = computed(() => (variant === 'green' ? 'green' : ''))
 	flex-direction: row;
 	padding: 20px;
 	width: 100%;
-	background-color: #59596d26;
-	border: 1px solid #59596d;
+	background-color: var(--color-tertiary-faded);
+	border: 1px solid var(--color-tertiary);
 
 	.amount {
 		display: flex;
@@ -66,7 +66,7 @@ const variantClass = computed(() => (variant === 'green' ? 'green' : ''))
 		color: white;
 		opacity: 0.5;
 		font-size: 10px;
-		border-right: 1px solid #59596d;
+		border-right: 1px solid var(--color-tertiary);
 		max-width: 220px;
 
 		input {
@@ -115,10 +115,10 @@ const variantClass = computed(() => (variant === 'green' ? 'green' : ''))
 
 	.amount {
 		opacity: 1;
-		border-right: 1px solid #00FA00;
+		border-right: 1px solid var(--color-secondary);
 
 		input {
-			color: #00fa00;
+			color: var(--color-secondary);
 
 			&::placeholder {
 				color: rgba(0, 250, 0, 0.5);
@@ -131,7 +131,7 @@ const variantClass = computed(() => (variant === 'green' ? 'green' : ''))
 	}
 
 	.token {
-		color: #00fa00;
+		color: var(--color-secondary);
 	}
 }
 

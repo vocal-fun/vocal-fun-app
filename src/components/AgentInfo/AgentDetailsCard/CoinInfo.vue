@@ -84,7 +84,7 @@ function formatChange(value: number): { formatted: string; color: string } {
 	padding-top: 20px;
 	display: flex;
 	flex-direction: column;
-	background-color: #161622;
+	background-color: var(--color-background);
 	gap: 28px;
 
 	.prices,
@@ -123,7 +123,7 @@ function formatChange(value: number): { formatted: string; color: string } {
 	.changes {
 		display: flex;
 		flex-direction: row;
-		border-block: 1px solid #59596D;
+		border-block: 1px solid var(--color-tertiary);
 		justify-content: space-between;
 		color: white;
 		font-size: 11px;
@@ -138,7 +138,7 @@ function formatChange(value: number): { formatted: string; color: string } {
 			align-items: center;
 
 			&:not(:last-child) {
-				border-right: 1px solid #59596D;
+				border-right: 1px solid var(--color-tertiary);
 			}
 
 			p {

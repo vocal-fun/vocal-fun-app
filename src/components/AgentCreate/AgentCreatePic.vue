@@ -90,8 +90,8 @@ function onFileChange(e: Event) {
     flex-direction: row;
     align-items: center;
     padding: 16px;
-    background-color: #59596d26;
-    border: 1.8px solid #59596d33;
+    background-color: var(--color-tertiary-faded);
+    border: 1.8px solid var(--color-tertiary-muted);
 
     img.profile {
       width: 62px;

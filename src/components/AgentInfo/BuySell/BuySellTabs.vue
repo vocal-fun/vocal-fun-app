@@ -46,7 +46,7 @@ function handleClick(tab: 'BUY' | 'SELL') {
 		flex: 1;
 		text-align: center;
 		padding: 20px;
-		background-color: #212133;
+		background-color: var(--color-surface);
 		border: none;
 		cursor: pointer;
 		font-size: 15px;
@@ -54,8 +54,8 @@ function handleClick(tab: 'BUY' | 'SELL') {
 		color: #fff;
 
 		&.active {
-			background: linear-gradient(348.34deg, #00fa00 -14.85%, rgba(0, 250, 0, 0) 93.01%);
-			border-bottom: 1px solid #00fa00;
+			background: linear-gradient(348.34deg, var(--color-secondary) -14.85%, rgba(0, 250, 0, 0) 93.01%);
+			border-bottom: 1px solid var(--color-secondary);
 		}
 
 		&:not(.active):hover {

@@ -54,7 +54,7 @@ onBeforeMount(async () => {
 <style scoped lang="scss">
 .agent-info {
   display: flex;
-  background-color: #161622;
+  background-color: var(--color-background);
   min-height: 100vh;
 
   &>* {
@@ -64,12 +64,12 @@ onBeforeMount(async () => {
 
   &> :nth-child(1) {
     max-width: 320px;
-    background-color: #212133;
+    background-color: var(--color-surface);
   }
 
   &> :nth-child(2) {
     min-width: 0;
-    border-inline: 1px solid #59596D;
+    border-inline: 1px solid var(--color-tertiary);
   }
 
   &> :nth-child(3) {
@@ -79,7 +79,7 @@ onBeforeMount(async () => {
   @media (max-width: 1300px) {
     &> :nth-child(1) {
       max-width: 250px;
-      background-color: #212133;
+      background-color: var(--color-surface);
     }
 
     &> :nth-child(3) {
@@ -96,7 +96,7 @@ onBeforeMount(async () => {
     }
 
     &> :nth-child(3) {
-      border-top: 1px solid #59596D
+      border-top: 1px solid var(--color-tertiary)
     }
   }
 

@@ -267,7 +267,7 @@ section.main {
 }
 
 .table-agents {
-  box-shadow: 1.39px 1.39px 0 0 #59596D, 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 #59596D, 0 -0.7px 0 0 #000000;
+  box-shadow: 1.39px 1.39px 0 0 var(--color-tertiary), 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 var(--color-tertiary), 0 -0.7px 0 0 #000000;
 }
 
 .agents-grid {
@@ -275,8 +275,8 @@ section.main {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   max-width: 2048px;
   margin: auto;
-  background: #161622;
-  border-top: 2px solid #59596D;
+  background: var(--color-background);
+  border-top: 2px solid var(--color-tertiary);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -295,9 +295,9 @@ section.main {
   width: 100%;
   min-width: 1000px;
   border-collapse: collapse;
-  background: #161622;
-  border-top: 2px solid #59596d;
-  box-shadow: 1.39px 1.39px 0 0 #59596D, 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 #59596D, 0 -0.7px 0 0 #000000;
+  background: var(--color-background);
+  border-top: 2px solid var(--color-tertiary);
+  box-shadow: 1.39px 1.39px 0 0 var(--color-tertiary), 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 var(--color-tertiary), 0 -0.7px 0 0 #000000;
 }
 
 .label-wrapper {
@@ -318,7 +318,7 @@ section.main {
 }
 
 .agents-table thead {
-  background: #161622;
+  background: var(--color-background);
   color: #8989AB;
   font-size: 12px;
 }
@@ -358,7 +358,7 @@ section.main {
 }
 
 .negative {
-  color: #FA6400;
+  color: var(--color-warn);
 }
 
 .table-avatar-column {
@@ -393,7 +393,7 @@ section.main {
 
 .actions-buttons .preview-btn {
   padding-right: 0;
-  border-right: 1px solid #37D339;
+  border-right: 1px solid var(--color-primary);
 }
 
 .actions-buttons .call-btn {
@@ -418,18 +418,18 @@ section.main {
 .actions-buttons .preview-btn:hover,
 .actions-buttons .call-btn:hover,
 .actions-buttons .buy-btn:hover {
-  background-color: #37D339;
-  color: #121212;
+  background-color: var(--color-primary);
+  color: var(--color-deep);
 }
 
 .actions-buttons .buy-btn {
-  background-color: #00FA00;
-  color: #121212;
+  background-color: var(--color-secondary);
+  color: var(--color-deep);
 }
 
 .actions-buttons .buy-btn:hover {
   background-color: #60FF60;
-  color: #000;
+  color: black;
 }
 
 .equalizer {
@@ -542,7 +542,7 @@ section.main {
   }
 
   section.main .table-agents {
-    box-shadow: 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 #59596D, 0 -0.7px 0 0 #000000;
+    box-shadow: 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 var(--color-tertiary), 0 -0.7px 0 0 #000000;
   }
 
   section.main .agents-grid {

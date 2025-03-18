@@ -84,10 +84,10 @@ $circle-gradient: linear-gradient(180deg,
   transition: transform 0.3s ease-in-out;
   padding-top: 14px;
   box-shadow:
-    3px 3px 0 0 #59596D,
+    3px 3px 0 0 var(--color-tertiary),
     3px 4.5px 0 0 #1B1B2A,
     -3px 3px 0 0 #1B1B2A,
-    3px 0 0 0 #59596D,
+    3px 0 0 0 var(--color-tertiary),
     0 -1.5px 0 0 #000000;
 
   .info {

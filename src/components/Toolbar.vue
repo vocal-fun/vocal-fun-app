@@ -127,14 +127,14 @@ function handleSearchInput(event: Event) {
   align-items: center;
   gap: 1.4rem;
   padding: 12px 24px;
-  background-color: #161622;
+  background-color: var(--color-background);
   flex-wrap: wrap;
 }
 
 .divider {
   align-self: stretch;
   width: 1px;
-  background: #59596d;
+  background: var(--color-tertiary);
   margin-top: -12px;
   margin-bottom: -12px;
 }
@@ -217,7 +217,7 @@ function handleSearchInput(event: Event) {
 .sort {
   label {
     margin-right: 0.5rem;
-    color: #00fa00;
+    color: var(--color-secondary);
   }
 }
 
@@ -227,7 +227,7 @@ function handleSearchInput(event: Event) {
 
 .dropdown-trigger {
   background-color: transparent;
-  color: #00fa00;
+  color: var(--color-secondary);
   cursor: pointer;
   padding: 4px 8px;
   font: inherit;
@@ -245,7 +245,7 @@ function handleSearchInput(event: Event) {
     height: 0;
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-    border-top: 5px solid #00fa00;
+    border-top: 5px solid var(--color-secondary);
   }
 }
 
@@ -253,8 +253,8 @@ function handleSearchInput(event: Event) {
   position: absolute;
   top: 100%;
   left: 0;
-  background: #161622;
-  border: 1px solid #00fa00;
+  background: var(--color-background);
+  border: 1px solid var(--color-secondary);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -263,13 +263,13 @@ function handleSearchInput(event: Event) {
 
   li {
     padding: 8px;
-    color: #00fa00;
+    color: var(--color-secondary);
     cursor: pointer;
     transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
 
     &:hover {
-      background-color: #00fa00;
-      color: #161622;
+      background-color: var(--color-secondary);
+      color: var(--color-background);
     }
   }
 }

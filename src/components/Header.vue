@@ -98,9 +98,9 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: #212133;
+  background-color: var(--color-surface);
   padding: 1.25rem;
-  border-bottom: 1px solid #555569;
+  border-bottom: 1px solid var(--color-tertiary);
 
   .logo {
     flex: 1;

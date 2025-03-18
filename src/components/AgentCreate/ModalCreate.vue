@@ -83,7 +83,7 @@ function testResponse() {
 .agent-info-modal {
 	display: flex;
 	flex-direction: column;
-	color: #00FA00;
+	color: var(--color-secondary);
 	width: 100%;
 
 	.close {
@@ -96,7 +96,7 @@ function testResponse() {
 
 		h3 {
 			font-size: 14px;
-			color: #37D339;
+			color: var(--color-primary);
 			margin-bottom: 20px;
 		}
 
@@ -133,13 +133,13 @@ function testResponse() {
 				padding: 16px 24px;
 				width: 100%;
 				margin: 24px 0px;
-				color: #00FA00;
+				color: var(--color-secondary);
 				transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
 
 				&:hover {
 					background-color: #00FA0022;
 					cursor: pointer;
-					border-color: #00FA00;
+					border-color: var(--color-secondary);
 				}
 			}
 
@@ -148,8 +148,8 @@ function testResponse() {
 				padding: 14px;
 				text-align: center;
 				color: black;
-				background-color: #00FA00;
-				border: 1.3px solid #00FA00;
+				background-color: var(--color-secondary);
+				border: 1.3px solid var(--color-secondary);
 				cursor: pointer;
 
 				transition: background-color 0.3s ease-in-out;
@@ -176,7 +176,7 @@ function testResponse() {
 
 			button {
 				background: #00FA0014;
-				border: 1px solid #00FA00;
+				border: 1px solid var(--color-secondary);
 				padding: 22px;
 				width: 100%;
 				transition: background-color 0.3s ease-in-out;
@@ -194,7 +194,7 @@ function testResponse() {
 			width: 44px;
 			height: 44px;
 			border: 4px solid rgba(0, 250, 0, 0.2);
-			border-top: 4px solid #00FA00;
+			border-top: 4px solid var(--color-secondary);
 			border-radius: 50%;
 			animation: spin 1s linear infinite;
 		}

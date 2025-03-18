@@ -16,8 +16,8 @@ const props = defineProps<{ agent: Agent }>()
 
 <style scoped lang="scss">
 .agent-details-card {
-	color: #00FA00;
-	border-bottom: 1px solid #59596D;
+	color: var(--color-secondary);
+	border-bottom: 1px solid var(--color-tertiary);
 	display: flex;
 	flex-direction: column;
 }

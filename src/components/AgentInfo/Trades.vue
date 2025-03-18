@@ -245,8 +245,8 @@ const dummyHolders = {
 	flex-direction: row;
 	gap: 24px;
 	padding: 20px 32px;
-	border-bottom: 1px solid #59596D;
-	color: #00FA00
+	border-bottom: 1px solid var(--color-tertiary);
+	color: var(--color-secondary);
 }
 
 .holders p {
@@ -270,8 +270,8 @@ const dummyHolders = {
 	display: flex;
 	flex-direction: column;
 	padding: 24px 0;
-	color: #00FA00;
-	border-bottom: 1px solid #59596d
+	color: var(--color-secondary);
+	border-bottom: 1px solid var(--color-tertiary)
 }
 
 .comments-container .add-comment-section {
@@ -284,14 +284,14 @@ const dummyHolders = {
 .comments-container .add-comment-section input {
 	flex: 1;
 	padding: 4px 8px;
-	color: #00fa00;
+	color: var(--color-secondary);
 	background: black;
-	border: 1px solid #59596d
+	border: 1px solid var(--color-tertiary)
 }
 
 .comments-container .add-comment-section button {
 	cursor: pointer;
-	background: #00fa00;
+	background: var(--color-secondary);
 	color: black;
 	border: none;
 	padding: 6px 12px;
@@ -345,7 +345,7 @@ const dummyHolders = {
 .transactions-table thead th {
 	position: sticky;
 	top: 0;
-	background-color: #161622
+	background-color: var(--color-background);
 }
 
 .transactions-table th,
@@ -401,11 +401,11 @@ const dummyHolders = {
 .transactions-table td,
 .holders-table td {
 	background-color: black;
-	color: #00FA00
+	color: var(--color-secondary);
 }
 
 .transactions-table td.sell-trx {
-	color: #FA6400
+	color: var(--color-warn);
 }
 
 .transactions-table td:first-child,
@@ -421,7 +421,7 @@ const dummyHolders = {
 .holders-table td:last-child:hover {
 	cursor: pointer;
 	text-decoration: underline;
-	color: #37D339
+	color: var(--color-primary)
 }
 
 .transactions-table th,
@@ -431,7 +431,7 @@ const dummyHolders = {
 
 .transactions-table tr,
 .holders-table tr {
-	border-bottom: 2px solid #59596D;
+	border-bottom: 2px solid var(--color-tertiary);
 	padding: 20px 30px
 }
 
@@ -482,8 +482,8 @@ tbody {
 
 	.curve-small {
 		padding: 0 20px;
-		border-bottom: 1px solid #59596D;
-		border-top: 1px solid #59596D;
+		border-bottom: 1px solid var(--color-tertiary);
+		border-top: 1px solid var(--color-tertiary);
 		margin-bottom: unset
 	}
 

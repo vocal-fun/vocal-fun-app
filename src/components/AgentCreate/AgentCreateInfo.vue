@@ -42,10 +42,10 @@ function updateField(field: keyof AgentInfo, value: string) {
     gap: 16px;
 
     input {
-      border: 1.8px solid #59596d33;
+      border: 1.8px solid var(--color-tertiary-muted);
       padding: 22px;
       color: white;
-      background-color: #59596d26;
+      background-color: var(--color-tertiary-faded);
 
       &::placeholder {
         opacity: 0.5;
@@ -55,8 +55,8 @@ function updateField(field: keyof AgentInfo, value: string) {
       background-color 0.3s ease-in-out;
 
       &:hover {
-        border-color: #37D339;
-        background-color: #59596d40;
+        border-color: var(--color-primary);
+        background-color: var(--color-tertiary-muted);
         cursor: pointer;
       }
     }

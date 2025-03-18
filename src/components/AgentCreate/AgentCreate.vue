@@ -166,19 +166,19 @@ async function handleClosePublishAgent() {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		background-color: #161622;
+		background-color: var(--color-background);
 		text-align: left;
 		padding: 34px 28px;
 		box-shadow:
-			2.78px 2.78px 0px 0px #59596d,
+			2.78px 2.78px 0px 0px var(--color-tertiary),
 			2.78px -4.17px 0px 0px #1b1b2a,
 			-2.78px -2.78px 0px 0px #1b1b2a,
-			2.78px 0px 0px 0px #59596d,
+			2.78px 0px 0px 0px var(--color-tertiary),
 			0px -1.39px 0px 0px #000000;
 
 		.create-btn {
 			padding: 14px;
-			color: #00fa00;
+			color: var(--color-secondary);
 			border: 1.3px solid #00fa0033;
 			width: 100%;
 			text-align: center;
@@ -192,12 +192,12 @@ async function handleClosePublishAgent() {
 
 			&:hover:not(:disabled) {
 				background-color: rgba(0, 250, 0, 0.1);
-				border-color: #00fa00;
+				border-color: var(--color-secondary);
 			}
 		}
 
 		.filled {
-			background-color: #00fa00;
+			background-color: var(--color-secondary);
 			color: black;
 			transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
 

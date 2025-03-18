@@ -32,10 +32,10 @@ defineProps<{ progressPercentage: number, slippageOpen?: boolean }>()
 	color: white;
 	margin-top: 24px;
 	margin-bottom: 22px;
-	border-bottom: 1px solid #59596D;
+	border-bottom: 1px solid var(--color-tertiary);
 
 	&.slippage-open {
-		border-left: 1px solid #59596D;
+		border-left: 1px solid var(--color-tertiary);
 	}
 
 	.title {
@@ -44,7 +44,7 @@ defineProps<{ progressPercentage: number, slippageOpen?: boolean }>()
 
 		p {
 			&:last-child {
-				color: #00fa00;
+				color: var(--color-secondary);
 			}
 		}
 	}
@@ -53,7 +53,7 @@ defineProps<{ progressPercentage: number, slippageOpen?: boolean }>()
 		position: relative;
 		width: 100%;
 		height: 43px;
-		background-color: #59596d80;
+		background-color: var(--color-tertiary-muted);
 		overflow: hidden;
 		margin-top: 10px;
 		margin-bottom: 20px;
@@ -62,7 +62,7 @@ defineProps<{ progressPercentage: number, slippageOpen?: boolean }>()
 	.progress-fill {
 		position: absolute;
 		height: 100%;
-		background-color: #00fa00;
+		background-color: var(--color-secondary);
 		transition: width 0.5s ease-in-out;
 	}
 
