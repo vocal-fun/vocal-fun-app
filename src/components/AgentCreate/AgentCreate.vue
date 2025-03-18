@@ -47,6 +47,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const agentsStore = useAgentsStore();
 const { handleConnectClick } = useWalletConnect()
 const user = computed(() => authStore.user)
 
@@ -113,7 +114,8 @@ function handleCreateAgent() {
 	isModalOpen.value = true
 }
 
-function handleClosePublishAgent() {
+async function handleClosePublishAgent() {
+	await agentsStore.getAgents(undefined, true)
 	agentInfo.value = {
 		name: '',
 		ticker: '',

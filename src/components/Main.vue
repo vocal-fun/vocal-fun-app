@@ -105,9 +105,8 @@ import { TypeGridTable, type Agent, type OpenModalState } from '~/types'
 
 const modalContent = useTemplateRef('modalContent')
 const agentsStore = useAgentsStore()
-// const balanceStore = useBalanceStore();
 const authStore = useAuthStore()
-const { handleConnectClick, accountAddress, isConnected } = useWalletConnect()
+const { handleConnectClick } = useWalletConnect()
 const route = useRoute()
 const router = useRouter()
 const user = computed(() => authStore.user)

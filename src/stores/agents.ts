@@ -13,10 +13,8 @@ import type {
 export const useAgentsStore = defineStore('agents', () => {
   const loading = ref(false);
   const agents = ref<Agent[]>([]);
-  
+
   const agentsPagination = ref({
-    page: 1,
-    limit: 20,
     sort: 'newest',
   });
 
@@ -40,8 +38,8 @@ export const useAgentsStore = defineStore('agents', () => {
       page: number;
       limit: number;
     }
-    >>({});
-  
+  >>({});
+
   const agentTrades = ref<Record<
     string,
     {
@@ -50,106 +48,161 @@ export const useAgentsStore = defineStore('agents', () => {
       page: number;
       limit: number;
     }
-    >>({});
-  
+  >>({});
+
   const config = ref<{ createAgentFees: string; chainId: number } | null>(null);
   const userDetails = ref<UserDetailsResponse | null>(null);
   const previews = ref<Record<string, PreviewDto>>({});
 
-  async function getAgents(
-    page = agentsPagination.value.page,
-    limit = agentsPagination.value.limit,
-    sort = agentsPagination.value.sort
-  ): Promise<void> {
+  function mapAgent(apiAgent: any): Agent {
+    return {
+      id: apiAgent._id,
+      name: apiAgent.name,
+      image: apiAgent.imageUrl,
+      rate: apiAgent.rate !== undefined ? apiAgent.rate : Number((Math.random() * 10).toFixed(2)),
+      createdAt: apiAgent.createdAt || '3days',
+      createdBy: apiAgent.createdBy._id,
+      route: apiAgent.name.toLowerCase().replace(/\s/g, '-'),
+      tokenName: apiAgent.symbol,
+      mcap: Number(apiAgent.marketCap),
+      price: Number(apiAgent.currentPrice),
+      contract: apiAgent.tokenAddress,
+      liquidity: Number((Math.random() * 10000).toFixed(2)),
+      volume24h: Number((Math.random() * 500).toFixed(2)),
+      change5m: Number((Math.random() * 10).toFixed(2)),
+      change1h: Number((Math.random() * 10).toFixed(2)),
+      change24h: Number((Math.random() * 10).toFixed(2)),
+      change7d: Number((Math.random() * 20).toFixed(2)),
+      comments: { comments: [] },
+      tokenHolders: { holders: { holders: [], total: 0 } },
+      trades: { trades: [] },
+    };
+  }
+  async function getAgents(sort = agentsPagination.value.sort, fetchLatestOnly = false): Promise<void> {
     try {
       loading.value = true;
-      const queryParams = new URLSearchParams({
-        page: String(page),
-        limit: String(limit),
-        sort: sort,
-      });
 
-      const url = `https://api.vocal.fun/api/v1/launchpad/agents?${queryParams.toString()}`;
-      const res = await $fetch<AgentsResponse & { pagination: { page: number; limit: number } }>(url);
-      agents.value = res.agents.map(({ _id, name, symbol, marketCap, currentPrice, createdBy, tokenAddress, rate, imageUrl, createdAt }) => ({
-        id: _id,
-        name,
-        image: imageUrl,
-        rate: rate !== undefined ? rate : Number((Math.random() * 10).toFixed(2)),
-        createdAt: createdAt || '3days',
-        createdBy: createdBy._id,
-        route: name.toLowerCase().replace(/\s/g, '-'),
-        tokenName: symbol,
-        mcap: Number(marketCap),
-        price: Number(currentPrice),
-        contract: tokenAddress,
-        liquidity: Number((Math.random() * 10000).toFixed(2)),
-        volume24h: Number((Math.random() * 500).toFixed(2)),
-        change5m: Number((Math.random() * 10).toFixed(2)),
-        change1h: Number((Math.random() * 10).toFixed(2)),
-        change24h: Number((Math.random() * 10).toFixed(2)),
-        change7d: Number((Math.random() * 20).toFixed(2)),
-        comments: { comments: [] },
-        tokenHolders: { holders: { holders: [], total: 0 } },
-        trades: { trades: [] },
-      }));
+      if (fetchLatestOnly) {
+        const limit = 1;
+        const page = 1;
+        const queryParams = new URLSearchParams({
+          page: String(page),
+          limit: String(limit),
+          sort,
+        });
+        const url = `https://api.vocal.fun/api/v1/launchpad/agents?${queryParams.toString()}`;
+        const res = await $fetch<AgentsResponse & {
+          pagination: { page: number; limit: number; total?: number }
+        }>(url);
 
-      agentsPagination.value.page = res.pagination.page;
-      agentsPagination.value.limit = res.pagination.limit;
+        if (res.agents.length === 0) {
+          return;
+        }
 
-      await Promise.all(
-        agents.value.map(async (agent) => {
-          await Promise.all([
-            getAgentComments(agent.id),
-            getTokenHolders(agent.id),
-            getAgentTrades(agent.id)
-          ]);
+        const latestAgent = res.agents.map(mapAgent)[0];
+        agents.value = [latestAgent, ...agents.value];
+      } else {
+        const limit = 100;
+        let page = 1;
+        const allAgents: Agent[] = [];
 
-          agent.comments = {
-            comments: agentComments.value[agent.id]?.data ?? [],
-          };
+        while (true) {
+          const queryParams = new URLSearchParams({
+            page: String(page),
+            limit: String(limit),
+            sort,
+          });
+          const url = `https://api.vocal.fun/api/v1/launchpad/agents?${queryParams.toString()}`;
+          const res = await $fetch<AgentsResponse & {
+            pagination: { page: number; limit: number; total?: number }
+          }>(url);
 
-          agent.tokenHolders = {
-            holders: {
-              holders: tokenHolders.value[agent.id]?.holders.holders ?? [],
-              total: tokenHolders.value[agent.id]?.holders.total ?? 0
-            }
-          };
-
-          agent.trades = {
-            trades: agentTrades.value[agent.id]?.trades ?? []
-          };
-        })
-      );
-
+          if (res.agents.length === 0) {
+            break;
+          }
+          const mappedAgents = res.agents.map(mapAgent);
+          allAgents.push(...mappedAgents);
+          page++;
+        }
+        agents.value = allAgents;
+      }
     } catch (error) {
-      console.warn('[AGENTS] Error fetching agents:', error);
+      console.warn("[AGENTS] Error fetching agents:", error);
       agents.value = [];
     } finally {
       loading.value = false;
     }
   }
 
-  async function getAgentComments(
-    agentId: string,
-    page = 1,
-    limit = 20
-  ): Promise<void> {
-    try {
-      const params = new URLSearchParams({
-        page: String(page),
-        limit: String(limit),
-      });
 
-      const res = await $fetch<CommentsApiResponse>(
-        `https://api.vocal.fun/api/v1/launchpad/comments/${agentId}?${params.toString()}`
-      );
+  async function loadAgentDetails(agentId: string): Promise<void> {
+    try {
+      const commentsLoaded = agentComments.value[agentId]?.data?.length > 0;
+      const holdersLoaded = tokenHolders.value[agentId]?.holders?.holders?.length > 0;
+      const tradesLoaded = agentTrades.value[agentId]?.trades?.length > 0;
+
+      if (!commentsLoaded) {
+        await getAgentComments(agentId, true);
+      }
+      if (!holdersLoaded) {
+        await getTokenHolders(agentId);
+      }
+      if (!tradesLoaded) {
+        await getAgentTrades(agentId);
+      }
+
+      const index = agents.value.findIndex((agent) => agent.id === agentId);
+      if (index !== -1) {
+        agents.value[index].comments = {
+          comments: agentComments.value[agentId]?.data ?? [],
+        };
+        agents.value[index].tokenHolders = {
+          holders: {
+            holders: tokenHolders.value[agentId]?.holders.holders ?? [],
+            total: tokenHolders.value[agentId]?.holders.total ?? 0,
+          },
+        };
+        agents.value[index].trades = {
+          trades: agentTrades.value[agentId]?.trades ?? [],
+        };
+      }
+    } catch (error) {
+      console.warn(`[LOAD AGENT DETAILS] Error loading details for agent ${agentId}:`, error);
+    }
+  }
+
+
+  async function getAgentComments(agentId: string, updateAgent: boolean = false): Promise<void> {
+    try {
+      const limit = 20;
+      let page = 1;
+      const allComments: Comment[] = [];
+
+      while (true) {
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: String(limit),
+        });
+        const url = `https://api.vocal.fun/api/v1/launchpad/comments/${agentId}?${params.toString()}`;
+        const res = await $fetch<CommentsApiResponse>(url);
+        const commentsPage = res.comments?.comments || [];
+        allComments.push(...commentsPage);
+        if (commentsPage.length < limit) break;
+        page++;
+      }
+
       agentComments.value[agentId] = {
-        data: res.comments?.comments || [],
-        total: res.comments?.total || 0,
-        page: res.pagination.page,
-        limit: res.pagination.limit,
+        data: allComments,
+        total: allComments.length,
+        page,
+        limit,
       };
+      if (updateAgent) {
+        const agentIndex = agents.value.findIndex((agent) => agent.id === agentId);
+        if (agentIndex !== -1) {
+          agents.value[agentIndex].comments = { comments: allComments };
+        }
+      }
     } catch (error) {
       console.warn(`[AGENT COMMENTS] Error fetching comments for agent ${agentId}:`, error);
       agentComments.value[agentId] = {
@@ -161,11 +214,12 @@ export const useAgentsStore = defineStore('agents', () => {
     }
   }
 
-  async function getCommentsForAllAgents(page = 1, limit = 20): Promise<void> {
+
+  async function getCommentsForAllAgents(): Promise<void> {
     try {
       loading.value = true;
       const promises = agents.value.map((agent) =>
-        getAgentComments(agent.id, page, limit)
+        getAgentComments(agent.id)
       );
       await Promise.all(promises);
     } catch (error) {
@@ -175,28 +229,38 @@ export const useAgentsStore = defineStore('agents', () => {
     }
   }
 
-  async function getTokenHolders(
-    agentId: string,
-    page = 1,
-    limit = 20
-  ): Promise<void> {
+  async function getTokenHolders(agentId: string): Promise<void> {
     try {
-      const params = new URLSearchParams({
-        page: String(page),
-        limit: String(limit),
-      });
-      const res = await $fetch<{
-        holders: { holders: TokenHoldersResponse['holders']['holders']; total: number };
-        pagination: { page: number; limit: number };
-      }>(`https://api.vocal.fun/api/v1/launchpad/holders/${agentId}?${params.toString()}`);
+      const limit = 20;
+      let page = 1;
+      const allHolders: TokenHoldersResponse['holders']['holders'] = [];
+
+      while (true) {
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: String(limit),
+        });
+        const url = `https://api.vocal.fun/api/v1/launchpad/holders/${agentId}?${params.toString()}`;
+        const res = await $fetch<{
+          holders: { holders: TokenHoldersResponse['holders']['holders']; total: number };
+          pagination: { page: number; limit: number };
+        }>(url);
+        const holdersPage = res.holders.holders || [];
+        allHolders.push(...holdersPage);
+
+        if (holdersPage.length < limit) {
+          break;
+        }
+        page++;
+      }
 
       tokenHolders.value[agentId] = {
         holders: {
-          holders: res.holders.holders,
-          total: res.holders.total,
+          holders: allHolders,
+          total: allHolders.length,
         },
-        page: res.pagination.page,
-        limit: res.pagination.limit,
+        page,
+        limit,
       };
     } catch (error) {
       console.warn(`[TOKEN HOLDERS] Error fetching holders for agent ${agentId}:`, error);
@@ -205,51 +269,59 @@ export const useAgentsStore = defineStore('agents', () => {
           holders: [],
           total: 0,
         },
-        page,
-        limit,
+        page: 1,
+        limit: 20,
       };
     }
   }
 
-  async function getAgentTrades(
-    agentId: string,
-    page = 1,
-    limit = 20
-  ): Promise<void> {
+  async function getAgentTrades(agentId: string): Promise<void> {
     try {
-      const params = new URLSearchParams({
-        page: String(page),
-        limit: String(limit),
-      });
-      const res = await $fetch<{
-        trades: { trades: Trade[]; total: number };
-        pagination: { page: number; limit: number };
-      }>(
-        `https://api.vocal.fun/api/v1/launchpad/trades/${agentId}?${params.toString()}`
-      );
+      const limit = 20;
+      let page = 1;
+      const allTrades: Trade[] = [];
+
+      while (true) {
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: String(limit),
+        });
+        const url = `https://api.vocal.fun/api/v1/launchpad/trades/${agentId}?${params.toString()}`;
+        const res = await $fetch<{
+          trades: { trades: Trade[]; total: number };
+          pagination: { page: number; limit: number };
+        }>(url);
+        const tradesPage = res.trades.trades || [];
+        allTrades.push(...tradesPage);
+
+        if (tradesPage.length < limit) {
+          break;
+        }
+        page++;
+      }
 
       agentTrades.value[agentId] = {
-        trades: res.trades.trades,
-        total: res.trades.total,
-        page: res.pagination.page,
-        limit: res.pagination.limit,
+        trades: allTrades,
+        total: allTrades.length,
+        page,
+        limit,
       };
     } catch (error) {
       console.warn(`[AGENT TRADES] Error fetching trades for agent ${agentId}:`, error);
       agentTrades.value[agentId] = {
         trades: [],
         total: 0,
-        page,
-        limit,
+        page: 1,
+        limit: 20,
       };
     }
   }
 
-  async function getTradesForAllAgents(page = 1, limit = 20): Promise<void> {
+  async function getTradesForAllAgents(): Promise<void> {
     try {
       loading.value = true;
       const promises = agents.value.map((agent) =>
-        getAgentTrades(agent.id, page, limit)
+        getAgentTrades(agent.id)
       );
       await Promise.all(promises);
     } catch (error) {
@@ -436,5 +508,6 @@ export const useAgentsStore = defineStore('agents', () => {
     getUserDetails,
     createAgent,
     addComment,
+    loadAgentDetails,
   };
 });

@@ -1,5 +1,6 @@
 <template>
   <div class="agent-info" v-if="agent">
+
     <AgentDetailsCard :agent="agent" />
     <Trades :agent="agent" />
     <BuySell :agent="agent" />
@@ -8,39 +9,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed, onBeforeMount } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAgentsStore } from '~/stores/agents';
 import AgentDetailsCard from '~/components/AgentInfo/AgentDetailsCard/AgentDetailsCard.vue';
 import Trades from '~/components/AgentInfo/Trades.vue';
 import BuySell from '~/components/AgentInfo/BuySell/BuySell.vue';
-import type { Agent } from '~/types';
 import { defaultAgent } from '~/consts';
+import type { Agent } from '~/types';
 
 const route = useRoute();
 const agentsStore = useAgentsStore();
-const agent = ref<Agent | null>(null);
+
+// Instead of copying the agent into a local ref,
+// use a computed property that returns the agent from the store.
+const agent = computed((): Agent => {
+  const id = route.params.id as string;
+  return agentsStore.agents.find(a => a.id === id) || defaultAgent;
+});
 
 onBeforeMount(async () => {
-  const agents = agentsStore.agents;
-  if (agents.length === 0) {
-    await agentsStore.getAgents()
+  // If the agents list is empty, load agents
+  if (!agentsStore.agents.length) {
+    await agentsStore.getAgents();
   }
-  const { id } = route.params;
-  const found = agentsStore.agents.find(agent => agent.id === id);
+  // Load additional details for the current agent if needed.
+  const id = route.params.id as string;
+  const found = agentsStore.agents.find(a => a.id === id);
   if (found) {
-    agent.value = { ...defaultAgent, ...found } as Agent;
-  }
-})
-
-onMounted(async () => {
-  const { id } = route.params;
-  const found = agentsStore.agents.find(agent => agent.id === id);
-  if (found) {
-    agent.value = { ...defaultAgent, ...found } as Agent;
+    // Only load extra details if they haven't been loaded
+    if (
+      !found.comments.comments.length ||
+      !found.tokenHolders.holders.holders.length ||
+      !found.trades.trades.length
+    ) {
+      await agentsStore.loadAgentDetails(found.id);
+    }
   }
 });
 </script>
+
 
 
 <style scoped lang="scss">

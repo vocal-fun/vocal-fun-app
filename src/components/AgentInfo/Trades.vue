@@ -128,7 +128,7 @@ async function handleAddComment() {
 	if (!newComment.value.trim()) return;
 	try {
 		await agentsStore.addComment(props.agent.id, newComment.value);
-		await agentsStore.getAgentComments(props.agent.id);
+		await agentsStore.getAgentComments(props.agent.id, true);
 		const agentCommentData = agentsStore.agentComments[props.agent.id];
 		props.agent.comments = { comments: agentCommentData.data };
 		newComment.value = '';
@@ -360,7 +360,7 @@ const dummyHolders = {
 .transactions-table td:first-child,
 .holders-table th:first-child,
 .holders-table td:first-child {
-	padding-left: 32px;
+	padding-left: 20px;
 	text-align: left
 }
 
@@ -395,7 +395,7 @@ const dummyHolders = {
 .holders-table td:last-child,
 .transactions-table th:last-child,
 .holders-table th:last-child {
-	padding-right: 30px
+	padding-right: 20px
 }
 
 .transactions-table td,
@@ -433,6 +433,11 @@ const dummyHolders = {
 .holders-table tr {
 	border-bottom: 2px solid #59596D;
 	padding: 20px 30px
+}
+
+thead,
+tbody {
+	font-size: 14px;
 }
 
 @media (max-width:600px) {
