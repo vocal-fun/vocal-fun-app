@@ -3,7 +3,7 @@
     <div class="socials">
       <a v-play-click-sound class="social shake-little" href="https://t.me/vocalfunofficial" target="_blank"
         rel="noopener noreferrer">
-        <NuxtImg class="telegram" src="/img/telegram.png" alt="Telegram Logo" format="webp" sizes="44px"
+        <NuxtImg class="telegram" src="/img/telegram.png" alt="Telegram Logo" format="webp" :width="22" :height="18"
           loading="lazy" />
         TELEGRAM
       </a>

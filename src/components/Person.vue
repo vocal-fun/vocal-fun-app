@@ -106,7 +106,7 @@ $circle-gradient: linear-gradient(180deg,
     }
 
     .dim {
-      opacity: 0.5;
+      opacity: 0.7;
 
       &:last-of-type {
         margin-top: 20px;

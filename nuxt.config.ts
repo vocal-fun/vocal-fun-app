@@ -22,6 +22,10 @@ export default defineNuxtConfig({
         { rel: 'icon', href: '/logo/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
         { rel: 'apple-touch-icon', href: '/logo/apple-touch-icon.png', sizes: '180x180' },
         { rel: 'manifest', href: '/site.webmanifest' },
+
+        { rel: 'preconnect', href: 'https://api.vocal.fun' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://web3modal.org' },
       ],
       // TODO: Add analytics later
       // script: [

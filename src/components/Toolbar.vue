@@ -3,11 +3,13 @@
     <div class="view-toggle">
       <button v-play-click-sound :class="{ active: viewMode === TypeGridTable.GRID }"
         @click="$emit('update:viewMode', TypeGridTable.GRID)">
-        <NuxtImg class="grid" src="/img/grid.png" alt="Grid button" format="webp" sizes="48px" loading="lazy" />
+        <NuxtImg class="grid" src="/img/grid.png" alt="Grid button" format="webp" :width="24" :height="24"
+          loading="lazy" />
       </button>
       <button v-play-click-sound :class="{ active: viewMode === TypeGridTable.TABLE }"
         @click="$emit('update:viewMode', TypeGridTable.TABLE)">
-        <NuxtImg class="table" src="/img/table.png" alt="Table button" format="webp" sizes="48px" loading="lazy" />
+        <NuxtImg class="table" src="/img/table.png" alt="Table button" format="webp" :width="24" :height="24"
+          loading="lazy" />
       </button>
     </div>
 
@@ -32,7 +34,8 @@
 
     <p class="watchlist">Watchlist</p>
     <div class="search">
-      <NuxtImg class="icon" src="/img/search.png" alt="Search Icon" format="webp" sizes="16px" loading="lazy" />
+      <NuxtImg class="icon" src="/img/search.png" alt="Search Icon" format="webp" :width="16" :height="16"
+        loading="lazy" />
       <input type="text" :value="searchQuery" @input="handleSearchInput" placeholder="Search" />
     </div>
   </div>
@@ -180,7 +183,7 @@ function handleSearchInput(event: Event) {
 }
 
 .watchlist {
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 .search {

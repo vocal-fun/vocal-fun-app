@@ -6,7 +6,7 @@
 		</div>
 		<div class="progress-bar">
 			<div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
-			<NuxtImg class="plane" src="/img/plane.png" loading="lazy" alt="Plane Progress"
+			<NuxtImg class="plane" src="/img/plane.png" loading="lazy" alt="Plane Progress" format="webp"
 				:style="{ left: `calc(${progressPercentage}% - 15px)` }" />
 		</div>
 		<p class="description">
@@ -14,7 +14,7 @@
 			the token will take off to
 			<span class="inline-aero">
 				aerodrome
-				<NuxtImg class="aerodrome" src="/img/aerodrome.png" alt="Aerodrome" loading="lazy" />
+				<NuxtImg class="aerodrome" src="/img/aerodrome.png" alt="Aerodrome" loading="lazy" format="webp" />
 			</span>
 		</p>
 	</div>
