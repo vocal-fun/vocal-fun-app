@@ -47,8 +47,123 @@ onMounted(() => {
 }
 </style>
 
-<!-- 
-<template>
+<!-- When we code have data from api -->
+
+<!-- <template>
+	<div id="tv_chart_container" style="width: 100%; height: 600px;"></div>
+</template>
+
+<script setup>
+import { onMounted, defineProps } from 'vue'
+import { widget } from 'charting_library'
+
+const props = defineProps({
+	fetchDataFromAPI: {
+		type: Array,
+		default: () => [],
+	},
+})
+
+const myDatafeed = {
+	onReady: (callback) => {
+		setTimeout(() => {
+			callback({
+				supports_search: false,
+				supports_group_request: false,
+				supports_marks: false,
+				supports_timescale_marks: false,
+				supports_time: true,
+			})
+		}, 0)
+	},
+
+	resolveSymbol: (symbolName, onSymbolResolvedCallback, onResolveErrorCallback) => {
+		const symbolInfo = {
+			ticker: symbolName,
+			name: symbolName,
+			session: '24x7',
+			timezone: 'Etc/UTC',
+			minmov: 1,
+			pricescale: 100,
+			has_intraday: true,
+			has_daily: true,
+			has_weekly_and_monthly: true,
+			supported_resolutions: ['1', '5', '15', '60', '1D'],
+			volume_precision: 2,
+		}
+		setTimeout(() => {
+			onSymbolResolvedCallback(symbolInfo)
+		}, 0)
+	},
+
+	getBars: async (symbolInfo, resolution, from, to, onHistoryCallback, onErrorCallback) => {
+		try {
+			const apiUrl = `https://testapi.example.com/data?from=${from}&to=${to}`
+			const response = await fetch(apiUrl)
+			const apiData = await response.json()
+			const bars = apiData.map(bar => ({
+				time: new Date(bar.time).getTime(),
+				open: bar.open,
+				high: bar.high,
+				low: bar.low,
+				close: bar.close,
+			}))
+
+			if (bars.length) {
+				onHistoryCallback(bars, { noData: false })
+			} else {
+				onHistoryCallback([], { noData: true })
+			}
+		} catch (error) {
+			onErrorCallback(error)
+		}
+	},
+
+	subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscribeUID, onResetCacheNeededCallback) => {
+
+		const interval = setInterval(async () => {
+		  const response = await fetch(`https://testapi.example.com/realtime?symbol=${symbolInfo.name}`)
+		  const newBar = await response.json()
+		  onRealtimeCallback({
+		    time: new Date(newBar.time).getTime(),
+		    open: newBar.open,
+		    high: newBar.high,
+		    low: newBar.low,
+		    close: newBar.close,
+		  })
+		}, 5000)
+		symbolInfo._interval = interval
+	},
+
+	unsubscribeBars: (subscriberUID) => {
+		// clearInterval(subscriberUID)
+	},
+}
+
+onMounted(() => {
+	const widgetOptions = {
+		symbol: 'MY_SYMBOL',            
+		interval: '5',                  
+		container_id: 'tv_chart_container',
+		datafeed: myDatafeed,             
+		library_path: '/charting_library/', // path to library
+		locale: 'en',
+		fullscreen: false,
+		autosize: true,
+		theme: 'Dark',
+	}
+
+	const tvWidget = new widget(widgetOptions)
+
+	tvWidget.onChartReady(() => {
+		console.log('Chart has loaded!')
+	})
+})
+</script> -->
+
+
+<!-- When all data from props -->
+<!-- <template>
 	<div id="tv_chart_container" style="width: 100%; height: 600px;"></div>
 </template>
 
@@ -60,16 +175,9 @@ const props = defineProps({
 	fetchDataFromAPI: {
 		type: Array,
 		default: () => [
-			{ open: 10, high: 10.63, low: 9.49, close: 9.55, time: 1642427876 },
-			{ open: 9.55, high: 10.30, low: 9.42, close: 9.94, time: 1642514276 },
-			{ open: 9.94, high: 10.17, low: 9.92, close: 9.78, time: 1642600676 },
-			{ open: 9.78, high: 10.59, low: 9.18, close: 9.51, time: 1642687076 },
-			{ open: 9.51, high: 10.46, low: 9.10, close: 10.17, time: 1642773476 },
-			{ open: 10.17, high: 10.96, low: 10.16, close: 10.47, time: 1642859876 },
-			{ open: 10.47, high: 11.39, low: 10.40, close: 10.81, time: 1642946276 },
-			{ open: 10.81, high: 11.60, low: 10.30, close: 10.75, time: 1643032676 },
-			{ open: 10.75, high: 11.60, low: 10.49, close: 10.93, time: 1643119076 },
-			{ open: 10.93, high: 11.53, low: 10.76, close: 10.96, time: 1643205476 },
+			{ time: "2018-10-19", open: 180.34, high: 180.99, low: 178.57, close: 179.85 },
+			{ time: "2018-10-20", open: 179.85, high: 181.00, low: 178.60, close: 180.00 },
+			{ time: "2018-10-21", open: 180.00, high: 182.00, low: 179.00, close: 181.50 },
 		],
 	},
 })
@@ -108,11 +216,13 @@ const myDatafeed = {
 
 	getBars: async (symbolInfo, resolution, from, to, onHistoryCallback, onErrorCallback) => {
 		try {
-			const apiData = props.fetchDataFromAPI
-			const bars = apiData
-				.filter(bar => bar.time >= from && bar.time <= to)
+			const bars = props.fetchDataFromAPI
+				.filter(bar => {
+					const barTimeSec = new Date(bar.time).getTime() / 1000
+					return barTimeSec >= from && barTimeSec <= to
+				})
 				.map(bar => ({
-					time: bar.time * 1000,
+					time: new Date(bar.time).getTime(),
 					open: bar.open,
 					high: bar.high,
 					low: bar.low,
@@ -129,7 +239,6 @@ const myDatafeed = {
 		}
 	},
 
-  // Left empty
 	subscribeBars: (symbolInfo, resolution, onRealtimeCallback, subscribeUID, onResetCacheNeededCallback) => {
 	},
 
@@ -139,11 +248,11 @@ const myDatafeed = {
 
 onMounted(() => {
 	const widgetOptions = {
-		symbol: 'MY_SYMBOL',            // Символ для графика
-		interval: '5',                  // Интервал по умолчанию (например, 5-минутный)
+		symbol: 'MY_SYMBOL',
+		interval: '5',
 		container_id: 'tv_chart_container',
-		datafeed: myDatafeed,           // Наш datafeed
-		library_path: '/charting_library/',  // Путь к файлам TradingView Charting Library
+		datafeed: myDatafeed,
+		library_path: '/charting_library/',
 		locale: 'en',
 		fullscreen: false,
 		autosize: true,
@@ -156,4 +265,5 @@ onMounted(() => {
 		console.log('Chart has loaded!')
 	})
 })
-</script> -->
+</script>
+-->
