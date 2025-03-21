@@ -14,52 +14,28 @@
   <div class="content">
     <template v-if="idleOrError">
       <div class="avatar">
-        <NuxtImg
-          alt="Selected AI Celebrity Avatar"
-          sizes="90vw md:400px"
-          format="webp"
-          loading="lazy"
-          :src="person.image"
-        />
+        <NuxtImg alt="Selected AI Celebrity Avatar" sizes="90vw md:400px" format="webp" loading="lazy"
+          :src="personSafe.image" />
       </div>
-      <div class="name">{{ person.name }}</div>
-      <div class="price">${{ person.rate }} / min</div>
+      <div class="name">{{ personSafe.name }}</div>
+      <div class="price">${{ personSafe.rate }} / min</div>
       <div v-show="hasError" class="error alert-color">some error happened</div>
     </template>
 
     <transition name="fade">
       <div v-if="callingOrOnCall" class="calling-dialog">
         <div class="person">
-          <NuxtImg
-            class="dialog-avatar"
-            alt="Selected AI Celebrity Avatar"
-            sizes="90vw md:400px"
-            format="webp"
-            loading="lazy"
-            :src="person.image"
-          />
-          <div class="name">{{ person.name }}</div>
+          <NuxtImg class="dialog-avatar" alt="Selected AI Celebrity Avatar" sizes="90vw md:400px" format="webp"
+            loading="lazy" :src="personSafe.image" />
+          <div class="name">{{ personSafe.name }}</div>
         </div>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="30"
-          height="36"
-          viewBox="0 0 10 10"
-          alt="Call Icon"
-          :class="['call-icon', calling ? 'shake shake-constant' : '']"
-        >
-          <path :d="callD" fill="#00FA00"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="36" viewBox="0 0 10 10" alt="Call Icon"
+          :class="['call-icon', calling ? 'shake shake-constant' : '']">
+          <path :d="callD" fill="#00FA00" />
         </svg>
         <div class="user-info">
-          <NuxtImg
-            class="dialog-avatar"
-            src="/img/user-avatar.png"
-            alt="Your avatar"
-            sizes="90vw md:400px"
-            format="webp"
-            loading="lazy"
-            quality="100"
-          />
+          <NuxtImg class="dialog-avatar" src="/img/user-avatar.png" alt="Your avatar" sizes="90vw md:400px"
+            format="webp" loading="lazy" quality="100" />
           <div class="name">You</div>
         </div>
       </div>
@@ -69,10 +45,12 @@
     <template v-if="idleOrError">
       <GreenModalButton icon="call" @click="startCall">Call</GreenModalButton>
       <GreenModalButton v-if="audio" icon="stop" @click="stopPreview">Stop</GreenModalButton>
-      <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview</GreenModalButton>
+      <GreenModalButton v-else icon="play" :loading="previewLoading" :disabled="!preview" @click="playPreview">Preview
+      </GreenModalButton>
       <template v-if="isDownloadable">
         <GreenModalButton icon="download" :loading="isDownloading" @click="download">Download</GreenModalButton>
-        <GreenModalButton v-if="isShareAvailable" icon="twitter" :loading="isDownloading" @click="share">Share</GreenModalButton>
+        <GreenModalButton v-if="isShareAvailable" icon="twitter" :loading="isDownloading" @click="share">Share
+        </GreenModalButton>
         <GreenModalButton v-else tag="a" icon="twitter" :href="tweetHref">Tweet</GreenModalButton>
       </template>
     </template>
@@ -82,12 +60,10 @@
         <span>{{ timerText }}</span>
       </GreenModalButton>
       <span>&#183;</span>
-      <span v-if="calling">calling <LoadingDots /></span>
-      <button
-        v-if="onCall"
-        class="hang-up-button alert-color"
-        @click="hangUpWithClickSound"
-      >
+      <span v-if="calling">calling
+        <LoadingDots />
+      </span>
+      <button v-if="onCall" class="hang-up-button alert-color" @click="hangUpWithClickSound">
         hang up
       </button>
     </template>
@@ -102,25 +78,23 @@ import { meta } from '~~/meta';
 import { icons } from '~/consts';
 import { audioService } from '~/services/audio';
 import type { Agent, OpenModalState, Preview } from '~/types';
+import { defaultAgent } from '~/consts';
 
 type CallStatusType = 'calling' | 'idle' | 'on-call';
 
 const props = withDefaults(
   defineProps<{
     person?: Agent,
+    modalType?: string,
   }>(),
   {
-    person: () => ({
-      name: '',
-      image: '',
-      rate: 1,
-      createdAt: '',
-      id: '',
-      route: '',
-    }),
+    person: () => ({ ...defaultAgent }),
+    modalType: 'default',
   }
 );
 
+
+const personSafe = computed(() => props.person || { name: '', image: '', rate: 1, createdAt: '', id: '', route: '' });
 const emit = defineEmits(['close']);
 
 let seconds = 0;
@@ -143,9 +117,9 @@ const callingOrOnCall = computed(() => (calling.value || onCall.value) && !hasEr
 
 const agentsStore = useAgentsStore();
 const preview = computed<Preview | null>(() =>
-  agentsStore.previews[props.person.id]
-  ? { ...agentsStore.previews[props.person.id], agentId: props.person.id }
-  : null
+  agentsStore.previews[personSafe.value.id]
+    ? { ...agentsStore.previews[personSafe.value.id], agentId: personSafe.value.id }
+    : null
 );
 
 const buyStore = useBuyStore();
@@ -156,7 +130,7 @@ const user = computed(() => authStore.user);
 
 const tweetHref = computed(() => {
   const pageUrl = encodeURIComponent(url.value);
-  return `https://twitter.com/intent/tweet?text=I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
+  return `https://twitter.com/intent/tweet?text=I had a legendary call with ${personSafe.value.name} on VOCAL.FUN... You gotta try this!&url=${pageUrl}`;
 });
 const { share: _share, isSupported: _isShareAvailable } = useShare();
 
@@ -177,7 +151,7 @@ const { $device } = useNuxtApp();
 
 const isShareAvailable = computed(() => _isShareAvailable.value && $device.isMobileOrTablet);
 
-const url = computed(() => `${meta.url}/${props.person.route}`);
+const url = computed(() => `${meta.url}/${personSafe.value.route}`);
 
 const share = async () => {
   if (!isShareAvailable.value) {
@@ -185,13 +159,13 @@ const share = async () => {
   }
   const options: ShareData = {
     title: 'VOCAL.FUN',
-    text: `I had a legendary call with ${props.person.name} on VOCAL.FUN... You gotta try this!\n${url.value}`,
+    text: `I had a legendary call with ${personSafe.value.name} on VOCAL.FUN... You gotta try this!\n${url.value}`,
     url: url.value,
   };
   try {
-    const mp4Blob = await downloadMp4(props.person.image);
+    const mp4Blob = await downloadMp4(personSafe.value.image);
     if (mp4Blob) {
-      options.files = [new File([mp4Blob], `${props.person.route}.mp4`, { type: 'video/mp4' })];
+      options.files = [new File([mp4Blob], `${personSafe.value.route}.mp4`, { type: 'video/mp4' })];
     }
     await _share(options);
   } catch (error) {
@@ -200,14 +174,14 @@ const share = async () => {
 };
 
 const download = async () => {
-  const mp4Blob = await downloadMp4(props.person.image);
+  const mp4Blob = await downloadMp4(personSafe.value.image);
   if (!mp4Blob) {
     return;
   }
   const url = URL.createObjectURL(mp4Blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${props.person.route}.mp4`;
+  a.download = `${personSafe.value.route}.mp4`;
   document.body.appendChild(a);
   a.click();
   URL.revokeObjectURL(url);
@@ -275,14 +249,14 @@ const call = async (signal: AbortSignal) => {
   const startInitTime = Date.now();
   try {
     // Initiate the call session and web socket connection
-    await initCallSession(props.person.id);
+    await initCallSession(personSafe.value.id);
     signal.throwIfAborted(); // Check if the call was cancelled
     const callDurationLeft = 2_000 - (Date.now() - startInitTime);
     await new Promise<void>((resolve) => setTimeout(resolve, callDurationLeft < 0 ? 0 : callDurationLeft));
     callStatus.value = 'on-call';
     stopCurrentSound();
     signal.throwIfAborted(); // Check if the call was cancelled
-    console.info(`[VOCAL.FUN] Call with ${props.person.name} started`);
+    console.info(`[VOCAL.FUN] Call with ${personSafe.value.name} started`);
     await startRecording();
     timer = setInterval(() => {
       seconds++;
@@ -340,8 +314,8 @@ const playPreview = async (click = true) => {
   if (click) {
     await audioService.click();
   }
-  if (props.person.id) {
-    await playCurrentSound(props.person.id);
+  if (personSafe.value.id) {
+    await playCurrentSound(personSafe.value.id);
   }
 }
 
@@ -368,7 +342,7 @@ const onOpen = async (state: OpenModalState) => {
   audioChunks.value = new Float32Array(0);
   cancelCurrentCall = null;
   previewLoading.value = true;
-  await agentsStore.getAgentPreview(props.person);
+  await agentsStore.getAgentPreview(personSafe.value);
   if (preview.value) {
     audioService.load(preview.value);
   }
@@ -406,14 +380,17 @@ defineExpose({
   align-items: center;
   justify-content: flex-end;
   width: 100%;
+
   .close {
     padding: 0.5rem 1rem;
     transition: color 0.3s ease-in-out;
+
     &:hover {
       color: white;
     }
   }
 }
+
 .info {
   margin: 1rem 0;
   display: inline-flex;
@@ -423,6 +400,7 @@ defineExpose({
     text-shadow: 0 0.55px 6.65px #0ADC0F;
     border-bottom: 1px solid transparent;
     transition: color 0.3s ease-in-out, border-bottom 0.3s ease-in-out;
+
     &:hover {
       color: white;
       border-bottom-color: white;
@@ -438,6 +416,7 @@ defineExpose({
 
   .avatar {
     margin-bottom: 1.25rem;
+
     img {
       height: 175px;
     }
@@ -466,7 +445,8 @@ defineExpose({
     height: 175px;
   }
 
-  .person, .user-info {
+  .person,
+  .user-info {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -478,6 +458,7 @@ defineExpose({
   margin: 0.5rem 1rem;
   text-align: center;
   transition: visibility 0.3s ease-in-out;
+
   &.hidden {
     visibility: hidden;
   }
@@ -502,6 +483,7 @@ defineExpose({
   .hang-up-button {
     border-bottom: 1px solid transparent;
     transition: border-bottom 0.3s ease-in-out;
+
     &:hover {
       border-bottom-color: var(--color-warn);
     }
@@ -513,10 +495,12 @@ defineExpose({
     width: 121px;
     justify-content: end;
   }
-  > span {
+
+  >span {
     width: 50px;
     font-variant-numeric: tabular-nums;
   }
+
   &:hover {
     cursor: default;
   }
@@ -525,24 +509,28 @@ defineExpose({
 .alert-color {
   color: var(--color-warn);
   text-shadow: 0 0 6.09px 0 var(--color-warn),
-  0 0.55px 6.65px 0 var(--color-warn);
+    0 0.55px 6.65px 0 var(--color-warn);
 }
 
 .fade-enter-active {
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
+
 .fade-enter-from {
   opacity: 0;
   transform: translateY(10px);
 }
+
 .fade-enter-to {
   opacity: 1;
   transform: translateY(0);
 }
 
 .fade-leave-active {
-  transition: none; /* No transition for leave */
+  transition: none;
+  /* No transition for leave */
 }
+
 .fade-leave-from,
 .fade-leave-to {
   opacity: 1;

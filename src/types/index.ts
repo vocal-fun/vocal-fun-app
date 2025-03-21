@@ -1,17 +1,109 @@
+export type AgentsResponse = {
+  agents: AgentDto[];
+};
+
 export type AgentDto = {
   /** Agent ID */
   _id: string;
+  /** Whether the agent is active */
+  active: boolean;
   /** Agent name */
   name: string;
-  /** Agent image src */
-  image: string;
-  /** Agent rate 1min/$ in USD */
-  rate: number;
-  createdAt: string;
   /** Agent twitter link */
   twitter: string;
+  /** Agent rate 1min/$ in USD */
+  rate: number;
+  /** URL of the agent image */
+  imageUrl: string;
+  /** Description of the agent */
+  description: string;
+  /** Whether the agent is featured */
+  featured: boolean;
+  /** Agent market cap (as string, e.g. "5000") */
+  marketCap: string;
+  /** Agent symbol */
+  symbol: string;
+  /** Agent token address */
+  tokenAddress: string;
+  /** Total supply of the agent token */
+  totalSupply: string;
+  /** Current price (as string) */
+  currentPrice: string;
+  /** Creation date */
+  createdAt: string;
+  /** Update date */
+  updatedAt: string;
+  /** Created by information */
+  createdBy: {
+    _id: string;
+    address: string;
+  };
   __v: number;
 };
+
+export type Comment = {
+  content: string;
+  createdBy: {
+    address: string;
+  };
+  createdAt: string;
+};
+
+export type CommentsResponse = {
+  comments: Comment[];
+};
+
+export type CommentsApiResponse = {
+  comments: {
+    comments: Comment[];
+    total: number;
+  };
+  pagination: {
+    page: number;
+    limit: number;
+  };
+};
+
+export type TokenHolder = {
+  user: {
+    address: string;
+  };
+  balance: number;
+  percentage: number;
+};
+
+export type TokenHoldersResponse = {
+  holders: {
+    holders: TokenHolder[];
+    total: number;
+  };
+};
+
+export type Trade = {
+  timestamp: string;
+  buyer: {
+    address: string;
+  };
+  seller: {
+    address: string;
+  };
+  amount: number;
+  price: number;
+  txHash: string;
+};
+
+export type AgentTradesResponse = {
+  trades: Trade[];
+};
+
+export type UserDetailsResponse = {
+  user: {
+    walletAddress: string;
+    createdAt: string;
+  };
+  agents: Agent[];
+};
+
 
 export type Agent = {
   id: string;
@@ -19,8 +111,23 @@ export type Agent = {
   image: string;
   rate: number;
   createdAt: string;
+  createdBy: string;
   route: string;
+  tokenName: string;
+  mcap: number; 
+  price: number;
+  contract: string;
+  liquidity: number;
+  volume24h: number;
+  change5m: number;
+  change1h: number;
+  change24h: number;
+  change7d: number;
+  comments: CommentsResponse; 
+  tokenHolders: TokenHoldersResponse;
+  trades: AgentTradesResponse;
 };
+
 
 export type PreviewDto = {
   /** Base64 encoded audio data */
@@ -60,3 +167,35 @@ export type BuyOptionDto = {
 };
 
 export type OpenModalState = 'default' | 'preview' | 'call';
+
+export enum TypeGridTable  {
+  GRID = 'grid',
+  TABLE = 'table'
+}
+
+export type ExampleVoice = {
+  id: string;
+  file: string;    
+  label: string;
+  description: string;
+  isPlaying: boolean;
+  audio: HTMLAudioElement | null;
+}
+
+export type AgentInfo = {
+  name: string;
+  ticker: string;
+  description: string;
+  twitter: string;
+  website: string;
+  image: File | string | null;
+  voiceSample: File | string | null;
+}
+
+export type CandleData = {
+	open: number
+	high: number
+	low: number
+	close: number
+	time: string
+}
