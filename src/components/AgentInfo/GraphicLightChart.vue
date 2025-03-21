@@ -1,6 +1,7 @@
 <template>
-	<div ref="chartContainer" class="chart-container"></div>
+	<div ref="chartContainer" style="width: 100%; height: 520px;"></div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, defineProps } from 'vue'
@@ -1160,9 +1161,9 @@ onMounted(() => {
 	)
 
 	mainSeries.applyOptions({
-		upColor: '#0ecb81',    
+		upColor: '#0ecb81',
 		wickUpColor: '#0ecb81',
-		downColor: '#f6465d',  
+		downColor: '#f6465d',
 		wickDownColor: '#f6465d',
 		borderVisible: false,
 	})
@@ -1193,10 +1194,3 @@ onUnmounted(() => {
 	window.removeEventListener('resize', handleWindowResize)
 })
 </script>
-
-<style scoped>
-.chart-container {
-	width: 100%;
-	height: 520px;
-}
-</style>
