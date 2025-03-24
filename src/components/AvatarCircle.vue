@@ -1,13 +1,7 @@
 <template>
 	<div class="avatar-block" :style="avatarStyles">
-		<NuxtImg class="avatar-img" :src="img" :width="size"
-			:height="size"
-			format="webp"
-			loading="lazy"
-			placeholder="/img/user-avatar.png"
-			placeholder-class="image-placeholder"
-			alt="Avatar agent"
-			/>
+		<NuxtImg class="avatar-img" fetchpriority="high" :src="img" :width="size" :height="size" format="webp"
+			placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" alt="Avatar agent" />
 	</div>
 </template>
 

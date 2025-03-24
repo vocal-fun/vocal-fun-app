@@ -14,8 +14,9 @@
         <Person v-for="n in 6" :key="n" :disabled="true" name="" tokenName="" :mcap="0" createdAt="" created-by="0x0000"
           :image="''" :id="String(n)" :rate="0" @open-modal="() => { }" />
       </div>
+
       <div v-else-if="viewMode === TypeGridTable.GRID" class="agents-grid">
-        <Person v-for="person in filteredAgents" :key="person.id" :name="person.name" :image="person.image"
+        <Person v-for="person in partialAgents" :key="person.id" :name="person.name" :image="person.image"
           :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap"
           :createdAt="person.createdAt" :created-by="person.createdBy" :disabled="modalLoading"
           @open-modal="openModal(person, $event)" />
@@ -44,7 +45,7 @@
           </thead>
 
           <tbody>
-            <tr v-play-click-sound v-for="person in filteredAgents" :key="person.id" @click="goToAgentPage(person)">
+            <tr v-play-click-sound v-for="person in partialAgents" :key="person.id" @click="goToAgentPage(person)">
               <td class="table-avatar-column" data-label="Vocal agent">
                 <NuxtImg class="avatar-img" format="webp" loading="lazy" width="48" height="48"
                   placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
@@ -80,7 +81,7 @@
         </table>
       </div>
     </div>
-
+    <div ref="loadMoreSentinel" class="load-more-sentinel"></div>
     <Modal :isOpen="isModalOpen" @close="closeModal">
       <ClientOnly>
         <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
@@ -90,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeMount } from 'vue'
+import { ref, computed, onMounted, onBeforeMount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAgentsStore } from '~/stores/agents'
 import { useAuthStore } from '~/stores/auth'
@@ -119,6 +120,10 @@ const viewMode = ref<TypeGridTable.GRID | TypeGridTable.TABLE>(TypeGridTable.GRI
 const sortBy = ref('mcap')
 const sortDirection = ref<'asc' | 'desc'>('desc')
 const loading = ref(true)
+
+const chunkSize = 10
+const totalRendered = ref(chunkSize)
+const loadMoreSentinel = ref<HTMLElement | null>(null)
 
 const columns = [
   { key: 'price', label: 'Price' },
@@ -185,6 +190,11 @@ const filteredAgents = computed(() => {
   return results
 })
 
+
+const partialAgents = computed(() => {
+  return filteredAgents.value.slice(0, totalRendered.value)
+})
+
 function toggleWatchlist() {
   showWatchlist.value = !showWatchlist.value
 }
@@ -212,11 +222,26 @@ function closeModal() {
   history.replaceState(null, '', '/')
 }
 
-onBeforeMount(async () => {
-  const agents = agentsStore.agents;
-  if (agents.length === 0) {
+
+onMounted(async () => {
+  if (agentsStore.agents.length === 0) {
     await agentsStore.getAgents()
   }
+
+  if (loadMoreSentinel.value) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const max = filteredAgents.value.length
+          totalRendered.value = Math.min(totalRendered.value + chunkSize, max)
+        }
+      })
+    }, {
+      rootMargin: '200px'
+    })
+    observer.observe(loadMoreSentinel.value)
+  }
+
   const agentRoute = route.params.slug?.[0] as string | undefined
   if (agentRoute) {
     const person = agentsStore.agents.find(a => a.route === agentRoute)
@@ -233,6 +258,10 @@ onBeforeMount(async () => {
 </script>
 
 <style scoped lang="scss">
+.load-more-sentinel {
+  height: 1px;
+}
+
 section.main {
   margin: 2.3rem 5.5rem 0 5.5rem;
 }
