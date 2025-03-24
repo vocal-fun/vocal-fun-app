@@ -1,26 +1,33 @@
 <template>
 	<div class="avatar-block" :style="avatarStyles">
-		<NuxtImg class="avatar-img" sizes="110px 110px" format="webp" loading="lazy" placeholder="/img/user-avatar.png"
-			placeholder-class="image-placeholder" :src="img" alt="Avatar agent" />
+		<NuxtImg class="avatar-img" :src="img" :width="size"
+			:height="size"
+			format="webp"
+			loading="lazy"
+			placeholder="/img/user-avatar.png"
+			placeholder-class="image-placeholder"
+			alt="Avatar agent"
+			/>
 	</div>
-
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 
 const props = defineProps<{
-	img: string;
-	size?: number;
+	img: string
+	size?: number
 }>()
 
 const size = props.size || 110
+
 const avatarStyles = computed(() => ({
 	'--avatar-size': `${size}px`,
 	'--before-size': `calc(${size}px + 40px)`,
 	'--after-size': `calc(${size}px + 20px)`
 }))
 </script>
+
 
 <style scoped lang="scss">
 .avatar-block {
