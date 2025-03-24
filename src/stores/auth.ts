@@ -48,7 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   /** Temporary solution to avoid WalletConnect usage */
   async function fakeAuthorize(): Promise<void> {
-    const fakeToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzk4ODkzM2FkNGEwM2UxZDEyZmExODciLCJhZGRyZXNzIjoiMHgxNmIxMDI1Y2QxYTgzMTQxYmY5M2U0N2RiYzMxNmYzNGYyN2YyZTc2IiwiaWF0IjoxNzQwMjEwNjc3LCJleHAiOjE3NDIyODQyNzd9.x1OQ-ko4us7RSA6xztJ8ykF8cyPiTJM8zJoivP2D7EM";
+    const fakeToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzk4ODkzM2FkNGEwM2UxZDEyZmExODciLCJhZGRyZXNzIjoiMHgxNmIxMDI1Y2QxYTgzMTQxYmY5M2U0N2RiYzMxNmYzNGYyN2YyZTc2IiwiaWF0IjoxNzQyODA0NTExLCJleHAiOjE3NDQ4NzgxMTF9.7PVpc-oledsfyMQxxmTtbODraho51jltaBiFJHmQRHE";
     const tokenCookie = useCookie('token');
     tokenCookie.value = fakeToken;
 
