@@ -1,6 +1,5 @@
 <template>
   <div class="agent-info" v-if="agent">
-
     <AgentDetailsCard :agent="agent" />
     <Trades :agent="agent" />
     <BuySell :agent="agent" />
@@ -21,23 +20,18 @@ import type { Agent } from '~/types';
 const route = useRoute();
 const agentsStore = useAgentsStore();
 
-// Instead of copying the agent into a local ref,
-// use a computed property that returns the agent from the store.
 const agent = computed((): Agent => {
   const id = route.params.id as string;
   return agentsStore.agents.find(a => a.id === id) || defaultAgent;
 });
 
 onBeforeMount(async () => {
-  // If the agents list is empty, load agents
   if (!agentsStore.agents.length) {
     await agentsStore.getAgents();
   }
-  // Load additional details for the current agent if needed.
   const id = route.params.id as string;
   const found = agentsStore.agents.find(a => a.id === id);
   if (found) {
-    // Only load extra details if they haven't been loaded
     if (
       !found.comments.comments.length ||
       !found.tokenHolders.holders.holders.length ||
