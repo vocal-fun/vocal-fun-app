@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<Graphic v-if="isTradingView" token="BONK" />
+		<Graphic v-if="isTradingView" :token="agent.tokenName" />
 		<GraphicLightChart v-else />
 		<CoinInfo v-if="$isSmallScreen" :agent="agent" />
 		<BondingCurve class="curve-small" v-if="$isSmallScreen" :progressPercentage="getPercentage(props.agent.mcap)" />
@@ -106,7 +106,7 @@ import CoinInfo from './AgentDetailsCard/CoinInfo.vue'
 import BondingCurve from './BuySell/BondingCurve.vue'
 import { getPercentage } from '~/utils/helpers'
 
-const isTradingView = false;
+const isTradingView = true;
 const props = defineProps({
 	agent: {
 		type: Object as () => Agent,
