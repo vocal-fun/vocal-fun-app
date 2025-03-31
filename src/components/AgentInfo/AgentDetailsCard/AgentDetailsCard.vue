@@ -11,7 +11,7 @@ import type { Agent } from '~/types'
 import AgentHeader from './AgentHeader.vue';
 import CoinInfo from './CoinInfo.vue';
 const { $isSmallScreen } = useNuxtApp();
-const props = defineProps<{ agent: Agent }>()
+defineProps<{ agent: Agent }>()
 </script>
 
 <style scoped lang="scss">

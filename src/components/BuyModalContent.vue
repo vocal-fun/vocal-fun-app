@@ -101,7 +101,7 @@ const openWallet = () => {
   width: 100%;
   border-bottom: 1px solid #00fa0047;
   .account {
-    margin-left: 2rem; // To make it visually centered
+    margin-left: 2rem;
     flex: 1;
     display: flex;
     justify-content: center;

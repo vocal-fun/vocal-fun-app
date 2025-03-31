@@ -51,7 +51,7 @@ import Modal from '~/components/Modal.vue'
 import CallModalContent from '~/components/CallModalContent.vue'
 import { useWalletConnect } from '~/composables/useWalletConnect'
 
-const props = defineProps<{ agent: Agent }>()
+defineProps<{ agent: Agent }>()
 const authStore = useAuthStore()
 const user = computed(() => authStore.user)
 

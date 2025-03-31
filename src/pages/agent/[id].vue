@@ -43,8 +43,6 @@ onBeforeMount(async () => {
 });
 </script>
 
-
-
 <style scoped lang="scss">
 .agent-info {
   display: flex;

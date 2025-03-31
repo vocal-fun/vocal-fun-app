@@ -150,6 +150,16 @@ function formatChange(value: number): { formatted: string; color: string } {
 	}
 }
 
+@media (min-width: 1100px) and (max-width: 1300px) {
+	.coin-info {
+		.changes {
+			div {
+				padding: 8px;
+			}
+		}
+	}
+}
+
 @media (max-width: 600px) {
 	.coin-info {
 		gap: 16px;
