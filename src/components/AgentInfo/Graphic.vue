@@ -1153,6 +1153,9 @@ onMounted(() => {
 		fullscreen: false,
 		autosize: true,
 		theme: 'Dark',
+		studies_overrides: {
+			'volume.volume.transparency': 100,
+		},
 	}
 
 	const tvWidget = new widget(widgetOptions)
