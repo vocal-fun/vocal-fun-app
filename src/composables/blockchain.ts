@@ -1,5 +1,5 @@
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
-import { BrowserProvider, ethers, Contract, type Eip1193Provider, type ContractTransactionResponse, JsonRpcProvider } from 'ethers';
+import { BrowserProvider, ethers, Contract, type ContractTransactionResponse, JsonRpcProvider } from 'ethers';
 import { defaultRpcUrl } from '~/consts';
 
 interface IERC20 {
