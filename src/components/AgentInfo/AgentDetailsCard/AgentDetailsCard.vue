@@ -10,6 +10,7 @@ import { defineProps } from 'vue'
 import type { Agent } from '~/types'
 import AgentHeader from './AgentHeader.vue';
 import CoinInfo from './CoinInfo.vue';
+
 const { $isSmallScreen } = useNuxtApp();
 defineProps<{ agent: Agent }>()
 </script>

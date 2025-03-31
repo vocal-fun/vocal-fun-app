@@ -51,6 +51,7 @@ import { NuxtImg } from '#components'
 import type { ExampleVoice } from '~/types'
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile, toBlobURL } from '@ffmpeg/util'
+
 const ffmpegWasm = new FFmpeg();
 const ffmpegLoaded = ref(false);
 const isConverting = ref(false);
