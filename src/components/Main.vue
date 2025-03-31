@@ -35,7 +35,7 @@
                     <NuxtImg class="arrow-up" format="webp" loading="lazy" src="/img/arrow-up.png" width="10" height="6"
                       alt="Up arrow"
                       :style="(sortBy === col.key && sortDirection === 'asc') ? 'opacity:1;' : 'opacity:0.4;'" />
-                    <NuxtImg class="arrow-down" format="webp"  loading="lazy" src="/img/arrow-up.png" width="10"
+                    <NuxtImg class="arrow-down" format="webp" loading="lazy" src="/img/arrow-up.png" width="10"
                       height="6" alt="Down arrow"
                       :style="(sortBy === col.key && sortDirection === 'desc') ? 'opacity:1; transform:rotate(180deg);' : 'opacity:0.4; transform:rotate(180deg);'" />
                   </div>
@@ -254,6 +254,10 @@ onMounted(async () => {
   }
   selectedPerson.value = agentsStore.agents[0]
   loading.value = false
+})
+
+watch(searchQuery, () => {
+  totalRendered.value = chunkSize
 })
 </script>
 
