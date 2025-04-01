@@ -1,152 +1,603 @@
 <template>
   <section class="main">
     <div class="content-header">
-      <h2>Talk to realtime AI agents</h2>
-      <EQ />
+      <div>
+        <h2>Voice AI agent coins</h2>
+        <button v-play-click-sound @click="createAgent">Launch my coin</button>
+      </div>
+      <EQ class="equalizer" />
     </div>
-    <div class="content-main">
-      <Person
-        v-for="person in agents"
-        :key="person.id"
-        :name="person.name"
-        :image="person.image"
-        :id="person.id"
-        :rate="person.rate"
-        :disabled="modalLoading"
-        @open-modal="openModal(person, $event)"
-      />
-      <Modal :isOpen="isModalOpen" @close="closeModal">
-        <ClientOnly>
-          <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
-        </ClientOnly>
-      </Modal>
+    <div class="table-agents">
+      <Toolbar v-model:sortBy="sortBy" v-model:searchQuery="searchQuery" :showWatchlist="showWatchlist"
+        v-model:viewMode="viewMode" :showSort="viewMode === TypeGridTable.GRID" @toggle-watchlist="toggleWatchlist" />
+      <div v-if="loading && viewMode === TypeGridTable.GRID" class="agents-grid">
+        <Person v-for="n in 6" :key="n" :disabled="true" name="" tokenName="" :mcap="0" createdAt="" created-by="0x0000"
+          :image="''" :id="String(n)" :rate="0" @open-modal="() => { }" />
+      </div>
+
+      <div v-else-if="viewMode === TypeGridTable.GRID" class="agents-grid">
+        <Person v-for="person in partialAgents" :key="person.id" :name="person.name" :image="person.image"
+          :id="person.id" :rate="person.rate" :tokenName="person.tokenName" :mcap="person.mcap"
+          :createdAt="person.createdAt" :created-by="person.createdBy" :disabled="modalLoading"
+          @open-modal="openModal(person, $event)" />
+      </div>
+
+      <div v-else class="table-container">
+        <table class="agents-table">
+          <thead>
+            <tr>
+              <th>Vocal agent</th>
+              <th v-play-click-sound v-for="col in columns" :key="col.key"
+                :class="{ sorted: sortBy === col.key, sorting: true }" @click="setSort(col.key)">
+                <div class="label-wrapper">
+                  <p class="column-title">{{ col.label }}</p>
+                  <div class="sort-arrows">
+                    <NuxtImg class="arrow-up" format="webp" loading="lazy" src="/img/arrow-up.png" width="10" height="6"
+                      alt="Up arrow"
+                      :style="(sortBy === col.key && sortDirection === 'asc') ? 'opacity:1;' : 'opacity:0.4;'" />
+                    <NuxtImg class="arrow-down" format="webp" loading="lazy" src="/img/arrow-up.png" width="10"
+                      height="6" alt="Down arrow"
+                      :style="(sortBy === col.key && sortDirection === 'desc') ? 'opacity:1; transform:rotate(180deg);' : 'opacity:0.4; transform:rotate(180deg);'" />
+                  </div>
+                </div>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-play-click-sound v-for="person in partialAgents" :key="person.id" @click="goToAgentPage(person)">
+              <td class="table-avatar-column" data-label="Vocal agent">
+                <NuxtImg class="avatar-img" format="webp" loading="lazy" width="48" height="48"
+                  placeholder="/img/user-avatar.png" placeholder-class="image-placeholder" :src="person.image"
+                  :alt="person.name" />
+                <div class="person-info">
+                  <p class="table-person-name">{{ person.name }}</p>
+                  <p class="token-name">${{ person.tokenName }}</p>
+                </div>
+              </td>
+              <td data-label="Price">${{ person.price }}</td>
+              <td data-label="Mcap">{{ formatShortNumber(person.mcap) }}</td>
+              <td data-label="24h vol.">{{ person.volume24h }}</td>
+              <td data-label="24h %" :class="{ negative: person.change24h < 0 }">
+                {{ person.change24h > 0 ? `+${person.change24h}` : person.change24h }}%
+              </td>
+              <td data-label="7d %" :class="{ negative: person.change7d < 0 }">
+                {{ person.change7d > 0 ? `+${person.change7d}` : person.change7d }}%
+              </td>
+              <td data-label="Holders">{{ person.tokenHolders.holders.total }}</td>
+              <td data-label="Actions" class="actions-buttons">
+                <button v-play-click-sound @click.stop="openModal(person, 'preview')" class="preview-btn">
+                  Preview
+                </button>
+                <button v-play-click-sound @click.stop="openModal(person, 'call')" class="call-btn">
+                  Call
+                </button>
+                <button v-play-click-sound @click.stop="buy(person)" class="buy-btn">
+                  Buy
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+    <div ref="loadMoreSentinel" class="load-more-sentinel"></div>
+    <Modal :isOpen="isModalOpen" @close="closeModal">
+      <ClientOnly>
+        <CallModalContent ref="modalContent" :person="selectedPerson" @close="closeModal" />
+      </ClientOnly>
+    </Modal>
   </section>
 </template>
 
 <script setup lang="ts">
-import type { Agent, OpenModalState } from '~/types';
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAgentsStore } from '~/stores/agents'
+import { useAuthStore } from '~/stores/auth'
+import { useWalletConnect } from '~/composables/useWalletConnect'
+import { formatShortNumber } from '~/utils/formatters'
+import EQ from '~/components/EQ.vue'
+import Person from '~/components/Person.vue'
+import Modal from '~/components/Modal.vue'
+import CallModalContent from '~/components/CallModalContent.vue'
+import Toolbar from '~/components/Toolbar.vue'
+import { TypeGridTable, type Agent, type OpenModalState } from '~/types'
 
-const modalContent = useTemplateRef('modalContent');
-const agentsStore = useAgentsStore();
-const authStore = useAuthStore();
-const { handleConnectClick } = useWalletConnect();
-const user = computed(() => authStore.user);
-const route = useRoute();
+const modalContent = useTemplateRef('modalContent')
+const agentsStore = useAgentsStore()
+const authStore = useAuthStore()
+const { handleConnectClick } = useWalletConnect()
+const route = useRoute()
+const router = useRouter()
+const user = computed(() => authStore.user)
+const modalLoading = ref(false)
+const isModalOpen = ref(false)
+const selectedPerson = ref<Agent | undefined>(undefined)
+const searchQuery = ref('')
+const showWatchlist = ref(false)
+const viewMode = ref<TypeGridTable.GRID | TypeGridTable.TABLE>(TypeGridTable.GRID)
+const sortBy = ref('mcap')
+const sortDirection = ref<'asc' | 'desc'>('desc')
+const loading = ref(true)
 
-const modalLoading = ref<boolean>(false);
-const isModalOpen = ref<boolean>(false);
-const selectedPerson = ref<Agent | undefined>(undefined);
+const chunkSize = 10
+const totalRendered = ref(chunkSize)
+const loadMoreSentinel = ref<HTMLElement | null>(null)
 
-const agents = computed(() => agentsStore.agents);
+const columns = [
+  { key: 'price', label: 'Price' },
+  { key: 'mcap', label: 'mcap' },
+  { key: 'volume24h', label: '24h vol.' },
+  { key: 'change24h', label: '24h %' },
+  { key: 'change7d', label: '7d %' },
+  { key: 'holders', label: 'Holders' }
+]
 
-const openModal = async (person: Agent, state: OpenModalState) => {
+function goToAgentPage(person: Agent) {
+  router.push(`/agent/${person.id}`)
+}
+
+function createAgent() {
+  router.push('/create')
+}
+
+function buy(person: Agent) {
+  router.push(`/agent/${person.id}`)
+  console.log('Buying token for:', person.name)
+}
+
+function setSort(field: string) {
+  if (sortBy.value === field) {
+    sortDirection.value = sortDirection.value === 'desc' ? 'asc' : 'desc'
+  } else {
+    sortBy.value = field
+    sortDirection.value = 'desc'
+  }
+}
+
+const filteredAgents = computed(() => {
+  let results = [...agentsStore.agents]
+
+  if (searchQuery.value) {
+    results = results.filter(agent =>
+      agent.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  }
+
+  switch (sortBy.value) {
+    case 'mcap':
+      results.sort((a, b) => b.mcap - a.mcap)
+      break
+    case 'price':
+      results.sort((a, b) => b.price - a.price)
+      break
+    case 'volume24h':
+      results.sort((a, b) => b.volume24h - a.volume24h)
+      break
+    case 'change24h':
+      results.sort((a, b) => b.change24h - a.change24h)
+      break
+    case 'change7d':
+      results.sort((a, b) => b.change7d - a.change7d)
+      break
+    case 'holders':
+      results.sort((a, b) => b.tokenHolders.holders.total - a.tokenHolders.holders.total)
+      break
+  }
+  if (sortDirection.value === 'asc') results.reverse()
+
+  return results
+})
+
+
+const partialAgents = computed(() => {
+  return filteredAgents.value.slice(0, totalRendered.value)
+})
+
+function toggleWatchlist() {
+  showWatchlist.value = !showWatchlist.value
+}
+
+async function openModal(person: Agent, state: OpenModalState) {
   if (state === 'call' && !user.value) {
-    handleConnectClick();
-    return;
+    handleConnectClick()
+    return
   }
 
-  modalLoading.value = true;
-  selectedPerson.value = person;
-  if (route.params.id !== person.route) {
-    history.replaceState(null, '', `/${person.route}`);
+  modalLoading.value = true
+  selectedPerson.value = person
+  const currentSlug = route.params.slug?.[0]
+  if (currentSlug !== person.route) {
+    history.replaceState(null, '', `/${person.route}`)
   }
-  isModalOpen.value = true; // TODO: move this line after await if need to wait
-  await modalContent.value?.onOpen(state);
-  modalLoading.value = false;
-};
+  isModalOpen.value = true
+  await modalContent.value?.onOpen(state)
+  modalLoading.value = false
+}
 
-const closeModal = () => {
-  isModalOpen.value = false;
-  modalContent.value?.onClose();
-  history.replaceState(null, '', '/');
-};
+function closeModal() {
+  isModalOpen.value = false
+  modalContent.value?.onClose()
+  history.replaceState(null, '', '/')
+}
 
-onBeforeMount(async () => {
-  await agentsStore.getAgents();
-  const agentRoute = route.params.slug?.[0] as string | undefined;
+
+onMounted(async () => {
+  if (agentsStore.agents.length === 0) {
+    await agentsStore.getAgents()
+  }
+
+  if (loadMoreSentinel.value) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const max = filteredAgents.value.length
+          totalRendered.value = Math.min(totalRendered.value + chunkSize, max)
+        }
+      })
+    }, {
+      rootMargin: '200px'
+    })
+    observer.observe(loadMoreSentinel.value)
+  }
+
+  const agentRoute = route.params.slug?.[0] as string | undefined
   if (agentRoute) {
-    const person = agentsStore.agents.find((agent) => agent.route === agentRoute);
+    const person = agentsStore.agents.find(a => a.route === agentRoute)
     if (person) {
-      selectedPerson.value = person;
-      await openModal(person, 'default');
-      return;
+      selectedPerson.value = person
+      await openModal(person, 'default')
+      loading.value = false
+      return
     }
   }
-  // preload first agent
-  selectedPerson.value = agentsStore.agents[0];
-});
+  selectedPerson.value = agentsStore.agents[0]
+  loading.value = false
+})
+
+watch(searchQuery, () => {
+  totalRendered.value = chunkSize
+})
 </script>
 
 <style scoped lang="scss">
+.load-more-sentinel {
+  height: 1px;
+}
+
 section.main {
   margin: 2.3rem 5.5rem 0 5.5rem;
+}
 
-  .content-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+.content-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.content-header button {
+  width: auto;
+}
+
+.content-header div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  font-size: 20px;
+}
+
+.content-header div:first-child:hover {
+  transition: color .3s ease-in-out;
+  color: #60FF60;
+}
+
+.content-header h2 {
+  color: white;
+}
+
+.table-agents {
+  box-shadow: 1.39px 1.39px 0 0 var(--color-tertiary), 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 var(--color-tertiary), 0 -0.7px 0 0 #000000;
+}
+
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  max-width: 2048px;
+  margin: auto;
+  background: var(--color-background);
+  border-top: 2px solid var(--color-tertiary);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.8rem;
+  margin-bottom: 3rem;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 3rem;
+}
+
+.agents-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  background: var(--color-background);
+  border-top: 2px solid var(--color-tertiary);
+  box-shadow: 1.39px 1.39px 0 0 var(--color-tertiary), 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 var(--color-tertiary), 0 -0.7px 0 0 #000000;
+}
+
+.label-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-arrows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.arrow-down {
+  margin-right: 1.5px;
+}
+
+.agents-table thead {
+  background: var(--color-background);
+  color: #8989AB;
+  font-size: 12px;
+}
+
+.agents-table thead th {
+  padding: 1.25rem .75rem;
+  text-align: left;
+  cursor: pointer;
+  transition: opacity .3s ease-in-out;
+}
+
+.agents-table thead th.sorted {
+  color: white;
+}
+
+.agents-table thead th:hover {
+  opacity: 0.8;
+}
+
+.agents-table tbody {
+  background-color: #000000;
+}
+
+.agents-table tbody tr {
+  border-bottom: 1px solid #333;
+  transition: background-color .3s ease-in-out;
+}
+
+.agents-table tbody tr:hover {
+  cursor: pointer;
+  background-color: #2b2b3b;
+}
+
+.agents-table tbody tr td {
+  margin-top: 10px;
+  padding: 4px 8px;
+}
+
+.negative {
+  color: var(--color-warn);
+}
+
+.table-avatar-column {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+  height: 100%;
+}
+
+.avatar-img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.person-info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.person-info .token-name {
+  max-width: 6ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions-buttons {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.actions-buttons .preview-btn {
+  padding-right: 0;
+  border-right: 1px solid var(--color-primary);
+}
+
+.actions-buttons .call-btn {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.actions-buttons .buy-btn {
+  padding-left: 0;
+}
+
+.actions-buttons .preview-btn,
+.actions-buttons .call-btn,
+.actions-buttons .buy-btn {
+  padding: 14px;
+  background-color: #37D33933;
+  display: flex;
+  cursor: pointer;
+  transition: background-color .3s ease-in-out;
+}
+
+.actions-buttons .preview-btn:hover,
+.actions-buttons .call-btn:hover,
+.actions-buttons .buy-btn:hover {
+  background-color: var(--color-primary);
+  color: var(--color-deep);
+}
+
+.actions-buttons .buy-btn {
+  background-color: var(--color-secondary);
+  color: var(--color-deep);
+}
+
+.actions-buttons .buy-btn:hover {
+  background-color: #60FF60;
+  color: black;
+}
+
+.equalizer {
+  height: 120px;
+  width: 430px;
+}
+
+@media (max-width:1200px) {
+  section.main {
+    margin: 2rem;
+  }
+
+  section.main .agents-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width:1100px) {
+  .agents-table tbody tr td:not(:first-child):not(:last-child) {
+    padding: unset;
+  }
+}
+
+@media (max-width:1048px) {
+  section.main .agents-table {
+    min-width: unset;
+    border-top: unset;
+  }
+
+  .person-info .token-name {
+    all: unset;
+  }
+
+  .agents-table tbody tr td {
+    padding: 4px 8px;
+  }
+
+  .table-container {
+    background-color: black;
+  }
+
+  .agents-table {
+    display: block;
+    border-collapse: separate;
+  }
+
+  .agents-table thead {
+    display: none;
+  }
+
+  .agents-table tbody {
+    display: block;
+  }
+
+  .agents-table tr {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas: "col1 col1 col1 col1" "col2 col3 col4 col4" "col5 col6 col7 col7" "col8 col8 col8 col8";
+    padding: 1rem;
     gap: 1rem;
+    background: black;
   }
 
-  .content-main {
-    min-height: 700px;
-    max-width: 2048px;
-    margin: auto;
-    background: #161622;
-    box-shadow:
-        1.39px 1.39px 0 0 #59596D,
-        1.39px -2.09px 0 0 #1B1B2A,
-        -1.39px -1.39px 0 0 #1B1B2A,
-        1.39px 0 0 0 #59596D,
-        0 -0.7px 0 0 #000000;
-
+  .agents-table td {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0.5rem;
+    border: unset;
+  }
+
+  .agents-table td[data-label]:not(:nth-child(1)):not(:nth-child(8))::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: bold;
+    color: #8989AB;
+    margin-bottom: 4px;
+  }
+
+  .agents-table td:nth-child(1) {
+    grid-area: col1;
+  }
+
+  .agents-table td:nth-child(8) {
+    grid-area: col8;
+    flex-direction: row;
+  }
+
+  .agents-table td:nth-child(8) button {
+    width: 100%;
+  }
+}
+
+@media (max-width:768px) {
+  section.main {
+    margin: 0;
+  }
+
+  section.main .content-header {
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.25rem;
-    padding: 1.875rem;
-    margin-bottom: 1rem;
-  }
-
-  .equalizer {
-    height: 120px;
-    width: 430px;
+    margin: 2rem;
   }
 }
 
-@media (max-width: 1024px) {
-  section.main {
-    margin: .75rem 1.25px 1.25px 1.25px;
-
-    .content-header {
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-
-      h2 {
-        text-align: center;
-      }
-
-      .equalizer {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-      }
-    }
+@media (max-width:500px) {
+  section.main .equalizer {
+    height: 80px;
+    width: unset;
   }
-}
 
-@media (max-width: 500px) {
-  section.main {
-    .equalizer {
-      height: 80px;
-    }
-    .content-main {
-      padding: .75rem;
-    }
+  section.main .table-agents {
+    box-shadow: 1.39px -2.09px 0 0 #1B1B2A, -1.39px -1.39px 0 0 #1B1B2A, 1.39px 0 0 0 var(--color-tertiary), 0 -0.7px 0 0 #000000;
+  }
+
+  section.main .agents-grid {
+    padding: 0.75rem;
+    margin-bottom: unset;
+    padding-bottom: 3rem;
+  }
+
+  section.main .table-container {
+    margin-bottom: unset;
+    padding-bottom: 3rem;
+  }
+
+  section.main .content-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  section.main .agents-table tr {
+    font-size: 12px;
+    gap: 4px;
+    padding: 8px;
   }
 }
 </style>

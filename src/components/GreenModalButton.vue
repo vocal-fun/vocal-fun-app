@@ -75,7 +75,7 @@ const h = computed(() => {
     display: inline-flex;
     width: 22px;
     height: 22px;
-    background: #00FA00;
+    background: var(--color-secondary);
     box-shadow: 0px 0.484656px 7px #0ADC0F, 0px 0px 8px #0ADC0F;
     border-radius: 100px;
     transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;

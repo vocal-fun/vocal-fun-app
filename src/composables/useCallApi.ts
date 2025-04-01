@@ -3,7 +3,6 @@ import { usePermission } from '@vueuse/core';
 import { AudioStreamPlayer } from '~/services/AudioStreamManager';
 import { getVideo } from '~/services/ffmpeg';
 import { Sound } from '~/consts';
-import type { Agent } from '~/types';
 
 export function useCallApi() {
   const audioPlayer = new AudioStreamPlayer();

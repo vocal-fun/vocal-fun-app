@@ -1,5 +1,5 @@
 import { useWeb3ModalProvider } from '@web3modal/ethers/vue';
-import { BrowserProvider, ethers, Contract, type Eip1193Provider, type ContractTransactionResponse, JsonRpcProvider } from 'ethers';
+import { BrowserProvider, ethers, Contract, type ContractTransactionResponse, JsonRpcProvider } from 'ethers';
 import { defaultRpcUrl } from '~/consts';
 
 interface IERC20 {
@@ -37,6 +37,16 @@ export function useBlockchain() {
     return signer;
   }
 
+  const getNativeBalance = async (address: string): Promise<bigint> => {
+    const provider = getProvider();
+    return provider.getBalance(address);
+  };
+
+   const getFormattedNativeBalance = async (address: string): Promise<string> => {
+    const balanceBigInt = await getNativeBalance(address);
+    return ethers.formatEther(balanceBigInt);
+   };
+  
   const signMessage = async (message: string): Promise<string> => {
     try {
       const provider = getProvider();
@@ -71,5 +81,7 @@ export function useBlockchain() {
     getProvider,
     signMessage,
     transfer,
+    getNativeBalance,
+    getFormattedNativeBalance,
   };
 }

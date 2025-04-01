@@ -1,52 +1,33 @@
 <template>
   <section class="header" :class="{ 'header--with-account': user }">
     <div class="socials">
-      <a v-play-click-sound class="social shake-little" href="https://t.me/vocalfunofficial" target="_blank" rel="noopener noreferrer">
-        <NuxtImg
-          class="telegram"
-          src="/img/telegram.png"
-          alt="Telegram Logo"
-          format="webp"
-          sizes="44px"
-          loading="lazy"
-        />
+      <a v-play-click-sound class="social shake-little" href="https://t.me/vocalfunofficial" target="_blank"
+        rel="noopener noreferrer">
+        <NuxtImg class="telegram" src="/img/telegram.png" alt="Telegram Logo" format="webp" :width="22" :height="18"
+          loading="lazy" />
         TELEGRAM
       </a>
-      <a v-play-click-sound class="social shake-little" href="https://x.com/vocal_fun" target="_blank" rel="noopener noreferrer">
-        <NuxtImg
-          class="twitter"
-          src="/img/twitter.png"
-          alt="Twitter Logo"
-          format="webp"
-          sizes="48px"
-          loading="lazy"
-        />
+      <a v-play-click-sound class="social shake-little" href="https://x.com/vocal_fun" target="_blank"
+        rel="noopener noreferrer">
+        <NuxtImg class="twitter" src="/img/twitter.png" alt="Twitter Logo" format="webp" sizes="48px" loading="lazy" />
         TWITTER
       </a>
     </div>
 
-    <a v-play-click-sound class="logo" href="https://vocal.fun" aria-label="Home" target="_blank" rel="noopener noreferrer">
+    <a v-play-click-sound class="logo" href="https://vocal.fun" aria-label="Home" target="_blank"
+      rel="noopener noreferrer">
       <span class="logo-bar"><span class="logo-bar-element"></span></span>
-      <NuxtImg
-        class="shake-little shake-constant"
-        src="/logo/logo.png"
-        alt="Logo"
-        width="24"
-        height="24"
-        format="webp"
-        sizes="48px"
-        loading="lazy"
-      />
+      <NuxtImg class="shake-little shake-constant" src="/logo/logo.png" alt="Logo" width="24" height="24" format="webp"
+        sizes="48px" loading="lazy" />
       vocal.fun
       <span class="logo-bar"><span class="logo-bar-element"></span></span>
     </a>
 
     <div class="user">
-      <button v-if="false" v-play-click-sound class="account" @click="buyStore.openBuyModal">
-        BALANCE: ${{ user?.balance }}
+      <button v-if="user && isLoggedIn" v-play-click-sound class="account" @click="buyStore.openBuyModal">
+        BALANCE: {{ user.balance }} $VOCAL
       </button>
-      <span v-if="user" class="account">BALANCE: ${{ user.balance }}</span>
-      <ConnectWallet v-if="false" class="wallet" />
+      <ConnectWallet class="wallet" />
     </div>
 
     <Modal :isOpen="isBuyModalOpen" @close="buyStore.closeBuyModal">
@@ -64,6 +45,7 @@ const buyStore = useBuyStore();
 const authStore = useAuthStore();
 
 const user = computed(() => authStore.user);
+const isLoggedIn = computed(() => authStore.loggedInAddress);
 const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 
 // const toggleBackgroundSound = () => {
@@ -81,7 +63,6 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 @mixin responsive-header($without-account: false) {
   & {
     height: auto;
-    margin-bottom: 2.1875rem;
     gap: 10px;
     flex-wrap: wrap;
     justify-content: center;
@@ -93,7 +74,8 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
     .user {
       order: 1;
       text-align: right;
-      @if ($without-account == true) {
+
+      @if ($without-account ==true) {
         margin-left: 1.25rem;
         justify-content: end;
       }
@@ -116,7 +98,9 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin: 1.25rem;
+  background-color: var(--color-surface);
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--color-tertiary);
 
   .logo {
     flex: 1;
@@ -166,10 +150,10 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
       align-items: center;
       cursor: pointer;
       box-shadow: -3px 3px 0 0 #7B8494 inset,
-                  -1.5px -1.5px 0 0 #4A5A6B inset,
-                  3px 3px 0 0 #EFFFFF inset,
-                  1.5px 1.5px 0 0 #ADB5C6 inset,
-                  -1.5px -1.5px 0 0 #4A5A6B inset;
+        -1.5px -1.5px 0 0 #4A5A6B inset,
+        3px 3px 0 0 #EFFFFF inset,
+        1.5px 1.5px 0 0 #ADB5C6 inset,
+        -1.5px -1.5px 0 0 #4A5A6B inset;
       padding: .375rem;
       color: #2E3F4B;
       background: #BDCED6;
@@ -178,10 +162,12 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
         margin-right: .1875rem;
         display: block;
       }
+
       .telegram {
         width: 22px;
         aspect-ratio: 29 / 25;
       }
+
       .twitter {
         width: 24px;
         aspect-ratio: 9 / 8;
@@ -223,6 +209,7 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 
 @media (max-width: 724px) {
   .header.header--with-account {
+
     .user,
     .socials {
       flex-basis: 100%;
@@ -232,12 +219,15 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 }
 
 @media (max-width: 655px) {
+
   .header:not(.header--with-account),
   .header.header--with-account {
+
     .socials,
     .user {
       justify-content: center;
     }
+
     .user {
       flex-basis: 100%;
       margin-left: 0;
@@ -247,10 +237,11 @@ const isBuyModalOpen = computed(() => buyStore.isBuyModalOpen);
 
 @media (max-width: 475px) {
   .header {
-    margin-bottom: 1.56rem;
+
     .logo {
       margin: .625rem 0;
     }
+
     .user {
       flex-direction: column;
       text-align: center;

@@ -1,0 +1,182 @@
+<template>
+	<div class="balance-action-panel">
+		<div class="balance-select">
+			<UserBalance v-model="inputValue" />
+			<div class="select-amount">
+				<button v-play-click-sound v-for="amount in amounts" :key="amount" class="select-amount-btn"
+					@click="selectAmount(amount)">
+					<NuxtImg class="solana-icon" alt="Solana icon" format="webp" loading="lazy" src="/img/eth.png" />
+					<span>{{ amount }}</span>
+				</button>
+			</div>
+		</div>
+
+		<div v-if="!$isSmallScreen" class="action">
+			<EQ class="equalizer" :repeatTimes="3" />
+			<button v-play-click-sound :disabled="isActionDisabled" @click="handleAction">
+				{{ selectedTab === 'BUY' ? 'BUY' : 'SELL' }}
+			</button>
+		</div>
+	</div>
+</template>
+
+<script setup lang="ts">
+import { defineProps, ref, computed } from 'vue'
+import EQ from '~/components/EQ.vue'
+import UserBalance from '~/components/UserBalance.vue'
+
+const { $isSmallScreen } = useNuxtApp()
+const authStore = useAuthStore()
+const { handleConnectClick } = useWalletConnect()
+
+const props = defineProps<{
+	userBalance: string
+	amounts: string[]
+	selectedTab: string
+}>()
+
+const user = computed(() => authStore.user)
+const inputValue = ref('')
+
+const isActionDisabled = computed(() => {
+	const value = parseFloat(inputValue.value)
+	return !inputValue.value || isNaN(value) || value <= 0
+})
+
+function selectAmount(amount: string) {
+	const balanceNum = parseFloat(props.userBalance)
+
+	if (amount === 'MAX' || parseFloat(amount) > balanceNum) {
+		let maxVal = balanceNum - 0.001
+		if (maxVal < 0) {
+			maxVal = 0
+		}
+		inputValue.value = maxVal.toFixed(6)
+	} else {
+		const selectedNum = parseFloat(amount)
+		inputValue.value = selectedNum.toFixed(6)
+	}
+}
+
+
+function buy() {
+	console.log('User wants to buy:', inputValue.value, 'ETH')
+}
+
+function sellFunction() {
+	console.log('User wants to sell:', inputValue.value, 'ETH')
+}
+
+function handleAction() {
+	if (!user.value) {
+		handleConnectClick()
+		return
+	}
+	if (isActionDisabled.value) return
+	if (props.selectedTab === 'BUY') {
+		buy()
+	} else {
+		sellFunction()
+	}
+}
+</script>
+
+<style scoped lang="scss">
+.balance-select {
+	display: flex;
+	flex-direction: column;
+	margin-top: 18px;
+	margin-bottom: 32px;
+
+	.select-amount {
+		display: flex;
+		gap: 8px;
+		margin-top: 12px;
+
+		&-btn {
+			display: flex;
+			align-items: center;
+			font-size: 12px;
+			gap: 8px;
+			padding: 12px;
+			border: 1px solid var(--color-tertiary);
+			background-color: transparent;
+			color: white;
+			cursor: pointer;
+			transition: background-color 0.3s ease-in-out;
+
+			&:hover {
+				background-color: rgba(89, 89, 109, 0.2);
+			}
+
+			.solana-icon {
+				width: 12px;
+				height: 12px;
+			}
+		}
+	}
+}
+
+.action {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	margin-bottom: 20px;
+
+	& :deep(.equalizer) {
+		width: 100%;
+		height: 40px;
+		overflow: hidden;
+	}
+
+	button {
+		padding: 24px;
+		width: 100%;
+		color: var(--color-deep);
+		background-color: var(--color-secondary);
+		text-align: center;
+		transition: background-color 0.3s ease-in-out;
+
+		&:hover {
+			background-color: #3cdb3c;
+		}
+
+		&:disabled {
+			background-color: #164216;
+			cursor: not-allowed;
+		}
+	}
+}
+
+@media (max-width: 1300px) {
+	.select-amount {
+		flex-wrap: wrap;
+	}
+}
+
+@media (max-width: 1100px) {
+	.select-amount {
+		flex-wrap: unset;
+
+		&-btn {
+			width: 100%;
+		}
+	}
+
+	.action {
+		button {
+			padding: 12px;
+		}
+	}
+}
+
+@media (max-width: 600px) {
+	.select-amount {
+		flex-wrap: wrap;
+
+		.select-amount-btn {
+			width: unset;
+		}
+	}
+}
+</style>

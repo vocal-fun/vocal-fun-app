@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@nuxt/image": "^1.8.1",
     "@nuxtjs/device": "3.2.4",
     "@nuxtjs/sitemap": "^7.0.0",
@@ -23,6 +24,7 @@
     "@web3modal/ethers": "^5.1.11",
     "ethers": "^6.13.5",
     "howler": "^2.2.4",
+    "lightweight-charts": "^5.0.3",
     "nuxt": "^3.14.1592",
     "pinia": "^2.3.1",
     "qrcode.vue": "^3.6.0",
@@ -34,6 +36,7 @@
   "packageManager": "yarn@1.22.22",
   "devDependencies": {
     "@types/howler": "^2.2.12",
+    "@types/lodash": "^4.17.16",
     "sass": "^1.83.4",
     "typescript": "^5.7.3"
   }

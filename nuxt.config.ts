@@ -7,7 +7,10 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   css: ['~/assets/styles/index.css'],
   modules: ['@nuxt/image', '@nuxtjs/sitemap', '@pinia/nuxt', 'vue-sonner/nuxt', '@nuxtjs/device'],
-
+  image: {
+    domains: ['storage.googleapis.com','vocal-fun.s3.ap-south-1.amazonaws.com'],
+    formats: ['webp', 'avif'],
+  },
   app: {
     head: {
       htmlAttrs: {
@@ -22,6 +25,10 @@ export default defineNuxtConfig({
         { rel: 'icon', href: '/logo/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
         { rel: 'apple-touch-icon', href: '/logo/apple-touch-icon.png', sizes: '180x180' },
         { rel: 'manifest', href: '/site.webmanifest' },
+
+        { rel: 'preconnect', href: 'https://api.vocal.fun' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://web3modal.org' },
       ],
       // TODO: Add analytics later
       // script: [
@@ -113,7 +120,22 @@ export default defineNuxtConfig({
     routeRules: {
       "/api/v1/**": { proxy: "https://api.vocal.fun/api/v1/**" },
       "/api/image/**": { proxy: "https://vocal-fun.s3.ap-south-1.amazonaws.com/agents/**" },
-    },
+      '/_nuxt/**': {
+        headers: {
+          'cache-control': 'public, max-age=31536000, immutable'
+        }
+      },
+      '/_ipx/**': {
+        headers: {
+          'cache-control': 'public, max-age=31536000, immutable'
+        }
+      },
+        '/img/**': {
+        headers: {
+          'cache-control': 'public, max-age=31536000, immutable'
+        }
+      },
+      },
     experimental: {
       wasm: true,
     },

@@ -27,7 +27,7 @@ body {
   font-size: 11px;
   border-radius: 0;
   border: none;
-  box-shadow: 1.39px 1.39px 0px 0px #59596D;
+  box-shadow: 1.39px 1.39px 0px 0px var(--color-tertiary);
   color: white;
   &[data-type="success"] {
     color: var(--color-primary);
