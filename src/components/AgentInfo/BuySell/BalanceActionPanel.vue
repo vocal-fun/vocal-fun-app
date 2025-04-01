@@ -45,13 +45,19 @@ const isActionDisabled = computed(() => {
 
 function selectAmount(amount: string) {
 	const balanceNum = parseFloat(props.userBalance)
-	if (amount === 'MAX') {
-		inputValue.value = props.userBalance
-		return
+
+	if (amount === 'MAX' || parseFloat(amount) > balanceNum) {
+		let maxVal = balanceNum - 0.001
+		if (maxVal < 0) {
+			maxVal = 0
+		}
+		inputValue.value = maxVal.toFixed(6)
+	} else {
+		const selectedNum = parseFloat(amount)
+		inputValue.value = selectedNum.toFixed(6)
 	}
-	const selectedNum = parseFloat(amount)
-	inputValue.value = selectedNum > balanceNum ? props.userBalance : amount
 }
+
 
 function buy() {
 	console.log('User wants to buy:', inputValue.value, 'ETH')

@@ -2,7 +2,7 @@
 	<div class="balance-user" :class="variantClass">
 		<div class="amount">
 			<input type="text" :value="modelValue" placeholder="0.00" @input="onInput" />
-			<p class="balance-amount">Balance {{ userBalance }} ETH</p>
+			<p class="balance-amount">Balance {{ displayBalance }} ETH</p>
 		</div>
 		<div class="token">
 			<p class="token-label">ETH</p>
@@ -10,7 +10,6 @@
 		</div>
 	</div>
 </template>
-
 <script setup lang="ts">
 import { defineProps, defineEmits, computed } from 'vue'
 
@@ -23,23 +22,38 @@ const emit = defineEmits(['update:modelValue'])
 const balanceStore = useBalanceStore()
 const userBalance = computed(() => balanceStore.userBalance)
 
+const displayBalance = computed(() => {
+	const bal = parseFloat(userBalance.value)
+	if (isNaN(bal)) return '0.000000'
+	const available = bal - 0.001
+	return (available < 0 ? 0 : available).toFixed(6)
+})
+
+
 function onInput(event: Event) {
 	const inputEl = event.target as HTMLInputElement
 	let val = inputEl.value
+
+	// Remove any characters except digits, comma, and dot
 	val = val.replace(/[^0-9.,]/g, '')
+	// Replace commas with dots
 	val = val.replace(/,/g, '.')
+	// Allow only one dot in the number
 	const firstDotIndex = val.indexOf('.')
 	if (firstDotIndex !== -1) {
 		val = val.substring(0, firstDotIndex + 1) + val.substring(firstDotIndex + 1).replace(/\./g, '')
 	}
+
 	const endsWithDot = val.endsWith('.')
 	const parsedVal = parseFloat(val)
-	const balanceNum = parseFloat(userBalance.value)
+	let balanceNum = parseFloat(userBalance.value)
+
 	if (!endsWithDot && !isNaN(parsedVal)) {
 		if (parsedVal < 0) {
 			val = '0'
 		} else if (parsedVal > balanceNum) {
-			val = userBalance.value
+			balanceNum -= 0.001
+			val = (Math.floor(balanceNum * 1e5) / 1e5).toString()
 		}
 	}
 	inputEl.value = val
@@ -49,6 +63,7 @@ function onInput(event: Event) {
 const variant = props.variant || 'default'
 const variantClass = computed(() => (variant === 'green' ? 'green' : ''))
 </script>
+
 
 <style scoped lang="scss">
 .balance-user {
